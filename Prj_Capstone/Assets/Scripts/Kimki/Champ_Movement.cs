@@ -1,72 +1,76 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Champ_Movement : MonoBehaviour
 {
-    public static List<GameObject> champions = new List<GameObject>();  // 모든 챔피언을 저장할 리스트
+    public static List<GameObject> champions = new List<GameObject>();
     public bool isSelected = false;
     public Vector3 targetPosition;
+    public int moveRange = 4;
+    public int currentMoveRange;
 
-    public int moveRange = 4;  // 챔피언의 기본 이동력
-    public int currentMoveRange; // 남은 이동력
+    private Dictionary<Vector2Int, int> costs = new Dictionary<Vector2Int, int>(); // 이동 비용
+    private Dictionary<Vector2Int, Vector2Int> cameFrom = new Dictionary<Vector2Int, Vector2Int>(); // 경로 추적
+    private SpriteRenderer spriteRenderer;
 
-    private Dictionary<Vector2Int, int> costs = new Dictionary<Vector2Int, int>(); // 타일까지의 이동 비용 저장
-
-    private SpriteRenderer spriteRenderer;  // SpriteRenderer를 이용해 테두리 적용
+    // 턴 관리
+    public static bool isPlayerTurn = true;  // 현재 플레이어 턴인지 체크
+    public Button endTurnButton;  // 턴 종료 버튼
 
     private void Start()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();  // SpriteRenderer 초기화
-
-        // 게임 시작 시 각 챔피언을 리스트에 추가 (이 스크립트가 붙어있는 모든 챔피언이 대상)
+        spriteRenderer = GetComponent<SpriteRenderer>();
         if (!champions.Contains(gameObject))
         {
             champions.Add(gameObject);
         }
+        currentMoveRange = moveRange;
 
-        currentMoveRange = moveRange; // 초기 이동력을 기본 이동력으로 설정
+        // 턴 종료 버튼 설정
+        if (endTurnButton != null)
+        {
+            endTurnButton.onClick.AddListener(EndPlayerTurn);  // 턴 종료 버튼에 함수 연결
+        }
     }
 
     private void Update()
     {
-        // 우클릭을 감지하여 선택 해제
-        if (isSelected && Input.GetMouseButtonDown(1))  // 우클릭 감지
+        if (isPlayerTurn)
         {
-            DeselectChampion();  // 선택 해제
+            if (isSelected && Input.GetMouseButtonDown(1))
+            {
+                DeselectChampion();
+            }
         }
     }
 
     private void OnMouseDown()
     {
-        // 챔피언 선택 상태 변경
-        SelectChampion();  // 새로운 챔피언 선택
+        // 적의 턴일 때는 챔피언과 상호작용할 수 없음
+        if (!isPlayerTurn) return;
 
-        // 선택된 챔피언의 이동 가능한 타일들을 계산 및 표시
+        SelectChampion();
         ShowMoveableTiles();
     }
 
     public void MoveToPosition(Vector3 newPosition)
     {
+        if (!isPlayerTurn) return;  // 적의 턴일 때는 이동 불가
+
         if (isSelected)
         {
-            Vector2Int targetTilePos = FindTileAtPosition(newPosition);  // 목표 타일 찾기
+            Vector2Int targetTilePos = FindTileAtPosition(newPosition);
 
-            // 이동할 타일까지의 이동 비용 계산
             if (costs.ContainsKey(targetTilePos))
             {
-                int moveCost = costs[targetTilePos];  // Dijkstra 알고리즘에서 계산된 총 이동 비용
+                int moveCost = costs[targetTilePos];
 
-                // 남은 이동력보다 많은 비용이 들면 이동하지 않음
                 if (currentMoveRange >= moveCost)
                 {
-                    currentMoveRange -= moveCost;  // 이동 비용 차감
-                    targetPosition = newPosition;
-                    transform.position = targetPosition;
-
-                    // 이동 후 남은 이동력에 따라 이동 가능한 타일 다시 계산
-                    ResetAllTiles();
-                    ShowMoveableTiles();
+                    List<Vector2Int> path = ReconstructPath(targetTilePos);
+                    StartCoroutine(MoveAlongPath(path, newPosition));
                 }
                 else
                 {
@@ -76,6 +80,115 @@ public class Champ_Movement : MonoBehaviour
             else
             {
                 Debug.LogError("타일까지의 이동 비용을 찾을 수 없습니다.");
+            }
+        }
+    }
+
+    private IEnumerator MoveAlongPath(List<Vector2Int> path, Vector3 finalPosition)
+    {
+        foreach (Vector2Int tile in path)
+        {
+            Vector3 tilePosition = Hex_Tile.allTiles[tile].transform.position;
+            transform.position = tilePosition;
+            spriteRenderer.enabled = true;
+            yield return new WaitForSeconds(0.2f);
+            spriteRenderer.enabled = false;
+        }
+
+        transform.position = finalPosition;
+        spriteRenderer.enabled = true;
+
+        currentMoveRange -= costs[FindTileAtPosition(finalPosition)];
+        ResetAllTiles();
+        ShowMoveableTiles();
+    }
+
+    private List<Vector2Int> ReconstructPath(Vector2Int targetTile)
+    {
+        List<Vector2Int> path = new List<Vector2Int>();
+        Vector2Int current = targetTile;
+
+        while (cameFrom.ContainsKey(current))
+        {
+            path.Add(current);
+            current = cameFrom[current];
+        }
+
+        path.Reverse();
+        return path;
+    }
+
+    public void ShowMoveableTiles()
+    {
+        costs.Clear();
+        cameFrom.Clear();
+        PriorityQueue<Vector2Int> frontier = new PriorityQueue<Vector2Int>();
+
+        Vector2Int currentPos = FindTileAtPosition(transform.position);
+
+        if (currentPos == null)
+        {
+            Debug.LogError("Champ의 위치에 해당하는 타일을 찾을 수 없습니다.");
+            return;
+        }
+
+        costs[currentPos] = 0;
+        frontier.Enqueue(currentPos, 0);
+
+        while (frontier.Count > 0)
+        {
+            Vector2Int current = frontier.Dequeue();
+            int currentCost = costs[current];
+
+            if (currentCost > moveRange) continue;
+
+            foreach (Vector2Int next in GetNeighbors(current))
+            {
+                if (Hex_Tile.allTiles.ContainsKey(next))
+                {
+                    int newCost = currentCost + Hex_Tile.allTiles[next].moveCost;
+
+                    if (!costs.ContainsKey(next) || newCost < costs[next])
+                    {
+                        costs[next] = newCost;
+                        frontier.Enqueue(next, newCost);
+                        cameFrom[next] = current;
+
+                        if (newCost <= currentMoveRange)
+                        {
+                            Hex_Tile.allTiles[next].HighlightTile();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 턴 종료 함수
+    public void EndPlayerTurn()
+    {
+        if (!isPlayerTurn) return;
+
+        isPlayerTurn = false;  // 플레이어 턴 종료
+        Debug.Log("플레이어 턴 종료. 적 턴 시작.");
+
+        // 적의 턴 시작
+        Enemy_Movement.StartEnemyTurn();  // 적의 턴 시작 (Enemy_Movement에서 관리)
+    }
+
+    // 적 턴 종료 후 플레이어 턴 시작
+    public static void StartPlayerTurn()
+    {
+        isPlayerTurn = true;  // 플레이어 턴 시작
+        Debug.Log("플레이어 턴 시작");
+
+        // 모든 챔피언의 이동력 복구
+        foreach (GameObject champ in champions)
+        {
+            Champ_Movement champMovement = champ.GetComponent<Champ_Movement>();
+            if (champMovement != null)
+            {
+                champMovement.currentMoveRange = champMovement.moveRange;  // 이동력 복구
             }
         }
     }
@@ -112,55 +225,6 @@ public class Champ_Movement : MonoBehaviour
 
         // 선택 해제 시 타일의 색상 초기화
         ResetAllTiles();
-    }
-
-    // 타일의 색상을 초기화하는 함수
-    public void ShowMoveableTiles()
-    {
-        costs.Clear();  // 비용 테이블 초기화
-        PriorityQueue<Vector2Int> frontier = new PriorityQueue<Vector2Int>();
-
-        // 현재 Champ의 위치를 기반으로 가장 가까운 타일의 좌표를 찾음
-        Vector2Int currentPos = FindTileAtPosition(transform.position);
-
-        if (currentPos == null)
-        {
-            Debug.LogError("Champ의 위치에 해당하는 타일을 찾을 수 없습니다.");
-            return;
-        }
-
-        costs[currentPos] = 0;
-        frontier.Enqueue(currentPos, 0);
-
-        // Dijkstra 알고리즘 수행
-        while (frontier.Count > 0)
-        {
-            Vector2Int current = frontier.Dequeue();
-            int currentCost = costs[current];
-
-            if (currentCost > moveRange) continue;  // 이동력을 초과한 타일은 무시
-
-            // 현재 타일에서 인접한 타일 검사
-            foreach (Vector2Int next in GetNeighbors(current))
-            {
-                if (Hex_Tile.allTiles.ContainsKey(next))
-                {
-                    int newCost = currentCost + Hex_Tile.allTiles[next].moveCost;
-
-                    if (!costs.ContainsKey(next) || newCost < costs[next])
-                    {
-                        costs[next] = newCost;
-                        frontier.Enqueue(next, newCost);
-
-                        // 이동 가능한 타일은 회색으로 표시
-                        if (newCost <= currentMoveRange)
-                        {
-                            Hex_Tile.allTiles[next].HighlightTile();
-                        }
-                    }
-                }
-            }
-        }
     }
 
     // Champ의 위치에서 가장 가까운 타일을 찾는 함수
