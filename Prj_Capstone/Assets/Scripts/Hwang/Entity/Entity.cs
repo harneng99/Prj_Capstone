@@ -20,11 +20,12 @@ public class Entity : MonoBehaviour, IPointerClickHandler
     #region Core Components
     public Stat entityStat { get; private set; }
     public Movement entityMovement { get; private set; }
+    public Combat entityCombat { get; private set; }
     #endregion
 
     #region Other Variables
     public event Action onPointerClick;
-    public bool isSelected { get; private set; }
+    [HideInInspector] public bool isSelected;
     #endregion
 
     protected virtual void Awake()
@@ -42,17 +43,26 @@ public class Entity : MonoBehaviour, IPointerClickHandler
     protected virtual void Start()
     {
         entityStat = core.GetCoreComponent<Stat>();
+        entityMovement = core.GetCoreComponent<Movement>();
+        entityCombat = core.GetCoreComponent<Combat>();
     }
 
     
     protected virtual void Update()
     {
-        
+        if (inputHandler.isMouseRightClick)
+        {
+            isSelected = false;
+            Manager.Instance.gameManager.ResetEntitySelected();
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         onPointerClick?.Invoke();
+        Manager.Instance.gameManager.ResetEntitySelected();
+        Manager.Instance.gameManager.currentSelectedEntity = this;
+        isSelected = true;
     }
 
     private void ShowInformation()

@@ -11,9 +11,9 @@ using UnityEngine.Tilemaps;
 public class Pathfinder : MonoBehaviour
 {
     [field: SerializeField] public Grid gridBase { get; private set; }
-    [field: SerializeField] public Tilemap moveableTileMap { get; private set; }
+    [field: SerializeField] public Tilemap moveableTilemap { get; private set; }
     
-    [HideInInspector] public List<HexgridNode> hexgridNodes = new List<HexgridNode>();
+    [HideInInspector] public List<GridNode> hexgridNodes = new List<GridNode>();
     
     [SerializeField] private List<Tilemap> obstacleTileMaps = new List<Tilemap>();
 
@@ -24,8 +24,8 @@ public class Pathfinder : MonoBehaviour
     private Vector3 cellSize;
     private List<Vector3Int> hexgridNodeAroundOffsets = new List<Vector3Int>() { new Vector3Int(0, -1, 1), new Vector3Int(0, 1, -1), new Vector3Int(1, -1, 0), new Vector3Int(1, 0, -1), new Vector3Int(-1, 1, 0), new Vector3Int(-1, 0, 1) };
 
-    private List<HexgridNode> openNodeList = new List<HexgridNode>();
-    private List<HexgridNode> closedNodeList = new List<HexgridNode>();
+    private List<GridNode> openNodeList = new List<GridNode>();
+    private List<GridNode> closedNodeList = new List<GridNode>();
 
     private void Awake()
     {
@@ -45,8 +45,9 @@ public class Pathfinder : MonoBehaviour
                     if (x + y + z != 0) continue;
 
                     Vector3Int hexgridPosition = new Vector3Int(x, y, z);
-                    Vector3Int cellgridPosition = moveableTileMap.WorldToCell(HexgridToWorldgrid(hexgridPosition));
-                    TileBase groundTile = moveableTileMap.GetTile(cellgridPosition);
+                    Vector3 worldgridPosition = HexgridToWorldgrid(hexgridPosition);
+                    Vector3Int cellgridPosition = moveableTilemap.WorldToCell(worldgridPosition);
+                    TileBase groundTile = moveableTilemap.GetTile(cellgridPosition);
 
                     if (groundTile != null)
                     {
@@ -63,7 +64,7 @@ public class Pathfinder : MonoBehaviour
                             }
                         }
 
-                        hexgridNodes.Add(new HexgridNode(hexgridPosition, cellgridPosition, isObstacle));
+                        hexgridNodes.Add(new GridNode(hexgridPosition, cellgridPosition, worldgridPosition, isObstacle));
                     }
                 }
             }
@@ -72,7 +73,7 @@ public class Pathfinder : MonoBehaviour
 
     private void Initialize()
     {
-        foreach (HexgridNode hexgridNode in hexgridNodes)
+        foreach (GridNode hexgridNode in hexgridNodes)
         {
             hexgridNode.gCost = 0;
             hexgridNode.hCost = int.MaxValue;
@@ -89,12 +90,12 @@ public class Pathfinder : MonoBehaviour
         return Mathf.Max(new int[] { Mathf.Abs(hexgridStartPosition.x - hexgridDestinationPosition.x), Mathf.Abs(hexgridStartPosition.y - hexgridDestinationPosition.y), Mathf.Abs(hexgridStartPosition.z - hexgridDestinationPosition.z) });
     }
 
-    public List<Vector3> PathFinding(Vector3Int cellgridStartPosition, Vector3Int cellgridDestinationPosition)
+    public List<GridNode> PathFinding(Vector3Int cellgridStartPosition, Vector3Int cellgridDestinationPosition)
     {
         Initialize();
 
-        HexgridNode startNode = hexgridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridStartPosition);
-        HexgridNode destinationNode = hexgridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridDestinationPosition);
+        GridNode startNode = hexgridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridStartPosition);
+        GridNode destinationNode = hexgridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridDestinationPosition);
 
         if (destinationNode == null) return null;
 
@@ -107,7 +108,7 @@ public class Pathfinder : MonoBehaviour
         while (openNodeList.Count > 0)
         {
             openNodeList = openNodeList.OrderBy(node => node.fCost).ThenByDescending(node => node.gCost).ToList();
-            HexgridNode currentNode = openNodeList[0];
+            GridNode currentNode = openNodeList[0];
             openNodeList.Remove(currentNode);
             closedNodeList.Add(currentNode);
 
@@ -120,7 +121,7 @@ public class Pathfinder : MonoBehaviour
             
             foreach (Vector3Int hexgridNodeAroundOffset in hexgridNodeAroundOffsets)
             {
-                HexgridNode adjacentNode = hexgridNodes.FirstOrDefault(node => node.hexgridPosition == currentNode.hexgridPosition + hexgridNodeAroundOffset);
+                GridNode adjacentNode = hexgridNodes.FirstOrDefault(node => node.hexgridPosition == currentNode.hexgridPosition + hexgridNodeAroundOffset);
                 
                 if (adjacentNode != null)
                 {
@@ -144,23 +145,20 @@ public class Pathfinder : MonoBehaviour
             }
         }
 
+        List<GridNode> path = new List<GridNode>();
         if (closedNodeList.Contains(destinationNode))
         {
-            List<Vector3> path = new List<Vector3>();
-
-            HexgridNode currentNode = destinationNode;
+            GridNode currentNode= destinationNode;
 
             while (currentNode.cameFromNode != null)
             {
-                path.Add(HexgridToWorldgrid(currentNode.hexgridPosition));
+                path.Add(currentNode);
                 currentNode = currentNode.cameFromNode;
             }
-            path.Add(HexgridToWorldgrid(currentNode.hexgridPosition));
+            path.Add(currentNode);
             path.Reverse();
-
-            return path;
         }
-        else return null;
+        return path;
     }
 
     public Vector3 HexgridToWorldgrid(Vector3Int hexgridPosition)
@@ -171,7 +169,7 @@ public class Pathfinder : MonoBehaviour
     public Vector3Int? HexgridToCellgrid(Vector3Int hexgridPosition)
     {
         // return new Vector3Int(Mathf.RoundToInt((hexgridPosition.x - hexgridPosition.z) / 2.0f), hexgridPosition.y);
-        HexgridNode hexgridNode = hexgridNodes.FirstOrDefault(node => node.hexgridPosition == hexgridPosition);
+        GridNode hexgridNode = hexgridNodes.FirstOrDefault(node => node.hexgridPosition == hexgridPosition);
         return hexgridNode == null ? null : hexgridNode.cellgridPosition;
         // return hexgridNodes.FirstOrDefault(node => node.hexgridPosition == hexgridPosition).cellgridPosition;
     }
