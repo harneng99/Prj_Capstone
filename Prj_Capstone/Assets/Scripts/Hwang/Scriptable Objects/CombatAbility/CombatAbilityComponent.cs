@@ -8,14 +8,14 @@ public abstract class CombatAbilityComponent : ICombatAbility
 {
     [SerializeField, HideInInspector] private string name = "";
 
-    [HideInInspector] public Entity entity;
+    public Entity entity { get; set; }
 
     public CombatAbilityComponent()
     {
         name = this.GetType().Name;
     }
 
-    public abstract void ApplyCombatAbility(Collider2D target);
+    public abstract void ApplyCombatAbility(Entity target);
 
     public virtual void InitializeCombatAbilityData(int numberOfAttacks) { }
 }

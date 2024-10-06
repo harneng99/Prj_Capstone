@@ -14,8 +14,9 @@ public class GridNode
     public bool isObstacle;
 
     public GridNode cameFromNode;
+    public CustomTileData customTileData;
 
-    public GridNode(Vector3Int hexgridPosition, Vector3Int cellgridPosition, Vector3 worldgridPosition, bool isObstacle)
+    public GridNode(Vector3Int hexgridPosition, Vector3Int cellgridPosition, Vector3 worldgridPosition, bool isObstacle, CustomTileData customTileData)
     {
         this.hexgridPosition = hexgridPosition;
         this.cellgridPosition = cellgridPosition;
@@ -24,5 +25,6 @@ public class GridNode
         this.hCost = int.MaxValue;
         this.fCost = gCost + hCost;
         this.isObstacle = isObstacle;
+        this.customTileData = customTileData;
     }
 }

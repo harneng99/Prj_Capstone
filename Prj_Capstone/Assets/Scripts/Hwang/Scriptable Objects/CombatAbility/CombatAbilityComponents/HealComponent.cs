@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class HealComponent : CombatAbilityComponent
 {
-    public override void ApplyCombatAbility(Collider2D target)
+    public override void ApplyCombatAbility(Entity target)
     {
         throw new System.NotImplementedException();
     }

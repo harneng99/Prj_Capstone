@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.Overlays;
 using UnityEngine;
+using UnityEngine.UI;
 
 [CustomEditor(typeof(CombatAbility))]
 public class CombatAbilityEditor : Editor
@@ -391,6 +392,11 @@ public class CombatAbilityEditor : Editor
         }
 
         serializedObject.ApplyModifiedProperties();
+
+        if (GUI.changed)
+        {
+            EditorUtility.SetDirty(target);
+        }
     }
 
     [DidReloadScripts]
