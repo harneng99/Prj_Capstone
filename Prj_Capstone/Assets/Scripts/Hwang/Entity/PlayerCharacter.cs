@@ -63,10 +63,13 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
         }
         else if (eventData.button == PointerEventData.InputButton.Right)
         {
-            Manager.Instance.uiManager.mercenarySlotWindow.ReturnCharacter(gameObject);
-            Manager.Instance.uiManager.mercenarySlotWindow.ResetHighlights();
-            entityMovement.prevWorldgridPosition = null;
-            gameObject.SetActive(false);
+            if (Manager.Instance.gameManager.characterSelectionPhase)
+            {
+                Manager.Instance.uiManager.mercenarySlotWindow.ReturnCharacter(gameObject);
+                Manager.Instance.uiManager.mercenarySlotWindow.ResetHighlights();
+                entityMovement.prevWorldgridPosition = null;
+                gameObject.SetActive(false);
+            }
         }
 
         onInitialDeployment = false;

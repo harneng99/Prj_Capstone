@@ -150,6 +150,7 @@ public abstract class Movement : CoreComponent
         GridNode destinationNode = path.Last();
 
         path.RemoveAt(0);
+        if (path.Count <= 0) yield break;
         GridNode currentDestinationNode = path.First();
 
         while (Vector3.Distance(entity.GetEntityFeetPosition(), destinationNode.worldgridPosition) > epsilon)

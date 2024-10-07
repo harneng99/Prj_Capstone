@@ -15,7 +15,6 @@ public class CombatAbilityButton : PooledObject
     public void ShowCombatAbilityCastRange()
     {
         entity.entityCombat.currentSelectedCombatAbility = combatAbility;
-        entity.highlightedTilemap.ClearAllTiles();
         entity.entityCombat.DrawCastingRange(combatAbility);
     }
 

@@ -29,4 +29,5 @@ MonoBehaviour:
       type: {class: HealComponent, ns: , asm: Assembly-CSharp}
       data:
         name: HealComponent
-        entity: {fileID: 0}
+        baseRestoreValue: 0
+        restoreValueIncreaseByLevel: 0

@@ -29,4 +29,3 @@ MonoBehaviour:
       type: {class: TileLevelChangeComponent, ns: , asm: Assembly-CSharp}
       data:
         name: TileLevelChangeComponent
-        entity: {fileID: 0}

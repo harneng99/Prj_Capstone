@@ -14,7 +14,7 @@ public class Combat : CoreComponent
     
     [SerializeField] private List<CombatAbility> combatAbilities;
     private Tilemap aoeTilemap;
-    private List<GameObject> combatAbilityButtons;
+    private List<GameObject> combatAbilityButtons = new List<GameObject>();
     private Canvas canvas;
     private Vector3Int currentMouseCellgridPosition;
 
@@ -22,13 +22,20 @@ public class Combat : CoreComponent
     {
         base.Awake();
 
-        entity.onPointerClick += GenerateCombatAbilityButtons;
+        entity.onPointerClick += () => { ToggleCombatAbilityButtons(); };
+        foreach (CombatAbility combatAbility in combatAbilities)
+        {
+            Debug.Log(combatAbility.name + ": " + combatAbility.castingRangeDictionary.Keys.Count);
+        }
         canvas = GameObject.FindWithTag("MainCanvas").GetComponent<Canvas>();
         aoeTilemap = GameObject.FindWithTag("AOETilemap").GetComponent<Tilemap>();
     }
 
     private void Start()
     {
+        GenerateCombatAbilityButtons();
+        ToggleCombatAbilityButtons(false);
+
         Manager.Instance.playerInputManager.controls.Map.MouseLeftClick.performed += _ => MouseLeftClick();
         Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
     }
@@ -51,7 +58,7 @@ public class Combat : CoreComponent
                     {
                         TileBase tileBase = entity.highlightedTilemap.GetTile(currentMouseCellgridPosition);
 
-                        if (tileBase.Equals(combatAbilityRangeHighlightedTileBase))
+                        if (tileBase != null && tileBase.Equals(combatAbilityRangeHighlightedTileBase))
                         {
                             DrawAOE(currentSelectedCombatAbility);
                         }
@@ -109,6 +116,8 @@ public class Combat : CoreComponent
 
     public void DrawCastingRange(CombatAbility combatAbility)
     {
+        entity.highlightedTilemap.ClearAllTiles();
+
         foreach (Vector3Int rangeHexgridOffset in combatAbility.castingRangeDictionary.Keys)
         {
             if (combatAbility.castingRangeDictionary[rangeHexgridOffset] == false) continue;
@@ -130,6 +139,8 @@ public class Combat : CoreComponent
 
     public void DrawAOE(CombatAbility combatAbility)
     {
+        aoeTilemap.ClearAllTiles();
+
         foreach (Vector3Int rangeHexgridOffset in combatAbility.AOEDictionary.Keys)
         {
             if (combatAbility.AOEDictionary[rangeHexgridOffset] == false) continue;
@@ -157,28 +168,33 @@ public class Combat : CoreComponent
         }
     }
 
+    protected void ToggleCombatAbilityButtons()
+    {
+        foreach (GameObject combatAbilityButton in combatAbilityButtons)
+        {
+            combatAbilityButton.SetActive(!combatAbilityButton.activeSelf);
+        }
+    }
+
     private void GenerateCombatAbilityButtons()
     {
-        if (entity.isSelected)
+        for (int i = 0; i < combatAbilities.Count; i++)
         {
-            for (int i = 0; i < combatAbilities.Count; i++)
+            GameObject combatAbilityButtonPrefab = Manager.Instance.objectPoolingManager.GetGameObject("Combat Ability Button");
+            CombatAbilityButton combatAbilityButton = combatAbilityButtonPrefab.GetComponent<CombatAbilityButton>();
+            RectTransform buttonRectTransform = combatAbilityButtonPrefab.GetComponent<RectTransform>();
+            combatAbilityButtonPrefab.GetComponentsInChildren<Image>().Skip(1).ToList()[0].sprite = combatAbilities[i].combatAbilityIcon;
+
+            combatAbilityButton.entity = entity;
+            foreach (CombatAbilityComponent combatAbilityComponent in combatAbilities[i].combatAbilityComponents)
             {
-                GameObject combatAbilityButtonPrefab = Manager.Instance.objectPoolingManager.GetGameObject("Combat Ability Button");
-                CombatAbilityButton combatAbilityButton = combatAbilityButtonPrefab.GetComponent<CombatAbilityButton>();
-                RectTransform buttonRectTransform = combatAbilityButtonPrefab.GetComponent<RectTransform>();
-                combatAbilityButtonPrefab.GetComponentsInChildren<Image>().Skip(1).ToList()[0].sprite = combatAbilities[i].combatAbilityIcon;
-                
-                combatAbilityButton.entity = entity;
-                foreach (CombatAbilityComponent combatAbilityComponent in combatAbilities[i].combatAbilityComponents)
-                {
-                    combatAbilityComponent.entity = entity;
-                }
-                combatAbilityButton.combatAbility = combatAbilities[i];
-                buttonRectTransform.SetParent(canvas.transform);
-                Vector3 currentLocalPosition = Manager.Instance.uiManager.buttonGenerateRectTransform.localPosition + Vector3.right * buttonRectTransform.sizeDelta.x * 1.5f * i;
-                buttonRectTransform.localPosition = currentLocalPosition;
-                combatAbilityButtons.Add(combatAbilityButtonPrefab);
+                combatAbilityComponent.entity = entity;
             }
+            combatAbilityButton.combatAbility = combatAbilities[i];
+            buttonRectTransform.SetParent(canvas.transform);
+            Vector3 currentLocalPosition = Manager.Instance.uiManager.buttonGenerateRectTransform.localPosition + Vector3.right * buttonRectTransform.sizeDelta.x * 1.5f * i;
+            buttonRectTransform.localPosition = currentLocalPosition;
+            combatAbilityButtons.Add(combatAbilityButtonPrefab);
         }
     }
 }

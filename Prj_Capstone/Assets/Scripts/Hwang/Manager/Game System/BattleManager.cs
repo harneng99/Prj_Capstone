@@ -24,10 +24,10 @@ public class BattleManager : MonoBehaviour
     public Tilemap fogTilemap { get; private set; }
     public PlayerCharacter mercenaryDragging { get; set; }
 
+    public Vector3Int currentMouseCellgridPosition { get; private set; }
     public List<Entity> entities { get; private set; } = new List<Entity>();
     private List<PlayerCharacter> mercenaries = new List<PlayerCharacter>();
     private List<Enemy> enemies = new List<Enemy>();
-    private Vector3Int currentMouseCellgridPosition;
     [SerializeField] private TileBase selectionTile;
 
     public event Action playerTurnStart;

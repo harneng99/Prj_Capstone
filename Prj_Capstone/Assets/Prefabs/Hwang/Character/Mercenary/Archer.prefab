@@ -72,6 +72,22 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7644453837755806950, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
+      propertyPath: combatAbilities.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7644453837755806950, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
+      propertyPath: combatAbilities.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 498032f0ea83cca49bb514bd6a521332, type: 2}
+    - target: {fileID: 7644453837755806950, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
+      propertyPath: combatAbilities.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: ae4af7ad832b1604496c8e32430126e9, type: 2}
+    - target: {fileID: 7644453837755806950, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
+      propertyPath: combatAbilities.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: 1bf9b07c940afe04b8e04074762af6bd, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

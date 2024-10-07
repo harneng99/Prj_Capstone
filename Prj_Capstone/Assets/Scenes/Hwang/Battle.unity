@@ -961,7 +961,7 @@ GameObject:
   - component: {fileID: 466424370}
   m_Layer: 5
   m_Name: Canvas
-  m_TagString: Untagged
+  m_TagString: MainCanvas
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1935,11 +1935,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mercenariesList:
-  - {fileID: 3308343947918306661, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
-  - {fileID: 3308343947918306661, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
-  - {fileID: 3308343947918306661, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
-  - {fileID: 3308343947918306661, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
-  - {fileID: 3308343947918306661, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
+  - {fileID: 1547703139137004086, guid: 6b43f899ebf7ce34ba8cc3b0e81214ae, type: 3}
+  - {fileID: 1547703139137004086, guid: 6b43f899ebf7ce34ba8cc3b0e81214ae, type: 3}
+  - {fileID: 1547703139137004086, guid: 6b43f899ebf7ce34ba8cc3b0e81214ae, type: 3}
+  - {fileID: 1547703139137004086, guid: 6b43f899ebf7ce34ba8cc3b0e81214ae, type: 3}
+  - {fileID: 1547703139137004086, guid: 6b43f899ebf7ce34ba8cc3b0e81214ae, type: 3}
   mercenarySlotInitialRectTransform: {fileID: 45145347}
   distanceBetweenMercenarySlot: 200
   mercenarySlotMoveDurationTime: 0.3
