@@ -14,6 +14,7 @@ public class CombatAbilityButton : PooledObject
 
     public void ShowCombatAbilityCastRange()
     {
+        Manager.Instance.gameManager.isAiming = true;
         entity.entityCombat.currentSelectedCombatAbility = combatAbility;
         entity.entityCombat.DrawCastingRange(combatAbility);
     }

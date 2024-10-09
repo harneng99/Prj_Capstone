@@ -17,6 +17,7 @@ public class BattleManager : MonoBehaviour
     public bool battlePhase { get; private set; } = false;
     public bool playerPhase { get; private set; } = false;
     public bool enemyPhase { get; private set; } = false;
+    public bool isAiming { get; set; } = false;
     public int currentTurnCount { get; private set; }
     public Tilemap moveableTilemap { get; private set; }
     public Tilemap objectTilemap { get; private set; }
@@ -26,8 +27,8 @@ public class BattleManager : MonoBehaviour
 
     public Vector3Int currentMouseCellgridPosition { get; private set; }
     public List<Entity> entities { get; private set; } = new List<Entity>();
-    private List<PlayerCharacter> mercenaries = new List<PlayerCharacter>();
-    private List<Enemy> enemies = new List<Enemy>();
+    public List<PlayerCharacter> mercenaries { get; private set; } = new List<PlayerCharacter>();
+    public List<Enemy> enemies { get; private set; } = new List<Enemy>();
     [SerializeField] private TileBase selectionTile;
 
     public event Action playerTurnStart;
@@ -46,6 +47,7 @@ public class BattleManager : MonoBehaviour
         playerTurnStart += Manager.Instance.playerInputManager.DisableInputSystemOnTurnChange;
         playerTurnStart += () => { currentTurnCount += 1; };
         enemyTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(Enemy)); };
+        enemyTurnStart += () => { RunEnemyAI(); };
         enemyTurnStart += Manager.Instance.playerInputManager.DisableInputSystemOnTurnChange;
     }
 
@@ -136,11 +138,20 @@ public class BattleManager : MonoBehaviour
         {
             if (entity.GetType().Equals(entityType))
             {
-                // TODO: Find a way to do this in code, not manually
+                // TODO: Find a way to do this in code, not manually listing all stats
                 entity.entityStat.health.IncreaseCurrentValue(entity.entityStat.health.recoveryValue);
                 entity.entityStat.stamina.IncreaseCurrentValue(entity.entityStat.stamina.recoveryValue);
             }
         }
+    }
+
+    private void RunEnemyAI()
+    {
+        foreach (Enemy enemy in enemies)
+        {
+            enemy.enemyCombat.RunEnemyAI();
+        }
+        TurnEnd();
     }
 
     public bool OutOfRange(Vector3Int cellgridPosition)

@@ -40,9 +40,9 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
         {
             if (!entityMovement.MoveToGrid(GetEntityFeetPosition(), true)) // failed moving
             {
-                if (entityMovement.prevWorldgridPosition.HasValue)
+                if (entityMovement.currentWorldgridPosition.HasValue)
                 {
-                    entityMovement.MoveToGrid(entityMovement.prevWorldgridPosition.Value, true);
+                    entityMovement.MoveToGrid(entityMovement.currentWorldgridPosition.Value, true);
                 }
                 else
                 {
@@ -67,7 +67,7 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
             {
                 Manager.Instance.uiManager.mercenarySlotWindow.ReturnCharacter(gameObject);
                 Manager.Instance.uiManager.mercenarySlotWindow.ResetHighlights();
-                entityMovement.prevWorldgridPosition = null;
+                entityMovement.currentWorldgridPosition = null;
                 gameObject.SetActive(false);
             }
         }
@@ -79,6 +79,7 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
     {
         if (Manager.Instance.gameManager.characterSelectionPhase)
         {
+            highlightedTilemap.ClearAllTiles();
             Manager.Instance.gameManager.mercenaryDragging = this;
             Vector3 mousePosition = Manager.Instance.gameManager.mainCamera.ScreenToWorldPoint(Input.mousePosition);
             transform.position = new Vector3(mousePosition.x, mousePosition.y, 0.0f);

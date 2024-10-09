@@ -221,7 +221,6 @@ public class CombatAbilityEditor : Editor
             EditorGUILayout.HelpBox("Warning: Dictionary has out of range key value. Click the button to clean up.", MessageType.Warning);
         }
         #endregion
-        Debug.Log(combatAbilityData.name + ": " + combatAbilityData.castingRangeDictionary.Keys.Count);
 
         EditorGUILayout.Space(singleLineHeight);
         EditorGUILayout.PropertyField(AOE, new GUIContent("Area Of Effect"));

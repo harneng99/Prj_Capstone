@@ -26,4 +26,25 @@ public class DamageComponent : CombatAbilityComponent
             }
         }
     }
+
+    public override float GetEnemyAIScore(Entity target)
+    {
+        Enemy enemy = entity as Enemy;
+
+        if (enemy == null) return 0.0f;
+
+        if (target.GetType().Equals(typeof(PlayerCharacter)))
+        {
+            if (target.entityStat.health.currentValue <= baseHealthDamage + healthDamageIncreaseByLevel * entity.level)
+            {
+                return enemy.enemyCombat.mercenaryKill;
+            }
+            else
+            {
+                return (baseHealthDamage + healthDamageIncreaseByLevel * entity.level) / target.entityStat.health.maxValue * enemy.enemyCombat.mercenaryDamage;
+            }
+        }
+
+        return 0.0f;
+    }
 }

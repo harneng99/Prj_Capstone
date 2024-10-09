@@ -24,4 +24,20 @@ public class Stat : CoreComponent
         }
         #endregion
     }
+
+    protected void Start()
+    {
+        health.OnCurrentValueMin += EntityDeath;
+    }
+
+    protected void EntityDeath()
+    {
+        entity.animator.SetTrigger("dead");
+    }
+
+    // Call this at the end of the entity death animation
+    public void SetEntityInactive()
+    {
+        gameObject.SetActive(false);
+    }
 }

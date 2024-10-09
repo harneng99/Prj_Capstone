@@ -14,13 +14,33 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -4550536852038561108, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
       propertyPath: <entityDescription>k__BackingField
-      value: This is a goblin. He has a family but you got to kill him no matter
-        what, which is a pretty simple thing.
+      value: A normal goblin with a wood club. Melee attacks when oponent is close
+        enough.
       objectReference: {fileID: 0}
     - target: {fileID: -4550536852038561108, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
       propertyPath: <entityConsistentData>k__BackingField
       value: 
       objectReference: {fileID: 11400000, guid: dfd04217081cb9b4282b07b6bc847ab3, type: 2}
+    - target: {fileID: 1866284817084512004, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: targetPriority.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1866284817084512004, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: combatAbilities.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1866284817084512004, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: targetPriority.Array.data[1]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1866284817084512004, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: combatAbilities.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: ae07051ec40081148a605b962edf643f, type: 2}
+    - target: {fileID: 1866284817084512004, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: combatAbilities.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: 82eaad1113f1afd408821b528dcbdca0, type: 2}
     - target: {fileID: 3169617991321872963, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
       propertyPath: m_Size.y
       value: 1
@@ -81,6 +101,18 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7644453837755806950, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: combatAbilities.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7644453837755806950, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: combatAbilities.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: ae07051ec40081148a605b962edf643f, type: 2}
+    - target: {fileID: 7644453837755806950, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: combatAbilities.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: 82eaad1113f1afd408821b528dcbdca0, type: 2}
     - target: {fileID: 9198675214995069023, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
       propertyPath: m_LocalScale.y
       value: 1

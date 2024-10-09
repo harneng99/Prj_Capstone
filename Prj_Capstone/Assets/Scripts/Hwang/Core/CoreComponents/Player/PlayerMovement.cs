@@ -7,28 +7,36 @@ using UnityEngine.Tilemaps;
 
 public class PlayerMovement : Movement
 {
-    PlayerCharacter playerCharacter;
+    PlayerCharacter mercenary;
 
     protected override void Awake()
     {
         base.Awake();
 
-        playerCharacter = entity as PlayerCharacter;
+        mercenary = entity as PlayerCharacter;
     }
 
-    protected override void MouseLeftClick()
+    protected override void Start()
+    {
+        base.Start();
+
+        Manager.Instance.playerInputManager.controls.Map.MouseLeftClick.performed += _ => MouseLeftClick();
+    }
+
+    // This is called whenever the mouse clicks anywhere. It is different from OnPointerClick event function.
+    private void MouseLeftClick()
     {
         if (Manager.Instance.gameManager.battlePhase)
         {
-            if (!isMoving && entity.isSelected)
+            if (!isMoving && mercenary.isSelected)
             {
                 Manager.Instance.uiManager.HideEntityInformation();
                 Vector3Int destinationCellgridPosition = pathfinder.moveableTilemap.WorldToCell(Manager.Instance.playerInputManager.GetMousePosition());
-                TileBase highlightedTile = entity.highlightedTilemap.GetTile(destinationCellgridPosition);
-                entity.highlightedTilemap.ClearAllTiles();
+                TileBase highlightedTile = mercenary.highlightedTilemap.GetTile(destinationCellgridPosition);
+                mercenary.highlightedTilemap.ClearAllTiles();
                 isShowingMoveableTiles = false;
 
-                if (highlightedTile != null)
+                if (highlightedTile != null && highlightedTile.Equals(moveRangeHighlightedTileBase))
                 {
                     MoveToGrid(destinationCellgridPosition, GridType.Cellgrid, false);
                 }

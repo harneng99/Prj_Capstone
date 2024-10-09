@@ -145,6 +145,6 @@ MonoBehaviour:
       type: {class: DamageComponent, ns: , asm: Assembly-CSharp}
       data:
         name: DamageComponent
-        baseHealthDamage: 0
-        healthDamageIncreaseByLevel: 0
+        baseHealthDamage: 30
+        healthDamageIncreaseByLevel: 5
         pauseTimeWhenHit: 0

@@ -513,7 +513,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4576263588562894269}
-  - component: {fileID: 95510161217745685}
+  - component: {fileID: 6162005342265368210}
   - component: {fileID: 1005184986029605087}
   m_Layer: 6
   m_Name: Movement
@@ -537,7 +537,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6604352797238293688}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &95510161217745685
+--- !u!114 &6162005342265368210
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -546,11 +546,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 6893640757250354046}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8c8cfba14af8404f8b710a991bd36c1, type: 3}
+  m_Script: {fileID: 11500000, guid: a7fe970f720b4514c958b5b5ef590a40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   moveRangeHighlightedTileBase: {fileID: 11400000, guid: 0676da133a4fbb242b1f68717947b672, type: 2}
-  moveRangeInHexGrid: {x: 5, y: 3, z: 5}
+  moveRangeInHexGrid: {x: 5, y: 5, z: 5}
   maxMovementStamina: 5
 --- !u!114 &1005184986029605087
 MonoBehaviour:
@@ -579,7 +579,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2896295547557312484}
-  - component: {fileID: 7644453837755806950}
+  - component: {fileID: 1866284817084512004}
   m_Layer: 6
   m_Name: Combat
   m_TagString: Untagged
@@ -602,7 +602,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6604352797238293688}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7644453837755806950
+--- !u!114 &1866284817084512004
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -611,16 +611,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 7480117654034975630}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 635837929ff3ef746ae9b8bea082f544, type: 3}
+  m_Script: {fileID: 11500000, guid: 2100d28cfc34dff4b82ddd57a70e5771, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <combatAbilityRangeHighlightedTileBase>k__BackingField: {fileID: 11400000, guid: 0676da133a4fbb242b1f68717947b672, type: 2}
-  <combatAbilityAOEHighlightedTileBase>k__BackingField: {fileID: 0}
-  combatAbilities:
-  - {fileID: 11400000, guid: 498032f0ea83cca49bb514bd6a521332, type: 2}
-  - {fileID: 11400000, guid: f16a7f64c5b4bdf42ac5893612a30fb6, type: 2}
-  - {fileID: 11400000, guid: 16be0cea5abc6d64d916dac681ba043b, type: 2}
-  - {fileID: 11400000, guid: ae4af7ad832b1604496c8e32430126e9, type: 2}
+  <combatAbilityRangeHighlightedTileBase>k__BackingField: {fileID: 11400000, guid: 87a3887f8c2233c4286c07c5a89833ec, type: 2}
+  <combatAbilityAOEHighlightedTileBase>k__BackingField: {fileID: 11400000, guid: 0decdefb311307748bb9cf105f5e22e9, type: 2}
+  combatAbilities: []
+  targetPriority: 
+  scoreMultiplierDecreaseAmount: 0.2
+  <mercenaryKill>k__BackingField: 500
+  <mercenaryDamage>k__BackingField: 1
+  distanceFromClosestMercenary: 1
+  meanDistanceFromMercenaries: 1
+  remainingStamina: 1
+  changeByCurrentHealth: 0
 --- !u!1 &8117587042479144461
 GameObject:
   m_ObjectHideFlags: 0

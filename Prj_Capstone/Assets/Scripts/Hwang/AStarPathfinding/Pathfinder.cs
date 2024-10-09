@@ -5,6 +5,18 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+public class PathInformation
+{
+    public List<GridNode> path { get; private set; } = null;
+    public int requiredStamina { get; private set; } = int.MaxValue;
+
+    public PathInformation(List<GridNode> path, int requiredStamina)
+    {
+        this.path = path;
+        this.requiredStamina = requiredStamina;
+    }
+}
+
 public class Pathfinder : MonoBehaviour
 {
     public Grid gridBase { get; private set; }
@@ -83,12 +95,12 @@ public class Pathfinder : MonoBehaviour
         closedNodeList.Clear();
     }
 
-    private int GetHeuristicDistance(Vector3Int hexgridStartPosition, Vector3Int hexgridDestinationPosition)
+    public int GetHeuristicDistance(Vector3Int hexgridStartPosition, Vector3Int hexgridDestinationPosition)
     {
         return Mathf.Max(new int[] { Mathf.Abs(hexgridStartPosition.x - hexgridDestinationPosition.x), Mathf.Abs(hexgridStartPosition.y - hexgridDestinationPosition.y), Mathf.Abs(hexgridStartPosition.z - hexgridDestinationPosition.z) });
     }
 
-    public List<GridNode> PathFinding(Vector3Int cellgridStartPosition, Vector3Int cellgridDestinationPosition)
+    public PathInformation PathFinding(Vector3Int cellgridStartPosition, Vector3Int cellgridDestinationPosition)
     {
         Initialize();
 
@@ -146,20 +158,47 @@ public class Pathfinder : MonoBehaviour
             }
         }
 
-        List<GridNode> path = new List<GridNode>();
         if (closedNodeList.Contains(destinationNode))
         {
-            GridNode currentNode= destinationNode;
+            int requiredStamina = 0;
+            List<GridNode> path = new List<GridNode>();
+
+            GridNode prevNode = null;
+            GridNode currentNode = destinationNode;
 
             while (currentNode.cameFromNode != null)
             {
                 path.Add(currentNode);
+
+                prevNode = currentNode;
                 currentNode = currentNode.cameFromNode;
+
+                requiredStamina += CalculateStamina(currentNode, prevNode);
             }
+
             path.Add(currentNode);
             path.Reverse();
+            return new PathInformation(path, requiredStamina);
         }
-        return path;
+
+        return null;
+    }
+
+    private int CalculateStamina(GridNode prevNode, GridNode nextNode)
+    {
+        int requiredStamina = 0;
+        int levelDifference = nextNode.customTileData.tileLevel - prevNode.customTileData.tileLevel;
+
+        if (levelDifference >= 1)
+        {
+            requiredStamina += Mathf.Abs(levelDifference);
+        }
+        else
+        {
+            requiredStamina += 1;
+        }
+
+        return requiredStamina;
     }
 
     public Vector3 HexgridToWorldgrid(Vector3Int hexgridPosition)
@@ -178,14 +217,7 @@ public class Pathfinder : MonoBehaviour
 
     public Vector3Int CellgridToHexgrid(Vector3Int cellgridPosition)
     {
-        if (cellgridPosition.y % 2 == 0)
-        {
-            return new Vector3Int(cellgridPosition.x - cellgridPosition.y / 2, cellgridPosition.y, -cellgridPosition.x - cellgridPosition.y / 2);
-        }
-        else
-        {
-            return new Vector3Int(cellgridPosition.x - cellgridPosition.y / 2, cellgridPosition.y, -cellgridPosition.x - cellgridPosition.y / 2) + new Vector3Int(Mathf.RoundToInt(-0.5f - cellgridPosition.y % 2 * 0.5f), cellgridPosition.y % 2, Mathf.RoundToInt(0.5f - cellgridPosition.y % 2 * 0.5f));
-        }
+        return new Vector3Int(cellgridPosition.x - cellgridPosition.y / 2, cellgridPosition.y, -cellgridPosition.x - cellgridPosition.y / 2 - cellgridPosition.y % 2);
         
         // GridNode cellgridNode = gridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridPosition);
         // return cellgridNode == null ? null : cellgridNode.cellgridPosition;

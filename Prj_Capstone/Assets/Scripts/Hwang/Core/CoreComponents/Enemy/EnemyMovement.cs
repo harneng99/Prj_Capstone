@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : Entity
+public class EnemyMovement : Movement
 {
-    public EnemyCombat enemyCombat { get; private set; }
+    private Enemy enemy;
 
     protected override void Awake()
     {
         base.Awake();
 
-        enemyCombat = entityCombat as EnemyCombat;
+        enemy = entity as Enemy;
     }
 }

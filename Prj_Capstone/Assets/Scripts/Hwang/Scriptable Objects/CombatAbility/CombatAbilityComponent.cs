@@ -17,5 +17,5 @@ public abstract class CombatAbilityComponent : ICombatAbility
 
     public abstract void ApplyCombatAbility(Entity target);
 
-    public virtual void InitializeCombatAbilityData(int numberOfAttacks) { }
+    public virtual float GetEnemyAIScore(Entity target) { return 0; } // this should be abstract
 }

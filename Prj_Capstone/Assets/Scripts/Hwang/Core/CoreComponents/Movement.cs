@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public enum GridType { Hexgrid, Cellgrid }
 
@@ -11,18 +13,18 @@ public enum GridType { Hexgrid, Cellgrid }
 public abstract class Movement : CoreComponent
 {
     [SerializeField] protected TileBase moveRangeHighlightedTileBase;
-    [SerializeField] private Vector3Int moveRangeInHexGrid;
-    [SerializeField] private int maxMovementStamina;
+    [SerializeField] protected Vector3Int moveRangeInHexGrid;
+    [SerializeField] protected int maxMovementStamina;
 
     public Pathfinder pathfinder { get; private set; }
-
-    public Vector3? prevWorldgridPosition { get; set; }
+    public Vector3? currentWorldgridPosition { get; set; }
     public Vector3Int currentCellgridPosition { get; private set; }
     public Vector3Int currentHexgridPosition { get; private set; }
-    
+
     // public Tilemap highlightedTilemap { get; private set; }
+    public event Action smoothMoveFinished;
     
-    protected bool isMoving;
+    public bool isMoving { get; protected set; }
     protected bool isShowingMoveableTiles;
     protected Coroutine smoothMovementCoroutine;
 
@@ -32,32 +34,21 @@ public abstract class Movement : CoreComponent
         
         pathfinder = GetComponent<Pathfinder>();
 
-        // highlightedTilemap = GameObject.FindWithTag("HighlightedTilemap").GetComponent<Tilemap>();
-        entity.onPointerClick += () => { ShowMoveableTiles(!isShowingMoveableTiles); };
+        entity.onPointerClick += () => { DrawMoveableTiles(!isShowingMoveableTiles); };
     }
 
-    private void Start()
+    protected virtual void Start()
     {
-        Manager.Instance.playerInputManager.controls.Map.MouseLeftClick.performed += _ => MouseLeftClick();
-
         currentCellgridPosition = pathfinder.moveableTilemap.WorldToCell(entity.GetEntityFeetPosition());
         currentHexgridPosition = pathfinder.CellgridToHexgrid(currentCellgridPosition);
-        entity.transform.position = pathfinder.HexgridToWorldgrid(currentHexgridPosition) + Vector3.up * entity.entityCollider.bounds.extents.y;
-    }
-
-    // This is called whenever the mouse clicks anywhere. It is different from OnPointerClick event function.
-    protected virtual void MouseLeftClick()
-    {
-
+        entity.transform.position = pathfinder.moveableTilemap.CellToWorld(currentCellgridPosition) + Vector3.up * entity.entityCollider.bounds.extents.y;
     }
 
     public void UpdateGridPositionData()
     {
-        prevWorldgridPosition = entity.GetEntityFeetPosition();
+        currentWorldgridPosition = entity.GetEntityFeetPosition();
         currentCellgridPosition = pathfinder.moveableTilemap.WorldToCell(entity.GetEntityFeetPosition());
         currentHexgridPosition = pathfinder.CellgridToHexgrid(currentCellgridPosition);
-        // entity.SetEntityFeetPosition(pathfinder.HexgridToWorldgrid(currentHexgridPosition));
-        // entity.transform.position = pathfinder.HexgridToWorldgrid(currentHexgridPosition) + Vector3.up * entity.entityCollider.bounds.extents.y;
     }
 
     /// <summary>
@@ -66,12 +57,12 @@ public abstract class Movement : CoreComponent
     /// <param name="position"></param>
     /// <param name="instantMove"></param>
     /// <returns></returns>
-    public bool MoveToGrid(Vector3 destinationWorldgridPosition, bool instantMove)
+    public virtual bool MoveToGrid(Vector3 destinationWorldgridPosition, bool instantMove)
     {
         Vector3Int destinationCellgridPosition = pathfinder.moveableTilemap.WorldToCell(destinationWorldgridPosition);
 
         // if (Manager.Instance.gameManager.fogTilemap.HasTile(destinationCellgridPosition)) return false;
-        
+
         if (instantMove)
         {
             GameObject tileGameObject = pathfinder.moveableTilemap.GetInstantiatedObject(destinationCellgridPosition);
@@ -90,13 +81,21 @@ public abstract class Movement : CoreComponent
         }
         else
         {
+            PathInformation pathInformation = pathfinder.PathFinding(currentCellgridPosition, destinationCellgridPosition);
+
+            if (pathInformation.requiredStamina > entity.entityStat.stamina.currentValue)
+            {
+                Manager.Instance.uiManager.ShowWarningUI("Warning: Not enough stamina.");
+                return false;
+            }
+
             isMoving = true;
-            List<GridNode> path = pathfinder.PathFinding(currentCellgridPosition, destinationCellgridPosition);
+            entity.entityStat.stamina.DecreaseCurrentValue(pathInformation.requiredStamina);
             if (smoothMovementCoroutine != null)
             {
                 StopCoroutine(smoothMovementCoroutine);
             }
-            smoothMovementCoroutine = StartCoroutine(MoveEntitySmooth(path));
+            smoothMovementCoroutine = StartCoroutine(MoveEntitySmooth(pathInformation.path));
             return true;
         }
     }
@@ -108,7 +107,7 @@ public abstract class Movement : CoreComponent
     /// <param name="gridType"></param>
     /// <param name="instantMove"></param>
     /// <returns></returns>
-    public bool MoveToGrid(Vector3Int destinationGridPosition, GridType gridType, bool instantMove)
+    public virtual bool MoveToGrid(Vector3Int destinationGridPosition, GridType gridType, bool instantMove)
     {
         Vector3Int destinationCellgridPosition = gridType.Equals(GridType.Hexgrid) ? pathfinder.HexgridToCellgrid(destinationGridPosition) : destinationGridPosition;
 
@@ -132,21 +131,27 @@ public abstract class Movement : CoreComponent
         }
         else
         {
+            PathInformation pathInformation = pathfinder.PathFinding(currentCellgridPosition, destinationCellgridPosition);
+
+            if (pathInformation.requiredStamina > entity.entityStat.stamina.currentValue)
+            {
+                Debug.LogWarning(entity.name + " is trying to move more than current stamina.");
+                return false;
+            }
+
             isMoving = true;
-            List<GridNode> path = pathfinder.PathFinding(currentCellgridPosition, destinationCellgridPosition);
+            entity.entityStat.stamina.DecreaseCurrentValue(pathInformation.requiredStamina);
             if (smoothMovementCoroutine != null)
             {
                 StopCoroutine(smoothMovementCoroutine);
             }
-            smoothMovementCoroutine = StartCoroutine(MoveEntitySmooth(path));
+            smoothMovementCoroutine = StartCoroutine(MoveEntitySmooth(pathInformation.path));
             return true;
         }
     }
 
-    private IEnumerator MoveEntitySmooth(List<GridNode> path)
+    protected IEnumerator MoveEntitySmooth(List<GridNode> path)
     {
-        int requiredStamina = 0;
-        GridNode prevNode = path.First();
         GridNode destinationNode = path.Last();
 
         path.RemoveAt(0);
@@ -163,18 +168,6 @@ public abstract class Movement : CoreComponent
                     
                     if (path.Count > 0)
                     {
-                        int levelDifference = currentDestinationNode.customTileData.tileLevel - prevNode.customTileData.tileLevel;
-
-                        if (levelDifference >= 1)
-                        {
-                            requiredStamina += Mathf.Abs(levelDifference);
-                        }
-                        else
-                        {
-                            requiredStamina += 1;
-                        }
-
-                        prevNode = currentDestinationNode;
                         currentDestinationNode = path.First();
                     }
                 }
@@ -193,7 +186,8 @@ public abstract class Movement : CoreComponent
             yield return null;
         }
 
-        entity.entityStat.stamina.DecreaseCurrentValue(requiredStamina);
+        UpdateGridPositionData();
+        smoothMoveFinished?.Invoke();
         isMoving = false;
     }
 
@@ -201,7 +195,7 @@ public abstract class Movement : CoreComponent
     /// Gets whether entity is going to show moveable tile area in bool value. True means it will show its moveable tile area, and vice versa.
     /// </summary>
     /// <param name="showTile"></param>
-    public virtual void ShowMoveableTiles(bool showTile)
+    public void DrawMoveableTiles(bool showTile = true)
     {
         if (!isMoving)
         {
@@ -223,45 +217,21 @@ public abstract class Movement : CoreComponent
 
                         GridNode moveableGridNode = pathfinder.gridNodes.FirstOrDefault(node => node.cellgridPosition == moveableCellgridPosition);
 
-                        if (moveableGridNode == null) continue;
-
-                        if (!moveableGridNode.isObstacle)
+                        if (moveableGridNode != null && !moveableGridNode.isObstacle)
                         {
-                            List<GridNode> path = pathfinder.PathFinding(currentCellgridPosition, moveableCellgridPosition);
+                            PathInformation pathInformation = pathfinder.PathFinding(currentCellgridPosition, moveableCellgridPosition);
 
-                            int requiredStamina = 0;
+                            if (entity.entityStat.stamina.currentValue < pathInformation.requiredStamina) continue;
+
                             bool pathOutOfRange = false;
-                            GridNode prevGridNode = null;
 
-                            foreach (GridNode gridNode in path)
+                            foreach (GridNode gridNode in pathInformation.path)
                             {
                                 if ((Mathf.Abs(gridNode.hexgridPosition.x - currentHexgridPosition.x) > moveRangeInHexGrid.x) || (Mathf.Abs(gridNode.hexgridPosition.y - currentHexgridPosition.y) > moveRangeInHexGrid.y) || (Mathf.Abs(gridNode.hexgridPosition.z - currentHexgridPosition.z) > moveRangeInHexGrid.z))
                                 {
                                     pathOutOfRange = true;
                                     break;
                                 }
-
-                                if (prevGridNode != null)
-                                {
-                                    int levelDifference = gridNode.customTileData.tileLevel - prevGridNode.customTileData.tileLevel;
-
-                                    if (levelDifference >= 1)
-                                    {
-                                        requiredStamina += Mathf.Abs(levelDifference);
-                                    }
-                                    else
-                                    {
-                                        requiredStamina += 1;
-                                    }
-                                }
-
-                                if (requiredStamina > maxMovementStamina)
-                                {
-                                    pathOutOfRange = true;
-                                    break;
-                                }
-
-                                prevGridNode = gridNode;
                             }
 
                             if (!pathOutOfRange)
