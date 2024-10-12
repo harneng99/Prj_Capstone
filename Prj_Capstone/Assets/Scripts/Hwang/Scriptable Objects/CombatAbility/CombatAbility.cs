@@ -15,9 +15,9 @@ public class CombatAbility : ScriptableObject
     [field: SerializeField] public int staminaCost { get; private set; }
     [field: SerializeField, TextArea] public string combatAbilityDescription { get; private set; } = "Default Combat Ability Description";
     [field: SerializeField, Tooltip("Describes the range that the entity can attack or cast current combat ability.")] public Vector3Int castingRange { get; private set; }
-    public SerializedDictionary<Vector3Int, bool> castingRangeDictionary { get; private set; } = new SerializedDictionary<Vector3Int, bool>();
+    [field: SerializeField] public SerializedDictionary<Vector3Int, bool> castingRangeDictionary { get; private set; }
     [field: SerializeField, Tooltip("The area where the combat ability will be applied when casted. Currently not considering the entity's facing direction.")] public Vector3Int AOE { get; private set; }
-    public SerializedDictionary<Vector3Int, bool> AOEDictionary { get; private set; } = new SerializedDictionary<Vector3Int, bool>();
+    [field: SerializeField] public SerializedDictionary<Vector3Int, bool> AOEDictionary { get; private set; }
     [field: SerializeReference] public List<CombatAbilityComponent> combatAbilityComponents { get; private set; }
 
     public void AddComponent(CombatAbilityComponent componentData)

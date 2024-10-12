@@ -4,15 +4,21 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Enemy
+  - MoveableTilemap
+  - ObjectTilemap
+  - HighlightedTilemap
+  - FogTilemap
+  - SelectionTilemap
+  - AOETilemap
+  - MainCanvas
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Player Character
+  - Player
   - Water
   - UI
-  - Enemy Character
+  - Enemy
   - 
   - 
   - 
@@ -53,4 +59,7 @@ TagManager:
     locked: 0
   - name: Fog
     uniqueID: 4241487911
+    locked: 0
+  - name: Selection
+    uniqueID: 1116240881
     locked: 0

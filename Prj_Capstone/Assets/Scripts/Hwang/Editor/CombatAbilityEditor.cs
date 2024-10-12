@@ -1,3 +1,4 @@
+using Codice.CM.Client.Differences.Graphic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.Overlays;
 using UnityEngine;
+using UnityEngine.UI;
 
 [CustomEditor(typeof(CombatAbility))]
 public class CombatAbilityEditor : Editor
@@ -31,7 +33,9 @@ public class CombatAbilityEditor : Editor
     private SerializedProperty combatAbilityType;
     private SerializedProperty staminaCost;
     private SerializedProperty castingRange;
+    private SerializedProperty castingRangeDictionary;
     private SerializedProperty AOE;
+    private SerializedProperty AOEDictionary;
     private SerializedProperty combatAbilityComponents;
 
     private void OnEnable()
@@ -43,8 +47,10 @@ public class CombatAbilityEditor : Editor
         combatAbilityType = serializedObject.FindProperty("<combatAbilityType>k__BackingField");
         staminaCost = serializedObject.FindProperty("<staminaCost>k__BackingField");
         combatAbilityDescription = serializedObject.FindProperty("<combatAbilityDescription>k__BackingField");
+        castingRangeDictionary = serializedObject.FindProperty("<castingRangeDictionary>k__BackingField");
         castingRange = serializedObject.FindProperty("<castingRange>k__BackingField");
         AOE = serializedObject.FindProperty("<AOE>k__BackingField");
+        AOEDictionary = serializedObject.FindProperty("<AOEDictionary>k__BackingField");
         combatAbilityComponents = serializedObject.FindProperty("<combatAbilityComponents>k__BackingField");
     }
 
@@ -66,6 +72,7 @@ public class CombatAbilityEditor : Editor
 
         EditorGUILayout.Space(singleLineHeight);
         EditorGUILayout.PropertyField(castingRange, new GUIContent("Casting Range"));
+        EditorGUILayout.PropertyField(castingRangeDictionary, new GUIContent("Casting Range Dictoniary"));
         #region Set Casting Range Dictionary
         for (int x = -combatAbilityData.castingRange.x; x <= combatAbilityData.castingRange.x; x++)
         {
@@ -80,6 +87,7 @@ public class CombatAbilityEditor : Editor
                     if (!combatAbilityData.castingRangeDictionary.ContainsKey(currentKey))
                     {
                         combatAbilityData.castingRangeDictionary.Add(currentKey, true);
+                        EditorUtility.SetDirty(combatAbilityData);
                     }
                 }
             }
@@ -216,6 +224,7 @@ public class CombatAbilityEditor : Editor
 
         EditorGUILayout.Space(singleLineHeight);
         EditorGUILayout.PropertyField(AOE, new GUIContent("Area Of Effect"));
+        EditorGUILayout.PropertyField(AOEDictionary, new GUIContent("AOE Dictoniary"));
         #region Set AOE Dictionary
         for (int x = -combatAbilityData.AOE.x; x <= combatAbilityData.AOE.x; x++)
         {
@@ -230,6 +239,7 @@ public class CombatAbilityEditor : Editor
                     if (!combatAbilityData.AOEDictionary.ContainsKey(currentKey))
                     {
                         combatAbilityData.AOEDictionary.Add(currentKey, true);
+                        EditorUtility.SetDirty(combatAbilityData);
                     }
                 }
             }
@@ -391,6 +401,11 @@ public class CombatAbilityEditor : Editor
         }
 
         serializedObject.ApplyModifiedProperties();
+
+        if (GUI.changed)
+        {
+            EditorUtility.SetDirty(combatAbilityData);
+        }
     }
 
     [DidReloadScripts]

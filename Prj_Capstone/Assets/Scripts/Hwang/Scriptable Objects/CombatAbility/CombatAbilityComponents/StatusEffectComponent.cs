@@ -9,7 +9,7 @@ public class StatusEffectComponent : CombatAbilityComponent
     [field: SerializeField] public StatusEffect statusEffect { get; private set; }
     [field: SerializeField, Range(0.0f, 100.0f)] public float effectAmount;
 
-    public override void ApplyCombatAbility(Collider2D target)
+    public override void ApplyCombatAbility(Entity target)
     {
         throw new System.NotImplementedException();
     }

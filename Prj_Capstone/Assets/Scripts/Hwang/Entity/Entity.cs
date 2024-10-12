@@ -3,17 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Tilemaps;
 using static UnityEngine.EventSystems.EventTrigger;
 
 public class Entity : MonoBehaviour, IPointerClickHandler
 {
     #region Entity Components
-    [SerializeField] private Sprite portrait;
+    [field: SerializeField] public Sprite entityPortrait { get; private set; }
+    [field: SerializeField] public string entityName { get; private set; }
+    [field: SerializeField, TextArea] public string entityDescription { get; private set; }
+    [field: SerializeField] public int level { get; private set; } = 1;
     public Animator animator { get; private set; }
     public SpriteRenderer spriteRenderer { get; private set; }
     public Collider2D entityCollider { get; private set; }
     public Core core { get; private set; }
-    public InputHandler inputHandler { get; private set; }
     [field: SerializeField] public EntityConsistentData entityConsistentData { get; private set; }
     #endregion
 
@@ -25,7 +28,8 @@ public class Entity : MonoBehaviour, IPointerClickHandler
 
     #region Other Variables
     public event Action onPointerClick;
-    [HideInInspector] public bool isSelected;
+    public bool isSelected { get; private set; }
+    public Tilemap highlightedTilemap { get; private set; }
     #endregion
 
     protected virtual void Awake()
@@ -33,11 +37,11 @@ public class Entity : MonoBehaviour, IPointerClickHandler
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         entityCollider = GetComponent<Collider2D>();
-        inputHandler = GetComponent<InputHandler>();
 
         core = GetComponentInChildren<Core>();
 
         onPointerClick += ShowInformation;
+        highlightedTilemap = GameObject.FindWithTag("HighlightedTilemap").GetComponent<Tilemap>();
     }
 
     protected virtual void Start()
@@ -45,35 +49,58 @@ public class Entity : MonoBehaviour, IPointerClickHandler
         entityStat = core.GetCoreComponent<Stat>();
         entityMovement = core.GetCoreComponent<Movement>();
         entityCombat = core.GetCoreComponent<Combat>();
+
+        Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
     }
 
     
     protected virtual void Update()
     {
-        if (inputHandler.isMouseRightClick)
+        
+    }
+
+    public virtual void OnPointerClick(PointerEventData eventData)
+    {
+        Manager.Instance.gameManager.Select(this);
+        onPointerClick?.Invoke();
+    }
+
+    protected virtual void ShowInformation()
+    {
+        Manager.Instance.uiManager.SetEntityInformation(entityPortrait, entityName, entityDescription, entityStat);
+    }
+
+    protected void MouseRightClick()
+    {
+        if (isSelected)
         {
             isSelected = false;
-            Manager.Instance.gameManager.ResetEntitySelected();
+            Manager.Instance.uiManager.HideEntityInformation();
+            highlightedTilemap.ClearAllTiles();
+            entityCombat.currentSelectedCombatAbility = null;
         }
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        onPointerClick?.Invoke();
         Manager.Instance.gameManager.ResetEntitySelected();
-        Manager.Instance.gameManager.currentSelectedEntity = this;
-        isSelected = true;
     }
 
-    private void ShowInformation()
-    {
-        isSelected = true;
-        Manager.Instance.gameManager.virtualCamera.Follow = transform;
-        Debug.Log("Show Informations");
-    }
+    public void Select() => isSelected = true;
 
+    public void Deselect() => isSelected = false;
+
+    /// <summary>
+    /// Returns the Vector3 value of the bottom center position of the entity's collider.
+    /// </summary>
+    /// <returns></returns>
     public Vector3 GetEntityFeetPosition()
     {
         return new Vector3(entityCollider.bounds.center.x, entityCollider.bounds.min.y, entityCollider.bounds.center.z);
+    }
+
+    /// <summary>
+    /// Gets world grid position and place the entity's feet position to it.
+    /// </summary>
+    /// <param name="position"></param>
+    public void SetEntityFeetPosition(Vector3 position)
+    {
+        transform.position = position + Vector3.up * entityCollider.bounds.extents.y;
     }
 }

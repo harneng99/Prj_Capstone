@@ -18,8 +18,144 @@ MonoBehaviour:
   <staminaCost>k__BackingField: 5
   <combatAbilityDescription>k__BackingField: Change the tile level by one. Cannot
     go over maximum/minimum tile level.
-  <castingRange>k__BackingField: {x: 2, y: 2, z: 2}
+  <castingRange>k__BackingField: {x: 5, y: 3, z: 5}
+  <castingRangeDictionary>k__BackingField:
+    _serializedList:
+    - Key: {x: -2, y: 0, z: 2}
+      Value: 1
+    - Key: {x: -2, y: 1, z: 1}
+      Value: 1
+    - Key: {x: -2, y: 2, z: 0}
+      Value: 1
+    - Key: {x: -1, y: -1, z: 2}
+      Value: 1
+    - Key: {x: -1, y: 0, z: 1}
+      Value: 1
+    - Key: {x: -1, y: 1, z: 0}
+      Value: 1
+    - Key: {x: -1, y: 2, z: -1}
+      Value: 1
+    - Key: {x: 0, y: -2, z: 2}
+      Value: 1
+    - Key: {x: 0, y: -1, z: 1}
+      Value: 1
+    - Key: {x: 0, y: 0, z: 0}
+      Value: 1
+    - Key: {x: 0, y: 1, z: -1}
+      Value: 1
+    - Key: {x: 0, y: 2, z: -2}
+      Value: 1
+    - Key: {x: 1, y: -2, z: 1}
+      Value: 1
+    - Key: {x: 1, y: -1, z: 0}
+      Value: 1
+    - Key: {x: 1, y: 0, z: -1}
+      Value: 1
+    - Key: {x: 1, y: 1, z: -2}
+      Value: 1
+    - Key: {x: 2, y: -2, z: 0}
+      Value: 1
+    - Key: {x: 2, y: -1, z: -1}
+      Value: 1
+    - Key: {x: 2, y: 0, z: -2}
+      Value: 1
+    - Key: {x: -4, y: 2, z: 2}
+      Value: 1
+    - Key: {x: -3, y: 1, z: 2}
+      Value: 1
+    - Key: {x: -3, y: 2, z: 1}
+      Value: 1
+    - Key: {x: 3, y: -2, z: -1}
+      Value: 1
+    - Key: {x: 3, y: -1, z: -2}
+      Value: 1
+    - Key: {x: 4, y: -2, z: -2}
+      Value: 1
+    - Key: {x: -5, y: 0, z: 5}
+      Value: 1
+    - Key: {x: -5, y: 1, z: 4}
+      Value: 1
+    - Key: {x: -5, y: 2, z: 3}
+      Value: 1
+    - Key: {x: -4, y: -1, z: 5}
+      Value: 1
+    - Key: {x: -4, y: 0, z: 4}
+      Value: 1
+    - Key: {x: -4, y: 1, z: 3}
+      Value: 1
+    - Key: {x: -3, y: -2, z: 5}
+      Value: 1
+    - Key: {x: -3, y: -1, z: 4}
+      Value: 1
+    - Key: {x: -3, y: 0, z: 3}
+      Value: 1
+    - Key: {x: -2, y: -2, z: 4}
+      Value: 1
+    - Key: {x: -2, y: -1, z: 3}
+      Value: 1
+    - Key: {x: -1, y: -2, z: 3}
+      Value: 1
+    - Key: {x: 1, y: 2, z: -3}
+      Value: 1
+    - Key: {x: 2, y: 1, z: -3}
+      Value: 1
+    - Key: {x: 2, y: 2, z: -4}
+      Value: 1
+    - Key: {x: 3, y: 0, z: -3}
+      Value: 1
+    - Key: {x: 3, y: 1, z: -4}
+      Value: 1
+    - Key: {x: 3, y: 2, z: -5}
+      Value: 1
+    - Key: {x: 4, y: -1, z: -3}
+      Value: 1
+    - Key: {x: 4, y: 0, z: -4}
+      Value: 1
+    - Key: {x: 4, y: 1, z: -5}
+      Value: 1
+    - Key: {x: 5, y: -2, z: -3}
+      Value: 1
+    - Key: {x: 5, y: -1, z: -4}
+      Value: 1
+    - Key: {x: 5, y: 0, z: -5}
+      Value: 1
+    - Key: {x: -5, y: 3, z: 2}
+      Value: 1
+    - Key: {x: -4, y: 3, z: 1}
+      Value: 1
+    - Key: {x: -3, y: 3, z: 0}
+      Value: 1
+    - Key: {x: -2, y: -3, z: 5}
+      Value: 1
+    - Key: {x: -2, y: 3, z: -1}
+      Value: 1
+    - Key: {x: -1, y: -3, z: 4}
+      Value: 1
+    - Key: {x: -1, y: 3, z: -2}
+      Value: 1
+    - Key: {x: 0, y: -3, z: 3}
+      Value: 1
+    - Key: {x: 0, y: 3, z: -3}
+      Value: 1
+    - Key: {x: 1, y: -3, z: 2}
+      Value: 1
+    - Key: {x: 1, y: 3, z: -4}
+      Value: 1
+    - Key: {x: 2, y: -3, z: 1}
+      Value: 1
+    - Key: {x: 2, y: 3, z: -5}
+      Value: 1
+    - Key: {x: 3, y: -3, z: 0}
+      Value: 1
+    - Key: {x: 4, y: -3, z: -1}
+      Value: 1
+    - Key: {x: 5, y: -3, z: -2}
+      Value: 1
   <AOE>k__BackingField: {x: 0, y: 0, z: 0}
+  <AOEDictionary>k__BackingField:
+    _serializedList:
+    - Key: {x: 0, y: 0, z: 0}
+      Value: 1
   <combatAbilityComponents>k__BackingField:
   - rid: 103809706976346113
   references:
@@ -29,4 +165,3 @@ MonoBehaviour:
       type: {class: TileLevelChangeComponent, ns: , asm: Assembly-CSharp}
       data:
         name: TileLevelChangeComponent
-        entity: {fileID: 0}

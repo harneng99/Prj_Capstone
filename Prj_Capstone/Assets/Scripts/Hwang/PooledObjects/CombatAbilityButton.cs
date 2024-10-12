@@ -7,38 +7,21 @@ using UnityEngine.EventSystems;
 
 public class CombatAbilityButton : PooledObject
 {
-    [HideInInspector] public Entity entity;
-    [HideInInspector] public CombatAbility combatAbility;
+    public Entity entity { get; set; }
+    public CombatAbility combatAbility { get; set; }
 
     private GameObject combatAbilityDescriptionPrefab;
 
     public void ShowCombatAbilityCastRange()
     {
+        Manager.Instance.gameManager.isAiming = true;
         entity.entityCombat.currentSelectedCombatAbility = combatAbility;
-        entity.entityCombat.combatAbilityRangeHighlightedTilemap.ClearAllTiles();
-
-        foreach (Vector3Int rangeHexgridOffset in combatAbility.castingRangeDictionary.Keys)
-        {
-            if (combatAbility.castingRangeDictionary[rangeHexgridOffset] == false) continue;
-
-            Vector3Int currentRangeHexgrid = entity.entityMovement.currentHexgridPosition + rangeHexgridOffset;
-            Vector3Int? currentRangeCellgrid = entity.entityMovement.pathfinder.HexgridToCellgrid(currentRangeHexgrid);
-
-            if (!currentRangeCellgrid.HasValue) continue;
-
-            GridNode currentGridNode = entity.entityMovement.pathfinder.hexgridNodes.FirstOrDefault(node => node.cellgridPosition == currentRangeCellgrid.Value);
-
-            if (currentGridNode != null && !currentGridNode.isObstacle)
-            {
-                entity.entityCombat.combatAbilityRangeHighlightedTilemap.SetTile(currentRangeCellgrid.Value, entity.entityCombat.combatAbilityRangeHighlightedTileBase);
-            }
-        }
+        entity.entityCombat.DrawCastingRange(combatAbility);
     }
 
     public void OnPointerEnter()
     {
-        Vector2 mousePosition = entity.inputHandler.controls.Map.MousePosition.ReadValue<Vector2>();
-        mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+        Vector2 mousePosition = Manager.Instance.gameManager.mainCamera.ScreenToWorldPoint(Input.mousePosition);
         combatAbilityDescriptionPrefab = Manager.Instance.objectPoolingManager.GetGameObject("Combat Ability Description");
         RectTransform descriptionRectTransform = combatAbilityDescriptionPrefab.GetComponent<RectTransform>();
         descriptionRectTransform.SetParent(transform);
