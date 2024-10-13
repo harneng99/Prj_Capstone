@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Stat : CoreComponent
 {
     [field: SerializeField] public StatComponent health { get; protected set; }
     [field: SerializeField] public StatComponent stamina { get; protected set; }
+    [field: SerializeField] public StatComponent attackMultiplier { get; protected set; }
+    [field: SerializeField] public StatComponent damageMultiplier { get; protected set; }
 
     protected override void Awake()
     {
@@ -40,4 +43,6 @@ public class Stat : CoreComponent
     {
         gameObject.SetActive(false);
     }
+
+    protected override void OnPointerClick(PointerEventData eventData) { }
 }

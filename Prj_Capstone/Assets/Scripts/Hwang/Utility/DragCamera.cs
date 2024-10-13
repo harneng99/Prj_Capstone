@@ -22,8 +22,8 @@ public class DragCamera : MonoBehaviour
     {
         if (isDragging)
         {
-            difference = Manager.Instance.gameManager.mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue()) - transform.position;
-            transform.position = origin - difference;
+            difference = Manager.Instance.playerInputManager.GetMousePosition() - transform.position;
+            Manager.Instance.gameManager.virtualCameraFollowTransform.position = origin - difference;
         }
     }
 
@@ -31,8 +31,9 @@ public class DragCamera : MonoBehaviour
     {
         if (context.started)
         {
-            virtualCamera.Follow = null;
-            origin = Manager.Instance.gameManager.mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+            // virtualCamera.Follow = null;
+            Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
+            origin = Manager.Instance.playerInputManager.GetMousePosition();
         }
         
         isDragging = context.started || context.performed;

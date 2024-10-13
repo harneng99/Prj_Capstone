@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 95510161217745685, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: <moveRangeInHexGrid>k__BackingField.x
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 95510161217745685, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: <moveRangeInHexGrid>k__BackingField.y
@@ -18,11 +18,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 95510161217745685, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: <moveRangeInHexGrid>k__BackingField.z
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 632466452638190511, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
+      propertyPath: <health>k__BackingField.<maxValue>k__BackingField
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 632466452638190511, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
+      propertyPath: <health>k__BackingField.<initialValue>k__BackingField
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 632466452638190511, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
+      propertyPath: <stamina>k__BackingField.<initialValue>k__BackingField
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 632466452638190511, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
+      propertyPath: <stamina>k__BackingField.<recoveryValue>k__BackingField
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3308343947918306661, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: m_Name
-      value: Archer
+      value: Priest
       objectReference: {fileID: 0}
     - target: {fileID: 3436735555467919529, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -70,15 +86,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6167329122503634279, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: <entityName>k__BackingField
-      value: Archer
+      value: Priest
       objectReference: {fileID: 0}
     - target: {fileID: 6167329122503634279, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: <entityDescription>k__BackingField
-      value: I am the bone of my sword...
+      value: You will die, not trembling before me, but as straw before me! A-----------MEEN!!!
       objectReference: {fileID: 0}
     - target: {fileID: 6350119558079097366, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: combatAbilities.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6350119558079097366, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: combatAbilities.Array.data[0]
@@ -87,27 +103,23 @@ PrefabInstance:
     - target: {fileID: 6350119558079097366, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: combatAbilities.Array.data[1]
       value: 
-      objectReference: {fileID: 11400000, guid: 1bf9b07c940afe04b8e04074762af6bd, type: 2}
+      objectReference: {fileID: 11400000, guid: f16a7f64c5b4bdf42ac5893612a30fb6, type: 2}
     - target: {fileID: 6350119558079097366, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: combatAbilities.Array.data[2]
       value: 
       objectReference: {fileID: 11400000, guid: ae4af7ad832b1604496c8e32430126e9, type: 2}
     - target: {fileID: 6350119558079097366, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: <combatAbilities>k__BackingField.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6350119558079097366, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: <combatAbilities>k__BackingField.Array.data[0]
       value: 
-      objectReference: {fileID: 11400000, guid: 498032f0ea83cca49bb514bd6a521332, type: 2}
+      objectReference: {fileID: 11400000, guid: 0296e0de9a0739946a1ed05e28d0b0b5, type: 2}
     - target: {fileID: 6350119558079097366, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: <combatAbilities>k__BackingField.Array.data[1]
       value: 
-      objectReference: {fileID: 11400000, guid: 1bf9b07c940afe04b8e04074762af6bd, type: 2}
-    - target: {fileID: 6350119558079097366, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
-      propertyPath: <combatAbilities>k__BackingField.Array.data[2]
-      value: 
-      objectReference: {fileID: 11400000, guid: ae4af7ad832b1604496c8e32430126e9, type: 2}
+      objectReference: {fileID: 11400000, guid: f16a7f64c5b4bdf42ac5893612a30fb6, type: 2}
     - target: {fileID: 7389683654378437627, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0

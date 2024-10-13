@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
@@ -12,12 +14,14 @@ public class BattleManager : MonoBehaviour
 {
     [field: SerializeField] public Camera mainCamera { get; private set; }
     [field: SerializeField] public CinemachineVirtualCamera virtualCamera { get; private set; }
+    [field: SerializeField] public Transform virtualCameraFollowTransform { get; private set; }
     public Entity currentSelectedEntity { get; private set; }
-    public bool characterSelectionPhase { get; private set; } = true;
+    public bool mercenaryDeploymentPhase { get; private set; } = true;
     public bool battlePhase { get; private set; } = false;
     public bool playerPhase { get; private set; } = false;
     public bool enemyPhase { get; private set; } = false;
     public bool isAiming { get; set; } = false;
+    public bool isAimingCopyForFunctionExecutionOrderCorrection { get; set; } = false; // TODO: A better way to implement this
     public int currentTurnCount { get; private set; }
     public Tilemap moveableTilemap { get; private set; }
     public Tilemap objectTilemap { get; private set; }
@@ -25,11 +29,11 @@ public class BattleManager : MonoBehaviour
     public Tilemap fogTilemap { get; private set; }
     public PlayerCharacter mercenaryDragging { get; set; }
 
+    [field: SerializeField] public TileBase selectionTile { get; private set; }
     public Vector3Int currentMouseCellgridPosition { get; private set; }
     public List<Entity> entities { get; private set; } = new List<Entity>();
     public List<PlayerCharacter> mercenaries { get; private set; } = new List<PlayerCharacter>();
     public List<Enemy> enemies { get; private set; } = new List<Enemy>();
-    [SerializeField] private TileBase selectionTile;
 
     public event Action playerTurnStart;
     public event Action playerTurnEnd;
@@ -44,11 +48,24 @@ public class BattleManager : MonoBehaviour
         // fogTilemap = GameObject.FindWithTag("FogTilemap").GetComponent<Tilemap>();
 
         playerTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(PlayerCharacter)); };
-        playerTurnStart += Manager.Instance.playerInputManager.DisableInputSystemOnTurnChange;
         playerTurnStart += () => { currentTurnCount += 1; };
+        playerTurnStart += () => { Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount; };
+        playerTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = true; };
+
+        playerTurnEnd += Manager.Instance.playerInputManager.DisableInputSystemOnTurnChange;
+        playerTurnEnd += Manager.Instance.uiManager.ShowPhaseInformationUI;
+
         enemyTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(Enemy)); };
         enemyTurnStart += () => { RunEnemyAI(); };
         enemyTurnStart += Manager.Instance.playerInputManager.DisableInputSystemOnTurnChange;
+        enemyTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = false; };
+
+        enemyTurnEnd += Manager.Instance.uiManager.ShowPhaseInformationUI;
+    }
+
+    private void Start()
+    {
+        Manager.Instance.playerInputManager.controls.Map.MouseLeftClick.performed += _ => MouseLeftClick();
     }
 
     private void Update()
@@ -79,12 +96,38 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    private void MouseLeftClick()
+    {
+        if (battlePhase)
+        {
+            Ray ray = Manager.Instance.gameManager.mainCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit rayHit;
+
+            if (Physics.Raycast(ray, out rayHit))
+            {
+                if (rayHit.collider.gameObject.GetComponent<CustomTileData>() != null)
+                {
+                    if (currentSelectedEntity == null)
+                    {
+                        Manager.Instance.uiManager.SetInformationUI(null, null, currentMouseCellgridPosition);
+                    }
+                    else
+                    {
+                        Manager.Instance.uiManager.SetTileData(currentMouseCellgridPosition);
+                    }
+                    Manager.Instance.uiManager.ShowInformationUI();
+                }
+            }
+        }
+    }
+
     public void Select(Entity entity)
     {
         ResetEntitySelected();
         entity.Select();
         currentSelectedEntity = entity;
-        virtualCamera.Follow = entity.transform;
+        // virtualCamera.Follow = entity.transform;
+        Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(entity.transform);
     }
 
     public void ResetEntitySelected()
@@ -95,9 +138,9 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void PlayerTurnStart()
+    public void StartBattlePhase()
     {
-        if (Manager.Instance.gameManager.characterSelectionPhase && Manager.Instance.uiManager.mercenarySlotWindow.CanProceedToBattlePhase())
+        if (Manager.Instance.gameManager.mercenaryDeploymentPhase && Manager.Instance.uiManager.mercenarySlotWindow.CanProceedToBattlePhase())
         {
             enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None).ToList();
             entities = FindObjectsByType<Entity>(FindObjectsSortMode.None).ToList();
@@ -106,28 +149,34 @@ public class BattleManager : MonoBehaviour
             {
                 entity.highlightedTilemap.ClearAllTiles();
             }
+            Manager.Instance.uiManager.turnCounter.SetActive(true);
+
             playerTurnStart?.Invoke();
-            characterSelectionPhase = false;
+            mercenaryDeploymentPhase = false;
             battlePhase = true;
             playerPhase = true;
-            currentTurnCount += 1;
+            enemyPhase = false;
+            Manager.Instance.uiManager.ShowPhaseInformationUI();
         }
     }
 
-    public void TurnEnd()
+    public async void TurnEnd()
     {
         if (playerPhase)
         {
             playerPhase = false;
-            playerTurnEnd?.Invoke();
             enemyPhase = true;
+            
+            playerTurnEnd?.Invoke();
+            await Task.Delay((int)(Manager.Instance.uiManager.phaseInformationUI.GetComponent<PhaseInformationUI>().uiDuration * 1000));
             enemyTurnStart?.Invoke();
         }
         else if (enemyPhase)
         {
             enemyPhase = false;
-            enemyTurnEnd?.Invoke();
             playerPhase = true;
+            
+            enemyTurnEnd?.Invoke();
             playerTurnStart?.Invoke();
         }
     }
@@ -145,12 +194,15 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    private void RunEnemyAI()
+    private async void RunEnemyAI()
     {
         foreach (Enemy enemy in enemies)
         {
             enemy.enemyCombat.RunEnemyAI();
+            await Task.Delay(2000);
         }
+
+        await Task.Delay(1000);
         TurnEnd();
     }
 
@@ -160,5 +212,24 @@ public class BattleManager : MonoBehaviour
         bool inObject = objectTilemap.HasTile(cellgridPosition);
 
         return !inMoveable && !inObject;
+    }
+
+    public void SetVirtualCameraFollowTransformTo(Transform follow)
+    {
+        virtualCameraFollowTransform.SetParent(follow);
+        virtualCameraFollowTransform.localPosition = Vector3.zero;
+    }
+
+    public bool EntityExistsAt(Vector3Int cellgridPosition)
+    {
+        foreach (Entity entity in entities)
+        {
+            if (entity.entityMovement.currentCellgridPosition.Equals(cellgridPosition))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 
 public enum SkillType { Active, Passive }
+[System.Flags] public enum AvailableTarget { Ally = 1 << 0, Enemy = 1 << 1, Self = 1 << 2 }
 
 [CreateAssetMenu(fileName = "newCombatAbilityData", menuName = "Data/Combat Ability Data")]
 public class CombatAbility : ScriptableObject
@@ -13,6 +14,9 @@ public class CombatAbility : ScriptableObject
     [field: SerializeField] public string combatAbilityName { get; private set; } = "Default Combat Ability Name";
     [field: SerializeField] public SkillType combatAbilityType { get; private set; }
     [field: SerializeField] public int staminaCost { get; private set; }
+    [field: SerializeField, Tooltip("The duration of the turn that the combat ability will be applied.")] public int turnDuration { get; private set; }
+    [field: SerializeField] public AvailableTarget availableTarget { get; private set; } = AvailableTarget.Enemy;
+    [field: SerializeField, Tooltip("Number of castings that the entity can make.")] public int maximumCastingAreaCount { get; private set; } = 1;
     [field: SerializeField, TextArea] public string combatAbilityDescription { get; private set; } = "Default Combat Ability Description";
     [field: SerializeField, Tooltip("Describes the range that the entity can attack or cast current combat ability.")] public Vector3Int castingRange { get; private set; }
     [field: SerializeField] public SerializedDictionary<Vector3Int, bool> castingRangeDictionary { get; private set; }

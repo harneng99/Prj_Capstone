@@ -10,16 +10,75 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 68d6fb54b938ba84a9232f2f19f37b3a, type: 3}
-  m_Name: restore
+  m_Name: Restore
   m_EditorClassIdentifier: 
   <combatAbilityIcon>k__BackingField: {fileID: 21300000, guid: c186f707a409ffc4d9d4bf7b3bbacb57, type: 3}
   <combatAbilityName>k__BackingField: Default Combat Ability Name
   <combatAbilityType>k__BackingField: 0
   <staminaCost>k__BackingField: 5
+  <turnDuration>k__BackingField: 0
+  <availableTarget>k__BackingField: 5
+  <maximumCastingAreaCount>k__BackingField: 1
   <combatAbilityDescription>k__BackingField: Heals the target up to 20% of the target's
     maximum health
   <castingRange>k__BackingField: {x: 2, y: 2, z: 2}
+  <castingRangeDictionary>k__BackingField:
+    _serializedList:
+    - Key: {x: -2, y: 0, z: 2}
+      Value: 1
+    - Key: {x: -2, y: 1, z: 1}
+      Value: 1
+    - Key: {x: -2, y: 2, z: 0}
+      Value: 1
+    - Key: {x: -1, y: -1, z: 2}
+      Value: 1
+    - Key: {x: -1, y: 0, z: 1}
+      Value: 1
+    - Key: {x: -1, y: 1, z: 0}
+      Value: 1
+    - Key: {x: -1, y: 2, z: -1}
+      Value: 1
+    - Key: {x: 0, y: -2, z: 2}
+      Value: 1
+    - Key: {x: 0, y: -1, z: 1}
+      Value: 1
+    - Key: {x: 0, y: 0, z: 0}
+      Value: 1
+    - Key: {x: 0, y: 1, z: -1}
+      Value: 1
+    - Key: {x: 0, y: 2, z: -2}
+      Value: 1
+    - Key: {x: 1, y: -2, z: 1}
+      Value: 1
+    - Key: {x: 1, y: -1, z: 0}
+      Value: 1
+    - Key: {x: 1, y: 0, z: -1}
+      Value: 1
+    - Key: {x: 1, y: 1, z: -2}
+      Value: 1
+    - Key: {x: 2, y: -2, z: 0}
+      Value: 1
+    - Key: {x: 2, y: -1, z: -1}
+      Value: 1
+    - Key: {x: 2, y: 0, z: -2}
+      Value: 1
   <AOE>k__BackingField: {x: 1, y: 1, z: 1}
+  <AOEDictionary>k__BackingField:
+    _serializedList:
+    - Key: {x: -1, y: 0, z: 1}
+      Value: 1
+    - Key: {x: -1, y: 1, z: 0}
+      Value: 1
+    - Key: {x: 0, y: -1, z: 1}
+      Value: 1
+    - Key: {x: 0, y: 0, z: 0}
+      Value: 1
+    - Key: {x: 0, y: 1, z: -1}
+      Value: 1
+    - Key: {x: 1, y: -1, z: 0}
+      Value: 1
+    - Key: {x: 1, y: 0, z: -1}
+      Value: 1
   <combatAbilityComponents>k__BackingField:
   - rid: 103809706976346112
   references:
@@ -29,5 +88,5 @@ MonoBehaviour:
       type: {class: HealComponent, ns: , asm: Assembly-CSharp}
       data:
         name: HealComponent
-        baseRestoreValue: 0
-        restoreValueIncreaseByLevel: 0
+        baseRestoreValue: 15
+        restoreValueIncreaseByLevel: 10

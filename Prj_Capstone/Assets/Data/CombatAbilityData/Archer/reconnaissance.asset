@@ -16,6 +16,9 @@ MonoBehaviour:
   <combatAbilityName>k__BackingField: Reconnaissance
   <combatAbilityType>k__BackingField: 0
   <staminaCost>k__BackingField: 3
+  <turnDuration>k__BackingField: 0
+  <availableTarget>k__BackingField: 8
+  <maximumCastingAreaCount>k__BackingField: 0
   <combatAbilityDescription>k__BackingField: Get the sight of a large area around
     the selected spot.
   <castingRange>k__BackingField: {x: 5, y: 5, z: 5}

@@ -103,6 +103,18 @@ MonoBehaviour:
     <minValue>k__BackingField: 0
     <initialValue>k__BackingField: 2
     <recoveryValue>k__BackingField: 5
+  <attackMultiplier>k__BackingField:
+    slider: {fileID: 0}
+    <maxValue>k__BackingField: 0
+    <minValue>k__BackingField: 0
+    <initialValue>k__BackingField: 0
+    <recoveryValue>k__BackingField: 0
+  <damageMultiplier>k__BackingField:
+    slider: {fileID: 0}
+    <maxValue>k__BackingField: 0
+    <minValue>k__BackingField: 0
+    <initialValue>k__BackingField: 0
+    <recoveryValue>k__BackingField: 0
 --- !u!1 &3308343947918306661
 GameObject:
   m_ObjectHideFlags: 0
@@ -513,7 +525,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4576263588562894269}
-  - component: {fileID: 6162005342265368210}
+  - component: {fileID: 838239355235548003}
   - component: {fileID: 1005184986029605087}
   m_Layer: 6
   m_Name: Movement
@@ -537,7 +549,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6604352797238293688}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6162005342265368210
+--- !u!114 &838239355235548003
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -546,12 +558,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6893640757250354046}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7fe970f720b4514c958b5b5ef590a40, type: 3}
+  m_Script: {fileID: 11500000, guid: 83103570977a77d438d3ae79c256c563, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <moveRangeInHexGrid>k__BackingField: {x: 0, y: 0, z: 0}
   moveRangeHighlightedTileBase: {fileID: 11400000, guid: 0676da133a4fbb242b1f68717947b672, type: 2}
-  moveRangeInHexGrid: {x: 5, y: 5, z: 5}
-  maxMovementStamina: 5
+  maxMovementStamina: 0
 --- !u!114 &1005184986029605087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -616,7 +628,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <combatAbilityRangeHighlightedTileBase>k__BackingField: {fileID: 11400000, guid: 87a3887f8c2233c4286c07c5a89833ec, type: 2}
   <combatAbilityAOEHighlightedTileBase>k__BackingField: {fileID: 11400000, guid: 0decdefb311307748bb9cf105f5e22e9, type: 2}
-  combatAbilities: []
+  <combatAbilities>k__BackingField: []
   targetPriority: 
   scoreMultiplierDecreaseAmount: 0.2
   <mercenaryKill>k__BackingField: 500

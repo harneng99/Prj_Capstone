@@ -15,4 +15,5 @@ public class CustomTileData : MonoBehaviour
     [field: SerializeField] public MoveableTileLayer moveableTileLayer { get; private set; }
     [field: SerializeField] public ObjectTileLayer objectTileLayer { get; private set; }
     [field: SerializeField] public InteractableTileLayer interactableTileLayer { get; private set; }
+    [field: SerializeField] public string tileInformation { get; private set; }
 }

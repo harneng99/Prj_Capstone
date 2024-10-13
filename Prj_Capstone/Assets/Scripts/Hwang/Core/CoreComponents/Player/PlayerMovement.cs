@@ -26,19 +26,29 @@ public class PlayerMovement : Movement
     // This is called whenever the mouse clicks anywhere. It is different from OnPointerClick event function.
     private void MouseLeftClick()
     {
-        if (Manager.Instance.gameManager.battlePhase)
+        if (!Manager.Instance.playerInputManager.IsPointerOverUI())
         {
-            if (!isMoving && mercenary.isSelected)
+            if (Manager.Instance.gameManager.battlePhase)
             {
-                Manager.Instance.uiManager.HideEntityInformation();
-                Vector3Int destinationCellgridPosition = pathfinder.moveableTilemap.WorldToCell(Manager.Instance.playerInputManager.GetMousePosition());
-                TileBase highlightedTile = mercenary.highlightedTilemap.GetTile(destinationCellgridPosition);
-                mercenary.highlightedTilemap.ClearAllTiles();
-                isShowingMoveableTiles = false;
-
-                if (highlightedTile != null && highlightedTile.Equals(moveRangeHighlightedTileBase))
+                if (!isMoving && mercenary.isSelected)
                 {
-                    MoveToGrid(destinationCellgridPosition, GridType.Cellgrid, false);
+                    Vector3Int destinationCellgridPosition = Manager.Instance.playerInputManager.GetMousePosition(GridType.Cellgrid);
+
+                    /*Ray ray = Manager.Instance.gameManager.mainCamera.ScreenPointToRay(Input.mousePosition);
+                    RaycastHit rayHit;
+                    if (Physics.Raycast(ray, out rayHit) && rayHit.collider.gameObject.GetComponent<Entity>() != null) return;*/
+
+                    // if (destinationCellgridPosition.Equals(currentCellgridPosition)) return;
+
+                    TileBase highlightedTile = mercenary.highlightedTilemap.GetTile(destinationCellgridPosition);
+
+                    if (highlightedTile != null && highlightedTile.Equals(moveRangeHighlightedTileBase))
+                    {
+                        if (MoveToGrid(destinationCellgridPosition, GridType.Cellgrid, false))
+                        {
+                            mercenary.highlightedTilemap.ClearAllTiles();
+                        }
+                    }
                 }
             }
         }

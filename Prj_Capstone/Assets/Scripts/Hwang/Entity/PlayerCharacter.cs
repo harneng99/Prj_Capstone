@@ -28,10 +28,12 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
 
     protected override void ShowInformation()
     {
-        if (UtilityFunctions.IsTilemapEmpty(highlightedTilemap))
+        base.ShowInformation();
+
+        /*if (UtilityFunctions.IsTilemapEmpty(highlightedTilemap))
         {
             Manager.Instance.uiManager.SetEntityInformation(entityPortrait, entityName, entityDescription, entityStat);
-        }
+        }*/
     }
 
     public override void OnPointerClick(PointerEventData eventData)
@@ -63,9 +65,12 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
         }
         else if (eventData.button == PointerEventData.InputButton.Right)
         {
-            if (Manager.Instance.gameManager.characterSelectionPhase)
+            if (Manager.Instance.gameManager.mercenaryDeploymentPhase)
             {
-                Manager.Instance.uiManager.mercenarySlotWindow.ReturnCharacter(gameObject);
+                if (!onInitialDeployment)
+                {
+                    Manager.Instance.uiManager.mercenarySlotWindow.ReturnCharacter(gameObject);
+                }
                 Manager.Instance.uiManager.mercenarySlotWindow.ResetHighlights();
                 entityMovement.currentWorldgridPosition = null;
                 gameObject.SetActive(false);
@@ -77,7 +82,7 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (Manager.Instance.gameManager.characterSelectionPhase)
+        if (Manager.Instance.gameManager.mercenaryDeploymentPhase)
         {
             highlightedTilemap.ClearAllTiles();
             Manager.Instance.gameManager.mercenaryDragging = this;

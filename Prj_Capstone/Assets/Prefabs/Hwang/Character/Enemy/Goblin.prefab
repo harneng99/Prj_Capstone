@@ -21,6 +21,22 @@ PrefabInstance:
       propertyPath: <entityConsistentData>k__BackingField
       value: 
       objectReference: {fileID: 11400000, guid: dfd04217081cb9b4282b07b6bc847ab3, type: 2}
+    - target: {fileID: 838239355235548003, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: maxMovementStamina
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 838239355235548003, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: <moveRangeInHexGrid>k__BackingField.x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 838239355235548003, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: <moveRangeInHexGrid>k__BackingField.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 838239355235548003, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: <moveRangeInHexGrid>k__BackingField.z
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1866284817084512004, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
       propertyPath: targetPriority.Array.size
       value: 2
@@ -92,6 +108,18 @@ PrefabInstance:
     - target: {fileID: 3436735555467919529, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6162005342265368210, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: <moveRangeInHexGrid>k__BackingField.x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6162005342265368210, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: <moveRangeInHexGrid>k__BackingField.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6162005342265368210, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
+      propertyPath: <moveRangeInHexGrid>k__BackingField.z
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7389683654378437627, guid: ba824795e2eddda4289c9cc3d2c3e215, type: 3}
       propertyPath: m_AnchorMax.x

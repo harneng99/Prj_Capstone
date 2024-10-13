@@ -5,15 +5,14 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public enum GridType { Hexgrid, Cellgrid }
 
 [RequireComponent(typeof(Pathfinder))]
-public abstract class Movement : CoreComponent
+public class Movement : CoreComponent
 {
+    [field: SerializeField] public Vector3Int moveRangeInHexGrid { get; protected set; }
     [SerializeField] protected TileBase moveRangeHighlightedTileBase;
-    [SerializeField] protected Vector3Int moveRangeInHexGrid;
     [SerializeField] protected int maxMovementStamina;
 
     public Pathfinder pathfinder { get; private set; }
@@ -21,11 +20,9 @@ public abstract class Movement : CoreComponent
     public Vector3Int currentCellgridPosition { get; private set; }
     public Vector3Int currentHexgridPosition { get; private set; }
 
-    // public Tilemap highlightedTilemap { get; private set; }
     public event Action smoothMoveFinished;
     
     public bool isMoving { get; protected set; }
-    protected bool isShowingMoveableTiles;
     protected Coroutine smoothMovementCoroutine;
 
     protected override void Awake()
@@ -33,8 +30,6 @@ public abstract class Movement : CoreComponent
         base.Awake();
         
         pathfinder = GetComponent<Pathfinder>();
-
-        entity.onPointerClick += () => { DrawMoveableTiles(!isShowingMoveableTiles); };
     }
 
     protected virtual void Start()
@@ -42,6 +37,24 @@ public abstract class Movement : CoreComponent
         currentCellgridPosition = pathfinder.moveableTilemap.WorldToCell(entity.GetEntityFeetPosition());
         currentHexgridPosition = pathfinder.CellgridToHexgrid(currentCellgridPosition);
         entity.transform.position = pathfinder.moveableTilemap.CellToWorld(currentCellgridPosition) + Vector3.up * entity.entityCollider.bounds.extents.y;
+    }
+
+    protected override void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button.Equals(PointerEventData.InputButton.Left))
+        {
+            if (Manager.Instance.gameManager.battlePhase)
+            {
+                if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
+                {
+                    ToggleMoveableTilemap(UtilityFunctions.IsTilemapEmpty(entity.highlightedTilemap));
+                }
+            }
+        }
+        else if (eventData.button.Equals(PointerEventData.InputButton.Right))
+        {
+            ToggleMoveableTilemap(false);
+        }
     }
 
     public void UpdateGridPositionData()
@@ -112,6 +125,8 @@ public abstract class Movement : CoreComponent
         Vector3Int destinationCellgridPosition = gridType.Equals(GridType.Hexgrid) ? pathfinder.HexgridToCellgrid(destinationGridPosition) : destinationGridPosition;
 
         // if (Manager.Instance.gameManager.fogTilemap.HasTile(destinationCellgridPosition)) return false;
+        if (Manager.Instance.gameManager.EntityExistsAt(destinationCellgridPosition)) return false;
+        if (currentCellgridPosition.Equals(destinationCellgridPosition)) return false;
 
         if (instantMove)
         {
@@ -122,6 +137,7 @@ public abstract class Movement : CoreComponent
                 if (!pathfinder.IsObstacle(destinationCellgridPosition) && pathfinder.isMoveable(destinationCellgridPosition))
                 {
                     entity.SetEntityFeetPosition(pathfinder.moveableTilemap.CellToWorld(destinationCellgridPosition));
+                    ToggleMoveableTilemap(false);
                     UpdateGridPositionData();
                     return true;
                 }
@@ -195,55 +211,51 @@ public abstract class Movement : CoreComponent
     /// Gets whether entity is going to show moveable tile area in bool value. True means it will show its moveable tile area, and vice versa.
     /// </summary>
     /// <param name="showTile"></param>
-    public void DrawMoveableTiles(bool showTile = true)
+    public void ToggleMoveableTilemap(bool showTile = true)
     {
-        if (!isMoving)
+        entity.highlightedTilemap.ClearAllTiles();
+
+        if (!showTile) return;
+
+        for (int x = -moveRangeInHexGrid.x; x <= moveRangeInHexGrid.x; x++)
         {
-            entity.highlightedTilemap.ClearAllTiles();
-            isShowingMoveableTiles = false;
-
-            if (!showTile) return;
-
-            for (int x = -moveRangeInHexGrid.x; x <= moveRangeInHexGrid.x; x++)
+            for (int y = -moveRangeInHexGrid.y; y <= moveRangeInHexGrid.y; y++)
             {
-                for (int y = -moveRangeInHexGrid.y; y <= moveRangeInHexGrid.y; y++)
+                for (int z = -moveRangeInHexGrid.z; z <= moveRangeInHexGrid.z; z++)
                 {
-                    for (int z = -moveRangeInHexGrid.z; z <= moveRangeInHexGrid.z; z++)
+                    if (x + y + z != 0) continue;
+
+                    Vector3Int moveableHexgridPosition = currentHexgridPosition + new Vector3Int(x, y, z);
+                    Vector3Int moveableCellgridPosition = pathfinder.HexgridToCellgrid(moveableHexgridPosition);
+
+                    GridNode moveableGridNode = pathfinder.gridNodes.FirstOrDefault(node => node.cellgridPosition == moveableCellgridPosition);
+
+                    if (moveableGridNode != null && !moveableGridNode.isObstacle)
                     {
-                        if (x + y + z != 0) continue;
+                        PathInformation pathInformation = pathfinder.PathFinding(currentCellgridPosition, moveableCellgridPosition);
 
-                        Vector3Int moveableHexgridPosition = currentHexgridPosition + new Vector3Int(x, y, z);
-                        Vector3Int moveableCellgridPosition = pathfinder.HexgridToCellgrid(moveableHexgridPosition);
-
-                        GridNode moveableGridNode = pathfinder.gridNodes.FirstOrDefault(node => node.cellgridPosition == moveableCellgridPosition);
-
-                        if (moveableGridNode != null && !moveableGridNode.isObstacle)
+                        if (pathInformation == null || entity.entityStat.stamina.currentValue < pathInformation.requiredStamina) continue;
+                        
+                        if (!PathOutOfRange(currentHexgridPosition, pathInformation))
                         {
-                            PathInformation pathInformation = pathfinder.PathFinding(currentCellgridPosition, moveableCellgridPosition);
-
-                            if (entity.entityStat.stamina.currentValue < pathInformation.requiredStamina) continue;
-
-                            bool pathOutOfRange = false;
-
-                            foreach (GridNode gridNode in pathInformation.path)
-                            {
-                                if ((Mathf.Abs(gridNode.hexgridPosition.x - currentHexgridPosition.x) > moveRangeInHexGrid.x) || (Mathf.Abs(gridNode.hexgridPosition.y - currentHexgridPosition.y) > moveRangeInHexGrid.y) || (Mathf.Abs(gridNode.hexgridPosition.z - currentHexgridPosition.z) > moveRangeInHexGrid.z))
-                                {
-                                    pathOutOfRange = true;
-                                    break;
-                                }
-                            }
-
-                            if (!pathOutOfRange)
-                            {
-                                entity.highlightedTilemap.SetTile(moveableCellgridPosition, moveRangeHighlightedTileBase);
-                            }
+                            entity.highlightedTilemap.SetTile(moveableCellgridPosition, moveRangeHighlightedTileBase);
                         }
                     }
                 }
             }
-
-            isShowingMoveableTiles = true;
         }
+    }
+
+    public bool PathOutOfRange(Vector3Int currentHexgridPosition, PathInformation pathInformation)
+    {
+        foreach (GridNode gridNode in pathInformation.path)
+        {
+            if ((Mathf.Abs(gridNode.hexgridPosition.x - currentHexgridPosition.x) > moveRangeInHexGrid.x) || (Mathf.Abs(gridNode.hexgridPosition.y - currentHexgridPosition.y) > moveRangeInHexGrid.y) || (Mathf.Abs(gridNode.hexgridPosition.z - currentHexgridPosition.z) > moveRangeInHexGrid.z))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

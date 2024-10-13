@@ -25,7 +25,7 @@ public class StatComponent
         currentValue = initialValue;
     }
 
-    public void IncreaseCurrentValue(float amount, bool allowMaxValue = true)
+    public void IncreaseCurrentValue(float amount, bool allowMaxValue = true, int durationTurn = 1, bool returnToInitialValue = false)
     {
         currentValue += amount;
         currentValue = allowMaxValue ? Mathf.Clamp(currentValue, minValue, maxValue) : Mathf.Clamp(currentValue, minValue, maxValue - epsilon);
@@ -37,7 +37,7 @@ public class StatComponent
         }
     }
 
-    public void DecreaseCurrentValue(float amount, bool allowMinValue = true)
+    public void DecreaseCurrentValue(float amount, bool allowMinValue = true, int durationTurn = 1, bool returnToInitialValue = false)
     {
         currentValue -= amount;
         currentValue = allowMinValue ? Mathf.Clamp(currentValue, minValue, maxValue) : Mathf.Clamp(currentValue, minValue + epsilon, maxValue);

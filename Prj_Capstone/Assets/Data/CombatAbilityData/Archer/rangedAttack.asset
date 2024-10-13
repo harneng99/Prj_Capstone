@@ -16,6 +16,9 @@ MonoBehaviour:
   <combatAbilityName>k__BackingField: Ranged Attack
   <combatAbilityType>k__BackingField: 0
   <staminaCost>k__BackingField: 3
+  <turnDuration>k__BackingField: 0
+  <availableTarget>k__BackingField: 2
+  <maximumCastingAreaCount>k__BackingField: 0
   <combatAbilityDescription>k__BackingField: Deals damage to the target in the selected
     area.
   <castingRange>k__BackingField: {x: 3, y: 3, z: 3}

@@ -1,9 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerCombat : Combat
 {
+    private PlayerCharacter mercenary;
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        mercenary = entity as PlayerCharacter;
+    }
+
     protected override void Start()
     {
         base.Start();
@@ -11,54 +21,66 @@ public class PlayerCombat : Combat
         Manager.Instance.playerInputManager.controls.Map.MouseLeftClick.performed += _ => MouseLeftClick();
     }
 
-    protected virtual void MouseLeftClick()
+    protected override void OnPointerClick(PointerEventData eventData)
     {
-        if (aoeTilemap.HasTile(currentMouseCellgridPosition))
+        if (eventData.button.Equals(PointerEventData.InputButton.Left))
         {
-            if (entity.entityStat.stamina.currentValue < currentSelectedCombatAbility.staminaCost)
+            if (Manager.Instance.gameManager.battlePhase)
             {
-                Manager.Instance.uiManager.ShowWarningUI("Warning: Not enough stamina.");
-            }
-            else
-            {
-                Manager.Instance.gameManager.isAiming = false;
-
-                bool hasTargetInRange = ApplyCombatAbility(currentMouseCellgridPosition, GridType.Cellgrid, currentSelectedCombatAbility);
-
-                if (!hasTargetInRange && !Manager.Instance.gameManager.isAiming)
+                if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
                 {
-                    Manager.Instance.uiManager.ShowWarningUI("Warning: No target in range.");
+                    Manager.Instance.uiManager.SetCombatAbilityButtons();
                 }
+            }
+        }
+        else if (eventData.button.Equals(PointerEventData.InputButton.Right))
+        {
+            // TODO: Delete the designated target of the combat ability
+        }
+    }
 
-                /*foreach (Vector3Int rangeHexgridOffset in currentSelectedCombatAbility.AOEDictionary.Keys)
+    protected override void MouseRightClick()
+    {
+        if (Manager.Instance.gameManager)
+        {
+            if (entity.isSelected && currentSelectedCombatAbility != null && currentSelectedCombatAbility.maximumCastingAreaCount == 1)
+            {
+                currentSelectedCombatAbility = null;
+                Manager.Instance.gameManager.isAiming = false;
+                Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection = false;
+                entity.highlightedTilemap.ClearAllTiles();
+                aoeTilemap.ClearAllTiles();
+            }
+        }
+    }
+
+    private void MouseLeftClick()
+    {
+        if (!Manager.Instance.playerInputManager.IsPointerOverUI())
+        {
+            if (Manager.Instance.gameManager.battlePhase)
+            {
+                if (aoeTilemap.HasTile(currentMouseCellgridPosition) && currentSelectedCombatAbility != null)
                 {
-                    if (currentSelectedCombatAbility.AOEDictionary[rangeHexgridOffset] == false) continue;
-
-                    Vector3Int currentRangeCellgrid = currentMouseCellgridPosition + entity.entityMovement.pathfinder.HexgridToCellgrid(rangeHexgridOffset);
-
-                    GridNode currentGridNode = entity.entityMovement.pathfinder.gridNodes.FirstOrDefault(node => node.cellgridPosition == currentRangeCellgrid);
-
-                    if (currentGridNode != null && !currentGridNode.isObstacle)
+                    if (entity.entityStat.stamina.currentValue < currentSelectedCombatAbility.staminaCost)
                     {
-                        foreach (Entity entity in Manager.Instance.gameManager.entities)
-                        {
-                            if (entity.isActiveAndEnabled && entity.entityMovement.currentCellgridPosition.Equals(currentRangeCellgrid))
-                            {
-                                hasTargetInRange = true;
+                        Manager.Instance.uiManager.ShowWarningUI("Warning: Not enough stamina.");
+                    }
+                    else
+                    {
+                        bool combatAbilityExecuted = ExecuteCombatAbility(currentMouseCellgridPosition, GridType.Cellgrid, currentSelectedCombatAbility);
 
-                                foreach (CombatAbilityComponent combatAbilityComponent in currentSelectedCombatAbility.combatAbilityComponents)
-                                {
-                                    combatAbilityComponent.ApplyCombatAbility(entity);
-                                }
-                            }
+                        if (!combatAbilityExecuted)
+                        {
+                            Manager.Instance.uiManager.ShowWarningUI("Warning: No target in range.");
+                        }
+                        else
+                        {
+                            Manager.Instance.gameManager.isAiming = false;
+                            Manager.Instance.uiManager.HideSideInformationUI();
                         }
                     }
-
-                    if (!hasTargetInRange && !Manager.Instance.gameManager.isAiming)
-                    {
-                        Manager.Instance.uiManager.ShowWarningUI("Warning: No target in range.");
-                    }
-                }*/
+                }
             }
         }
     }

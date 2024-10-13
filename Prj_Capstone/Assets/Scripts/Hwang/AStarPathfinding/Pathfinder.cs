@@ -100,14 +100,16 @@ public class Pathfinder : MonoBehaviour
         return Mathf.Max(new int[] { Mathf.Abs(hexgridStartPosition.x - hexgridDestinationPosition.x), Mathf.Abs(hexgridStartPosition.y - hexgridDestinationPosition.y), Mathf.Abs(hexgridStartPosition.z - hexgridDestinationPosition.z) });
     }
 
-    public PathInformation PathFinding(Vector3Int cellgridStartPosition, Vector3Int cellgridDestinationPosition)
+    public PathInformation PathFinding(Vector3Int cellgridStartPosition, Vector3Int cellgridDestinationPosition, bool allowOverlap = true)
     {
         Initialize();
 
         GridNode startNode = gridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridStartPosition);
         GridNode destinationNode = gridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridDestinationPosition);
 
-        if (destinationNode == null) return null;
+
+        if (allowOverlap == false && Manager.Instance.gameManager.EntityExistsAt(cellgridDestinationPosition)) return null;
+        if (startNode == null || destinationNode == null) return null;
 
         startNode.cameFromNode = null;
         startNode.gCost = 0;
@@ -217,7 +219,14 @@ public class Pathfinder : MonoBehaviour
 
     public Vector3Int CellgridToHexgrid(Vector3Int cellgridPosition)
     {
-        return new Vector3Int(cellgridPosition.x - cellgridPosition.y / 2, cellgridPosition.y, -cellgridPosition.x - cellgridPosition.y / 2 - cellgridPosition.y % 2);
+        if (cellgridPosition.y < 0 && cellgridPosition.y % 2 != 0)
+        {
+            return new Vector3Int(cellgridPosition.x - cellgridPosition.y / 2, cellgridPosition.y, -cellgridPosition.x - cellgridPosition.y / 2 - cellgridPosition.y % 2) + new Vector3Int(1, 0, -1);
+        }
+        else
+        {
+            return new Vector3Int(cellgridPosition.x - cellgridPosition.y / 2, cellgridPosition.y, -cellgridPosition.x - cellgridPosition.y / 2 - cellgridPosition.y % 2);
+        }
         
         // GridNode cellgridNode = gridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridPosition);
         // return cellgridNode == null ? null : cellgridNode.cellgridPosition;

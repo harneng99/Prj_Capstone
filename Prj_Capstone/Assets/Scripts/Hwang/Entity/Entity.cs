@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
 using static UnityEngine.EventSystems.EventTrigger;
 
-public class Entity : MonoBehaviour, IPointerClickHandler
+public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     #region Entity Components
     [field: SerializeField] public Sprite entityPortrait { get; private set; }
@@ -27,7 +27,7 @@ public class Entity : MonoBehaviour, IPointerClickHandler
     #endregion
 
     #region Other Variables
-    public event Action onPointerClick;
+    public event Action<PointerEventData> onPointerClick;
     public bool isSelected { get; private set; }
     public Tilemap highlightedTilemap { get; private set; }
     #endregion
@@ -39,21 +39,19 @@ public class Entity : MonoBehaviour, IPointerClickHandler
         entityCollider = GetComponent<Collider2D>();
 
         core = GetComponentInChildren<Core>();
+        entityStat = core.GetCoreComponent<Stat>();
+        entityMovement = core.GetCoreComponent<Movement>();
+        entityCombat = core.GetCoreComponent<Combat>();
 
-        onPointerClick += ShowInformation;
         highlightedTilemap = GameObject.FindWithTag("HighlightedTilemap").GetComponent<Tilemap>();
     }
 
     protected virtual void Start()
     {
-        entityStat = core.GetCoreComponent<Stat>();
-        entityMovement = core.GetCoreComponent<Movement>();
-        entityCombat = core.GetCoreComponent<Combat>();
-
         Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
     }
 
-    
+
     protected virtual void Update()
     {
         
@@ -61,13 +59,54 @@ public class Entity : MonoBehaviour, IPointerClickHandler
 
     public virtual void OnPointerClick(PointerEventData eventData)
     {
-        Manager.Instance.gameManager.Select(this);
-        onPointerClick?.Invoke();
+        if (!isSelected)
+        {
+            highlightedTilemap.ClearAllTiles();
+        }
+        if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
+        {
+            Manager.Instance.gameManager.Select(this);
+            ShowInformation();
+        }
+        onPointerClick?.Invoke(eventData);
+        Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection = Manager.Instance.gameManager.isAiming;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (Manager.Instance.gameManager.battlePhase)
+        {
+            if (Manager.Instance.gameManager.isAiming)
+            {
+                Manager.Instance.uiManager.SetSideInformationUI(this, entityDescription);
+                Manager.Instance.uiManager.ShowSideInformationUI();
+            }
+        }
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (Manager.Instance.gameManager.battlePhase)
+        {
+            if (Manager.Instance.gameManager.isAiming)
+            {
+                Manager.Instance.uiManager.HideSideInformationUI();
+            }
+        }
     }
 
     protected virtual void ShowInformation()
     {
-        Manager.Instance.uiManager.SetEntityInformation(entityPortrait, entityName, entityDescription, entityStat);
+        if (Manager.Instance.gameManager.mercenaryDeploymentPhase)
+        {
+            Manager.Instance.uiManager.SetSideInformationUI(this, entityDescription);
+            Manager.Instance.uiManager.ShowSideInformationUI();
+        }
+        else if (Manager.Instance.gameManager.battlePhase)
+        {
+            Manager.Instance.uiManager.SetInformationUI(this, entityDescription, entityMovement.pathfinder.moveableTilemap.WorldToCell(GetEntityFeetPosition()));
+            Manager.Instance.uiManager.ShowInformationUI();
+        }
     }
 
     protected void MouseRightClick()
@@ -75,7 +114,7 @@ public class Entity : MonoBehaviour, IPointerClickHandler
         if (isSelected)
         {
             isSelected = false;
-            Manager.Instance.uiManager.HideEntityInformation();
+            // Manager.Instance.uiManager.HideEntityInformation();
             highlightedTilemap.ClearAllTiles();
             entityCombat.currentSelectedCombatAbility = null;
         }

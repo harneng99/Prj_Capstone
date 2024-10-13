@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
-public class Combat : CoreComponent
+public abstract class Combat : CoreComponent
 {
     [field: SerializeField] public TileBase combatAbilityRangeHighlightedTileBase { get; private set; }
     [field: SerializeField] public TileBase combatAbilityAOEHighlightedTileBase { get; private set; }
@@ -14,9 +15,9 @@ public class Combat : CoreComponent
     public bool isCasting { get; private set; } // 정신집중
     public bool isAttacking { get; private set; } // 공격 애니메이션 종료
     
-    [SerializeField] protected List<CombatAbility> combatAbilities;
+    [field: SerializeField] public List<CombatAbility> combatAbilities { get; protected set; }
+    public List<GameObject> combatAbilityButtons { get; protected set; } = new List<GameObject>();
     protected Tilemap aoeTilemap;
-    protected List<GameObject> combatAbilityButtons = new List<GameObject>();
     protected Canvas canvas;
     protected Vector3Int currentMouseCellgridPosition;
 
@@ -24,14 +25,13 @@ public class Combat : CoreComponent
     {
         base.Awake();
 
-        entity.onPointerClick += () => { ToggleCombatAbilityButtons(); };
         canvas = GameObject.FindWithTag("MainCanvas").GetComponent<Canvas>();
         aoeTilemap = GameObject.FindWithTag("AOETilemap").GetComponent<Tilemap>();
     }
 
     protected virtual void Start()
     {
-        GenerateCombatAbilityButtons();
+        combatAbilityButtons = Manager.Instance.uiManager.GenerateCombatAbilityButtons(entity);
         ToggleCombatAbilityButtons(false);
 
         Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
@@ -43,8 +43,7 @@ public class Combat : CoreComponent
         {
             if (entity.isSelected && currentSelectedCombatAbility != null)
             {
-                Vector3 mousePosition = Manager.Instance.playerInputManager.GetMousePosition();
-                Vector3Int nextCellgridPosition = entity.highlightedTilemap.WorldToCell(mousePosition);
+                Vector3Int nextCellgridPosition = Manager.Instance.playerInputManager.GetMousePosition(GridType.Cellgrid);
 
                 if (currentMouseCellgridPosition != nextCellgridPosition)
                 {
@@ -72,12 +71,9 @@ public class Combat : CoreComponent
         }
     }
 
-    protected virtual void MouseRightClick()
-    {
-        currentSelectedCombatAbility = null;
-        Manager.Instance.gameManager.isAiming = false;
-        ToggleCombatAbilityButtons(false);
-    }
+    protected abstract void MouseRightClick();
+
+    protected override void OnPointerClick(PointerEventData eventData) { }
 
     public void DrawCastingRange(CombatAbility combatAbility)
     {
@@ -125,7 +121,7 @@ public class Combat : CoreComponent
         }
     }
 
-    protected bool ApplyCombatAbility(Vector3Int combatAbilityCenterGridPosition, GridType gridType, CombatAbility selectedCombatAbility)
+    protected bool ExecuteCombatAbility(Vector3Int combatAbilityCenterGridPosition, GridType gridType, CombatAbility selectedCombatAbility)
     {
         bool hasTargetInRange = false;
 
@@ -137,9 +133,11 @@ public class Combat : CoreComponent
 
             Vector3Int currentRangeHexgrid = combatAbilityCenterHexgridPosition + rangeHexgridOffset;
 
+            // TODO: Change ApplyCombatAbility Function to be independent from its parameter type
+
             foreach (Entity entity in Manager.Instance.gameManager.entities)
             {
-                if (!entity.isActiveAndEnabled) continue;
+                if (!CheckAbilityCondition(entity, selectedCombatAbility)) continue;
 
                 if (entity.entityMovement.currentHexgridPosition.Equals(currentRangeHexgrid))
                 {
@@ -156,6 +154,7 @@ public class Combat : CoreComponent
         if (hasTargetInRange)
         {
             entity.entityStat.stamina.DecreaseCurrentValue(selectedCombatAbility.staminaCost);
+            aoeTilemap.ClearAllTiles();
             return true;
         }
         else
@@ -164,41 +163,24 @@ public class Combat : CoreComponent
         }
     }
 
+    protected bool CheckAbilityCondition(Entity target, CombatAbility selectedCombatAbility)
+    {
+        if (!target.isActiveAndEnabled) return false;
+
+        /*if (selectedCombatAbility.canBeUsedToSelf && target.Equals(entity)) return false;
+
+        if (selectedCombatAbility.canBeUsedToAlly && target.GetType().Equals(entity.GetType())) return false;
+
+        if (selectedCombatAbility.canBeUsedToEnemy && !target.GetType().Equals(entity.GetType())) return false;*/
+
+        return true;
+    }
+
     protected void ToggleCombatAbilityButtons(bool setActive)
     {
         foreach (GameObject combatAbilityButton in combatAbilityButtons)
         {
             combatAbilityButton.SetActive(setActive);
-        }
-    }
-
-    protected void ToggleCombatAbilityButtons()
-    {
-        foreach (GameObject combatAbilityButton in combatAbilityButtons)
-        {
-            combatAbilityButton.SetActive(!combatAbilityButton.activeSelf);
-        }
-    }
-
-    private void GenerateCombatAbilityButtons()
-    {
-        for (int i = 0; i < combatAbilities.Count; i++)
-        {
-            GameObject combatAbilityButtonPrefab = Manager.Instance.objectPoolingManager.GetGameObject("Combat Ability Button");
-            CombatAbilityButton combatAbilityButton = combatAbilityButtonPrefab.GetComponent<CombatAbilityButton>();
-            RectTransform buttonRectTransform = combatAbilityButtonPrefab.GetComponent<RectTransform>();
-            combatAbilityButtonPrefab.GetComponentsInChildren<Image>().Skip(1).ToList()[0].sprite = combatAbilities[i].combatAbilityIcon;
-
-            combatAbilityButton.entity = entity;
-            foreach (CombatAbilityComponent combatAbilityComponent in combatAbilities[i].combatAbilityComponents)
-            {
-                combatAbilityComponent.entity = entity;
-            }
-            combatAbilityButton.combatAbility = combatAbilities[i];
-            buttonRectTransform.SetParent(canvas.transform);
-            Vector3 currentLocalPosition = Manager.Instance.uiManager.buttonGenerateRectTransform.localPosition + Vector3.right * buttonRectTransform.sizeDelta.x * 1.5f * i;
-            buttonRectTransform.localPosition = currentLocalPosition;
-            combatAbilityButtons.Add(combatAbilityButtonPrefab);
         }
     }
 }
