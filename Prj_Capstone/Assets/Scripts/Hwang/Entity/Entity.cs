@@ -59,17 +59,20 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
 
     public virtual void OnPointerClick(PointerEventData eventData)
     {
-        if (!isSelected)
+        if (eventData.button.Equals(PointerEventData.InputButton.Left))
         {
-            highlightedTilemap.ClearAllTiles();
+            /*if (!isSelected)
+            {
+                highlightedTilemap.ClearAllTiles();
+            }*/
+            if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
+            {
+                Manager.Instance.gameManager.Select(this);
+                ShowInformation();
+            }
+            onPointerClick?.Invoke(eventData);
+            Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection = Manager.Instance.gameManager.isAiming;
         }
-        if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
-        {
-            Manager.Instance.gameManager.Select(this);
-            ShowInformation();
-        }
-        onPointerClick?.Invoke(eventData);
-        Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection = Manager.Instance.gameManager.isAiming;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -113,12 +116,12 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         if (isSelected)
         {
-            isSelected = false;
             // Manager.Instance.uiManager.HideEntityInformation();
             highlightedTilemap.ClearAllTiles();
             entityCombat.currentSelectedCombatAbility = null;
         }
         Manager.Instance.gameManager.ResetEntitySelected();
+        Manager.Instance.uiManager.HideSideInformationUI();
     }
 
     public void Select() => isSelected = true;

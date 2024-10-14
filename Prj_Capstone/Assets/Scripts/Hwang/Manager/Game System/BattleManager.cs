@@ -132,6 +132,7 @@ public class BattleManager : MonoBehaviour
 
     public void ResetEntitySelected()
     {
+        currentSelectedEntity = null;
         foreach (Entity entity in entities)
         {
             entity.Deselect();
@@ -152,6 +153,7 @@ public class BattleManager : MonoBehaviour
             Manager.Instance.uiManager.turnCounter.SetActive(true);
 
             playerTurnStart?.Invoke();
+            ResetEntitySelected();
             mercenaryDeploymentPhase = false;
             battlePhase = true;
             playerPhase = true;
@@ -217,7 +219,10 @@ public class BattleManager : MonoBehaviour
     public void SetVirtualCameraFollowTransformTo(Transform follow)
     {
         virtualCameraFollowTransform.SetParent(follow);
-        virtualCameraFollowTransform.localPosition = Vector3.zero;
+        if (follow != null)
+        {
+            virtualCameraFollowTransform.localPosition = Vector3.zero;
+        }
     }
 
     public bool EntityExistsAt(Vector3Int cellgridPosition)

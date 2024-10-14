@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 68d6fb54b938ba84a9232f2f19f37b3a, type: 3}
-  m_Name: RangedAttack
+  m_Name: rangedAttack
   m_EditorClassIdentifier: 
   <combatAbilityIcon>k__BackingField: {fileID: 21300000, guid: 81486ee611fa4224081ce6029f573a35, type: 3}
   <combatAbilityName>k__BackingField: Ranged Attack

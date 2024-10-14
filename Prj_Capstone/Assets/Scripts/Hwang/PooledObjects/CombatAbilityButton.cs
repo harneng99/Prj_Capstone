@@ -10,8 +10,6 @@ public class CombatAbilityButton : PooledObject, IPointerEnterHandler, IPointerE
     public Entity entity { get; set; }
     public CombatAbility combatAbility { get; set; }
 
-    private GameObject combatAbilityDescriptionPrefab;
-
     public void ToggleCombatAbilityCastRange()
     {
         if (Manager.Instance.gameManager.isAiming)
@@ -34,17 +32,21 @@ public class CombatAbilityButton : PooledObject, IPointerEnterHandler, IPointerE
     public void OnPointerEnter(PointerEventData eventData)
     {
         Vector2 mousePosition = Manager.Instance.playerInputManager.GetMousePosition();
-        combatAbilityDescriptionPrefab = Manager.Instance.objectPoolingManager.GetGameObject("Combat Ability Description");
-        RectTransform descriptionRectTransform = combatAbilityDescriptionPrefab.GetComponent<RectTransform>();
-        descriptionRectTransform.SetParent(transform);
-        TMP_Text combatAbilityDescriptionText = combatAbilityDescriptionPrefab.GetComponentInChildren<TMP_Text>();
-        descriptionRectTransform.position = mousePosition;
-        Debug.Log("Mouse Position: " + mousePosition + ", rectTransform.position: " + descriptionRectTransform.position);
-        combatAbilityDescriptionText.text = combatAbility.combatAbilityDescription;
+        GameObject combatAbilityDescriptionPopup = Manager.Instance.uiManager.combatAbilityDescriptionPopup;
+        combatAbilityDescriptionPopup.SetActive(true);
+        TMP_Text[] combatAbilityDescriptionText = combatAbilityDescriptionPopup.GetComponentsInChildren<TMP_Text>();
+        combatAbilityDescriptionText[0].text = combatAbility.name;
+        combatAbilityDescriptionText[1].text = combatAbility.combatAbilityDescription;
+        // combatAbilityDescriptionPrefab = Manager.Instance.objectPoolingManager.GetGameObject("Combat Ability Description");
+        // RectTransform descriptionRectTransform = combatAbilityDescriptionPopup.GetComponent<RectTransform>();
+        // descriptionRectTransform.SetParent(transform);
+        // descriptionRectTransform.position = mousePosition;
+        // Debug.Log("Mouse Position: " + mousePosition + ", rectTransform.position: " + descriptionRectTransform.position);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        combatAbilityDescriptionPrefab.GetComponent<PooledObject>().ReleaseObject();
+        // combatAbilityDescriptionPrefab.GetComponent<PooledObject>().ReleaseObject();
+        Manager.Instance.uiManager.combatAbilityDescriptionPopup.SetActive(false);
     }
 }

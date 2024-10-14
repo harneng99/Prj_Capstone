@@ -67,6 +67,7 @@ public class BattleSceneUIManager : UIManager
 
     #region Extra UI
     [field: Header("Extra UI")]
+    [field: SerializeField] public GameObject combatAbilityDescriptionPopup { get; private set; }
     [field: SerializeField] public GameObject phaseInformationUI { get; private set; }
     [field: SerializeField] public GameObject turnCounter { get; private set; }
     #endregion
@@ -183,7 +184,7 @@ public class BattleSceneUIManager : UIManager
 
     public void GenerateShorcutPortrait()
     {
-        int index = 0;
+        int count = 0;
 
         foreach (PlayerCharacter mercenary in Manager.Instance.gameManager.mercenaries)
         {
@@ -193,9 +194,9 @@ public class BattleSceneUIManager : UIManager
                 RectTransform shortcutPortraitRectTransform = shortcutPortraitGameObject.GetComponent<RectTransform>();
                 ShortcutPortrait shortcutPortrait = shortcutPortraitGameObject.GetComponent<ShortcutPortrait>();
                 shortcutPortrait.mercenary = mercenary;
-                shortcutPortraitGameObject.transform.position = shortcutPortraitGenerateRectTransform.position + Vector3.right * distanceBetweenShortcutPortrait * index;
+                shortcutPortraitRectTransform.position = shortcutPortraitGenerateRectTransform.position + Vector3.right * distanceBetweenShortcutPortrait * count;
                 shortcutPortraitRectTransform.SetParent(shortcutPortraitGenerateRectTransform);
-                index += 1;
+                count += 1;
             }
         }
     }

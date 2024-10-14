@@ -13,9 +13,19 @@ public class CombatAbilityDescription : PooledObject
 
     private void OnEnable()
     {
-        float pivotX = Manager.Instance.playerInputManager.GetMousePosition().x / Screen.width;
-        float pivotY = Manager.Instance.playerInputManager.GetMousePosition().y / Screen.height;
+        /*float pivotX = Input.mousePosition.x / Screen.width;
+        float pivotY = Input.mousePosition.y / Screen.height;*/
 
-        combatAbilityDescriptionRectTransform.pivot = new Vector3(pivotX, pivotY);
+        combatAbilityDescriptionRectTransform.position = Input.mousePosition;
+        if (!UtilityFunctions.IsFullyVisibleFrom(combatAbilityDescriptionRectTransform))
+        {
+            combatAbilityDescriptionRectTransform.pivot = Vector2.right;
+        }
+        // combatAbilityDescriptionRectTransform.pivot = new Vector3(pivotX, pivotY);
+    }
+
+    private void OnDisable()
+    {
+        combatAbilityDescriptionRectTransform.pivot = Vector2.zero;
     }
 }

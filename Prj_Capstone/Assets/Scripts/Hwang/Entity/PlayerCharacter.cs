@@ -38,32 +38,36 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
 
     public override void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Left)
+        if (eventData.button.Equals(PointerEventData.InputButton.Left))
         {
-            if (!entityMovement.MoveToGrid(GetEntityFeetPosition(), true)) // failed moving
+            if (Manager.Instance.gameManager.mercenaryDeploymentPhase)
             {
-                if (entityMovement.currentWorldgridPosition.HasValue)
+                if (!entityMovement.MoveToGrid(GetEntityFeetPosition(), true)) // failed moving
                 {
-                    entityMovement.MoveToGrid(entityMovement.currentWorldgridPosition.Value, true);
+                    if (entityMovement.currentWorldgridPosition.HasValue)
+                    {
+                        entityMovement.MoveToGrid(entityMovement.currentWorldgridPosition.Value, true);
+                    }
+                    else
+                    {
+                        Manager.Instance.uiManager.mercenarySlotWindow.ResetHighlights();
+                        gameObject.SetActive(false);
+                    }
                 }
-                else
+                else // moving success
                 {
-                    Manager.Instance.uiManager.mercenarySlotWindow.ResetHighlights();
-                    gameObject.SetActive(false);
+                    entityMovement.UpdateGridPositionData();
+                    Manager.Instance.uiManager.mercenarySlotWindow.OnCharacterDrop();
                 }
             }
-            else // moving success
-            {
-                entityMovement.UpdateGridPositionData();
-                Manager.Instance.uiManager.mercenarySlotWindow.OnCharacterDrop();
-            }
-
-            if (!eventData.dragging && !onInitialDeployment)
+            else if (Manager.Instance.gameManager.battlePhase)
             {
                 base.OnPointerClick(eventData);
             }
+
+            onInitialDeployment = false;
         }
-        else if (eventData.button == PointerEventData.InputButton.Right)
+        else if (eventData.button.Equals(PointerEventData.InputButton.Right))
         {
             if (Manager.Instance.gameManager.mercenaryDeploymentPhase)
             {
@@ -76,23 +80,22 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
                 gameObject.SetActive(false);
             }
         }
-
-        onInitialDeployment = false;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         if (Manager.Instance.gameManager.mercenaryDeploymentPhase)
         {
+            Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(transform);
             highlightedTilemap.ClearAllTiles();
             Manager.Instance.gameManager.mercenaryDragging = this;
-            Vector3 mousePosition = Manager.Instance.gameManager.mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            transform.position = new Vector3(mousePosition.x, mousePosition.y, 0.0f);
+            transform.position = Manager.Instance.playerInputManager.GetMousePosition();
         }
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
         Manager.Instance.gameManager.mercenaryDragging = null;
     }
 }
