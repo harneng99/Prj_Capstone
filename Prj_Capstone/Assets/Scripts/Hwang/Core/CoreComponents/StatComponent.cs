@@ -25,6 +25,7 @@ public class StatComponent
         currentValue = initialValue;
     }
 
+    // TODO: Add turn base logic to stats
     public void IncreaseCurrentValue(float amount, bool allowMaxValue = true, int durationTurn = 1, bool returnToInitialValue = false)
     {
         currentValue += amount;

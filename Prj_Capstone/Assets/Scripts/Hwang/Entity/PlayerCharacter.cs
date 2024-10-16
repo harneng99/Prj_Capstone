@@ -21,7 +21,7 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
 
         if (onInitialDeployment)
         {
-            SetEntityFeetPosition((Vector2)Manager.Instance.gameManager.mainCamera.ScreenToWorldPoint(Input.mousePosition) + Vector2.down * entityCollider.bounds.extents.y * 0.2f);
+            SetEntityFeetPosition(Manager.Instance.playerInputManager.GetMousePosition() + Vector3.down * entityCollider.bounds.extents.y * 0.2f);
             // Add offset for visual
         }
     }
@@ -29,11 +29,6 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
     protected override void ShowInformation()
     {
         base.ShowInformation();
-
-        /*if (UtilityFunctions.IsTilemapEmpty(highlightedTilemap))
-        {
-            Manager.Instance.uiManager.SetEntityInformation(entityPortrait, entityName, entityDescription, entityStat);
-        }*/
     }
 
     public override void OnPointerClick(PointerEventData eventData)
@@ -59,13 +54,16 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
                     entityMovement.UpdateGridPositionData();
                     Manager.Instance.uiManager.mercenarySlotWindow.OnCharacterDrop();
                 }
+
+                if (!eventData.dragging)
+                {
+                    base.OnPointerClick(eventData);
+                }
             }
             else if (Manager.Instance.gameManager.battlePhase)
             {
                 base.OnPointerClick(eventData);
             }
-
-            onInitialDeployment = false;
         }
         else if (eventData.button.Equals(PointerEventData.InputButton.Right))
         {

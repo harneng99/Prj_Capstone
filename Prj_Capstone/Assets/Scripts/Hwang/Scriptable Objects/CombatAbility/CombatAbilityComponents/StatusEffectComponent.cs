@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum StatusEffect { horror, poison, burn, stunned, paralyze }
+// TODO: Add status effect logic
+public enum StatusEffect { horror, poison, burn, stunned, paralyze, taunted }
 
 public class StatusEffectComponent : CombatAbilityComponent
 {

@@ -14,6 +14,7 @@ public class CombatAbility : ScriptableObject
     [field: SerializeField] public string combatAbilityName { get; private set; } = "Default Combat Ability Name";
     [field: SerializeField] public SkillType combatAbilityType { get; private set; }
     [field: SerializeField] public int staminaCost { get; private set; }
+    // TODO: Add logic to newly added combat ability components
     [field: SerializeField, Tooltip("The duration of the turn that the combat ability will be applied.")] public int turnDuration { get; private set; }
     [field: SerializeField] public AvailableTarget availableTarget { get; private set; } = AvailableTarget.Enemy;
     [field: SerializeField, Tooltip("Number of castings that the entity can make.")] public int maximumCastingAreaCount { get; private set; } = 1;

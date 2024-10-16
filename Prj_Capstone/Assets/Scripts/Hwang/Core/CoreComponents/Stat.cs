@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 
 public class Stat : CoreComponent
 {
+    // TODO: Change damage logic affected by multipliers
     [field: SerializeField] public StatComponent health { get; protected set; }
     [field: SerializeField] public StatComponent stamina { get; protected set; }
     [field: SerializeField] public StatComponent attackMultiplier { get; protected set; }

@@ -43,12 +43,9 @@ public class Movement : CoreComponent
     {
         if (eventData.button.Equals(PointerEventData.InputButton.Left))
         {
-            if (Manager.Instance.gameManager.battlePhase)
+            if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
             {
-                if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
-                {
-                    ToggleMoveableTilemap(UtilityFunctions.IsTilemapEmpty(entity.highlightedTilemap));
-                }
+                ToggleMoveableTilemap(UtilityFunctions.IsTilemapEmpty(entity.highlightedTilemap));
             }
         }
         else if (eventData.button.Equals(PointerEventData.InputButton.Right))

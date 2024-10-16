@@ -10,6 +10,7 @@ public enum TargetType { Closest, LowestHealth, PotentialThreat }
 
 public class WhatToDo
 {
+    // TODO: Add logic about potential threat type mercenary
     public float score { get; private set; }
     public CombatAbility combatAbility { get; private set; }
     public Vector3Int enemyHexgridPosition { get; private set; }
