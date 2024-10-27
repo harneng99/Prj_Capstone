@@ -108,15 +108,22 @@ public class EnemyCombat : Combat
             return;
         }
 
+        Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(enemy.transform);
+
         if (highestScoreWhatToDo.moveAfterAttack)
         {
             if (highestScoreWhatToDo.combatAbility != null)
             {
                 await Task.Delay(200);
                 enemy.enemyCombat.DrawCastingRange(highestScoreWhatToDo.combatAbility);
+
                 await Task.Delay(200);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
+                Manager.Instance.gameManager.virtualCameraFollowTransform.position = enemy.entityMovement.pathfinder.HexgridToWorldgrid(highestScoreWhatToDo.combatAbilityHexgridCenter);
                 enemy.enemyCombat.DrawAOE(enemy.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.combatAbilityHexgridCenter), highestScoreWhatToDo.combatAbility);
+
                 await Task.Delay(200);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(enemy.transform);
                 enemy.highlightedTilemap.ClearAllTiles();
                 aoeTilemap.ClearAllTiles();
                 ExecuteCombatAbility(highestScoreWhatToDo.combatAbilityHexgridCenter, GridType.Hexgrid, highestScoreWhatToDo.combatAbility);
@@ -125,12 +132,17 @@ public class EnemyCombat : Combat
             if (!highestScoreWhatToDo.enemyHexgridPosition.Equals(enemy.entityMovement.currentHexgridPosition))
             {
                 await Task.Delay(200);
-                enemy.entityMovement.ToggleMoveableTilemap();
+                enemy.entityMovement.DrawMoveableTilemap();
+
                 await Task.Delay(200);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
+                Manager.Instance.gameManager.virtualCameraFollowTransform.position = enemy.entityMovement.pathfinder.HexgridToWorldgrid(highestScoreWhatToDo.enemyHexgridPosition);
                 Manager.Instance.gameManager.selectionTilemap.SetTile(entity.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.enemyHexgridPosition), Manager.Instance.gameManager.selectionTile);
+
                 await Task.Delay(200);
                 enemy.highlightedTilemap.ClearAllTiles();
                 Manager.Instance.gameManager.selectionTilemap.SetTile(entity.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.enemyHexgridPosition), null);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(enemy.transform);
                 enemy.entityMovement.MoveToGrid(highestScoreWhatToDo.enemyHexgridPosition, GridType.Hexgrid, false);
                 if (enemy.entityMovement.isMoving)
                 {
@@ -143,12 +155,17 @@ public class EnemyCombat : Combat
             if (!highestScoreWhatToDo.enemyHexgridPosition.Equals(enemy.entityMovement.currentHexgridPosition))
             {
                 await Task.Delay(200);
-                enemy.entityMovement.ToggleMoveableTilemap();
+                enemy.entityMovement.DrawMoveableTilemap();
+
                 await Task.Delay(200);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
+                Manager.Instance.gameManager.virtualCameraFollowTransform.position = enemy.entityMovement.pathfinder.HexgridToWorldgrid(highestScoreWhatToDo.enemyHexgridPosition);
                 Manager.Instance.gameManager.selectionTilemap.SetTile(entity.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.enemyHexgridPosition), Manager.Instance.gameManager.selectionTile);
+
                 await Task.Delay(200);
                 enemy.highlightedTilemap.ClearAllTiles();
                 Manager.Instance.gameManager.selectionTilemap.SetTile(entity.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.enemyHexgridPosition), null);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(enemy.transform);
                 enemy.entityMovement.MoveToGrid(highestScoreWhatToDo.enemyHexgridPosition, GridType.Hexgrid, false);
                 while (enemy.entityMovement.isMoving)
                 {
@@ -160,9 +177,14 @@ public class EnemyCombat : Combat
             {
                 await Task.Delay(200);
                 enemy.enemyCombat.DrawCastingRange(highestScoreWhatToDo.combatAbility);
+
                 await Task.Delay(200);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
+                Manager.Instance.gameManager.virtualCameraFollowTransform.position = enemy.entityMovement.pathfinder.HexgridToWorldgrid(highestScoreWhatToDo.combatAbilityHexgridCenter);
                 enemy.enemyCombat.DrawAOE(enemy.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.combatAbilityHexgridCenter), highestScoreWhatToDo.combatAbility);
+
                 await Task.Delay(200);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(enemy.transform);
                 enemy.highlightedTilemap.ClearAllTiles();
                 aoeTilemap.ClearAllTiles();
                 ExecuteCombatAbility(highestScoreWhatToDo.combatAbilityHexgridCenter, GridType.Hexgrid, highestScoreWhatToDo.combatAbility);
@@ -234,7 +256,7 @@ public class EnemyCombat : Combat
         else return null;
     }
 
-    // TODO: If there are many mercenaries with the same health, then sort through distance.
+    // TODO: If there are many mercenaries with the same health, then sort through distance or potential threat.
     private PlayerCharacter LowestHealth()
     {
         PlayerCharacter currentLowestHealthTarget = null;
@@ -247,6 +269,11 @@ public class EnemyCombat : Combat
                 currentLowestHealthTarget = mercenary;
                 lowestHealth = mercenary.entityStat.health.currentValue;
             }
+            /*else if (lowestHealth == mercenary.entityStat.health.currentValue)
+            {
+                PathInformation originalMiminumHealthPathInformation = entity.entityMovement.pathfinder.PathFinding(entity.entityMovement.currentCellgridPosition, currentLowestHealthTarget.entityMovement.currentCellgridPosition);
+                PathInformation newMinimumHealthPathInformation = entity.entityMovement.pathfinder.PathFinding(entity.entityMovement.currentCellgridPosition, mercenary.entityMovement.currentCellgridPosition);
+            }*/
         }
 
         return currentLowestHealthTarget;

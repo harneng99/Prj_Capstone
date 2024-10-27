@@ -40,17 +40,25 @@ PrefabInstance:
       propertyPath: <stamina>k__BackingField.<recoveryValue>k__BackingField
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 1732000302543434024, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
+      propertyPath: m_SortingLayer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1732000302543434024, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 525957867
+      objectReference: {fileID: 0}
     - target: {fileID: 3308343947918306661, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: m_Name
       value: Knight
       objectReference: {fileID: 0}
     - target: {fileID: 3436735555467919529, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.49709946
       objectReference: {fileID: 0}
     - target: {fileID: 3436735555467919529, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 1.8920002
       objectReference: {fileID: 0}
     - target: {fileID: 3436735555467919529, guid: 85b651ff5be508a4297eef071d5e75f4, type: 3}
       propertyPath: m_LocalPosition.z

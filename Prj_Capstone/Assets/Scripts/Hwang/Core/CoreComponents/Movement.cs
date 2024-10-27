@@ -45,12 +45,20 @@ public class Movement : CoreComponent
         {
             if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
             {
-                ToggleMoveableTilemap(UtilityFunctions.IsTilemapEmpty(entity.highlightedTilemap));
+                if (!Manager.Instance.gameManager.currentSelectedEntity.Equals(entity))
+                {
+                    DrawMoveableTilemap(UtilityFunctions.IsTilemapEmpty(entity.highlightedTilemap));
+                }
+                else
+                {
+                    DrawMoveableTilemap(false);
+                    DrawMoveableTilemap(true);
+                }
             }
         }
         else if (eventData.button.Equals(PointerEventData.InputButton.Right))
         {
-            ToggleMoveableTilemap(false);
+            DrawMoveableTilemap(false);
         }
     }
 
@@ -134,7 +142,7 @@ public class Movement : CoreComponent
                 if (!pathfinder.IsObstacle(destinationCellgridPosition) && pathfinder.isMoveable(destinationCellgridPosition))
                 {
                     entity.SetEntityFeetPosition(pathfinder.moveableTilemap.CellToWorld(destinationCellgridPosition));
-                    ToggleMoveableTilemap(false);
+                    DrawMoveableTilemap(false);
                     UpdateGridPositionData();
                     return true;
                 }
@@ -154,6 +162,12 @@ public class Movement : CoreComponent
 
             isMoving = true;
             entity.entityStat.stamina.DecreaseCurrentValue(pathInformation.requiredStamina);
+
+            if (entity.isSelected)
+            {
+                Manager.Instance.uiManager.SetInformationUI(entity, entity.entityDescription, currentCellgridPosition);
+            }
+
             if (smoothMovementCoroutine != null)
             {
                 StopCoroutine(smoothMovementCoroutine);
@@ -200,6 +214,10 @@ public class Movement : CoreComponent
         }
 
         UpdateGridPositionData();
+        if (entity.isSelected)
+        {
+            Manager.Instance.uiManager.SetInformationUI(entity, entity.entityDescription, currentCellgridPosition);
+        }
         smoothMoveFinished?.Invoke();
         isMoving = false;
     }
@@ -208,7 +226,7 @@ public class Movement : CoreComponent
     /// Gets whether entity is going to show moveable tile area in bool value. True means it will show its moveable tile area, and vice versa.
     /// </summary>
     /// <param name="showTile"></param>
-    public void ToggleMoveableTilemap(bool showTile = true)
+    public void DrawMoveableTilemap(bool showTile = true)
     {
         entity.highlightedTilemap.ClearAllTiles();
 

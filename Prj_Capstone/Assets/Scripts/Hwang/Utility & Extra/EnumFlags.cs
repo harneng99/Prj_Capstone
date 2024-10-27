@@ -3,9 +3,9 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-public sealed class EnumFlagsAttribute : PropertyAttribute
+public sealed class EnumFlags : PropertyAttribute
 {
-    public EnumFlagsAttribute() { }
+    public EnumFlags() { }
 
     public static List<int> GetSelectedIndexes<T>(T val) where T : IConvertible
     {
@@ -40,7 +40,7 @@ public sealed class EnumFlagsAttribute : PropertyAttribute
 }
 
 #if UNITY_EDITOR
-[CustomPropertyDrawer(typeof(EnumFlagsAttribute))]
+[CustomPropertyDrawer(typeof(EnumFlags))]
 public class EnumFlagsAttributeDrawer : PropertyDrawer
 {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)

@@ -32,13 +32,13 @@ public class PlayerMovement : Movement
             {
                 if (!isMoving && mercenary.isSelected)
                 {
+                    if (mercenary.entityStat.currentlyAppliedStatusEffect.HasFlag(StatusEffect.Paralyze) || mercenary.entityStat.currentlyAppliedStatusEffect.HasFlag(StatusEffect.Stun) || mercenary.entityStat.currentlyAppliedStatusEffect.HasFlag(StatusEffect.Horror))
+                    {
+                        Manager.Instance.uiManager.ShowWarningUI("Warning: Selected mercenary can't move.");
+                        return;
+                    }
+
                     Vector3Int destinationCellgridPosition = Manager.Instance.playerInputManager.GetMousePosition(GridType.Cellgrid);
-
-                    /*Ray ray = Manager.Instance.gameManager.mainCamera.ScreenPointToRay(Input.mousePosition);
-                    RaycastHit rayHit;
-                    if (Physics.Raycast(ray, out rayHit) && rayHit.collider.gameObject.GetComponent<Entity>() != null) return;*/
-
-                    // if (destinationCellgridPosition.Equals(currentCellgridPosition)) return;
 
                     TileBase highlightedTile = mercenary.highlightedTilemap.GetTile(destinationCellgridPosition);
 
@@ -46,7 +46,7 @@ public class PlayerMovement : Movement
                     {
                         if (MoveToGrid(destinationCellgridPosition, GridType.Cellgrid, false))
                         {
-                            mercenary.highlightedTilemap.ClearAllTiles();
+                            DrawMoveableTilemap(false);
                         }
                     }
                 }

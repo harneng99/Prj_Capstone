@@ -52,12 +52,13 @@ public class BattleManager : MonoBehaviour
         playerTurnStart += () => { Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount; };
         playerTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = true; };
 
-        playerTurnEnd += Manager.Instance.playerInputManager.DisableInputSystemOnTurnChange;
+        // TODO: Below code deletes all the ClickHandler. Should find a way to fix this.
+        // playerTurnEnd += Manager.Instance.playerInputManager.DisableInputSystemOnTurnChange;
+        playerTurnEnd += Manager.Instance.uiManager.HideInformationUI;
         playerTurnEnd += Manager.Instance.uiManager.ShowPhaseInformationUI;
 
         enemyTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(Enemy)); };
         enemyTurnStart += () => { RunEnemyAI(); };
-        enemyTurnStart += Manager.Instance.playerInputManager.DisableInputSystemOnTurnChange;
         enemyTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = false; };
 
         enemyTurnEnd += Manager.Instance.uiManager.ShowPhaseInformationUI;
@@ -159,6 +160,7 @@ public class BattleManager : MonoBehaviour
             playerPhase = true;
             enemyPhase = false;
             Manager.Instance.uiManager.ShowPhaseInformationUI();
+            Manager.Instance.uiManager.HideSideInformationUI();
         }
     }
 
@@ -190,8 +192,11 @@ public class BattleManager : MonoBehaviour
             if (entity.GetType().Equals(entityType))
             {
                 // TODO: Find a way to do this in code, not manually listing all stats
-                entity.entityStat.health.IncreaseCurrentValue(entity.entityStat.health.recoveryValue);
-                entity.entityStat.stamina.IncreaseCurrentValue(entity.entityStat.stamina.recoveryValue);
+                if (!entity.entityStat.currentlyAppliedStatusEffect.HasFlag(StatusEffect.Burn))
+                {
+                    entity.entityStat.health.IncreaseCurrentValue(entity.entityStat.health.recoveryValue);
+                    entity.entityStat.stamina.IncreaseCurrentValue(entity.entityStat.stamina.recoveryValue);
+                }
             }
         }
     }

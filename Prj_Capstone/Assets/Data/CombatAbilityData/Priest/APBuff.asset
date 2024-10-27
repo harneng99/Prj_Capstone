@@ -10,35 +10,45 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 68d6fb54b938ba84a9232f2f19f37b3a, type: 3}
-  m_Name: HailOfArrows
+  m_Name: APBuff
   m_EditorClassIdentifier: 
   <combatAbilityIcon>k__BackingField: {fileID: 0}
-  <combatAbilityName>k__BackingField: Hail of Arrows
+  <combatAbilityName>k__BackingField: Attack Power Buff
   <combatAbilityType>k__BackingField: 0
-  <staminaCost>k__BackingField: 5
-  <turnDuration>k__BackingField: 0
-  <availableTarget>k__BackingField: 2
-  <maximumCastingAreaCount>k__BackingField: 0
-  <combatAbilityDescription>k__BackingField: Deals damage to all targets the in selected
-    area.
+  <staminaCost>k__BackingField: 1
+  <castingTurnDuration>k__BackingField: 0
+  <availableTarget>k__BackingField: 5
+  <maximumCastingAreaCount>k__BackingField: 2
+  <combatAbilityDescription>k__BackingField: Increase attack damage of selected allies
+    by 20%p.
   <castingRange>k__BackingField: {x: 3, y: 3, z: 3}
   <castingRangeDictionary>k__BackingField:
     _serializedList:
+    - Key: {x: 0, y: 0, z: 0}
+      Value: 1
+    - Key: {x: -3, y: 3, z: 0}
+      Value: 1
+    - Key: {x: -2, y: 2, z: 0}
+      Value: 1
+    - Key: {x: -1, y: 1, z: 0}
+      Value: 1
+    - Key: {x: 1, y: -1, z: 0}
+      Value: 1
+    - Key: {x: 2, y: -2, z: 0}
+      Value: 1
+    - Key: {x: 3, y: -3, z: 0}
+      Value: 1
     - Key: {x: -3, y: 0, z: 3}
       Value: 1
     - Key: {x: -3, y: 1, z: 2}
       Value: 1
     - Key: {x: -3, y: 2, z: 1}
       Value: 1
-    - Key: {x: -3, y: 3, z: 0}
-      Value: 1
     - Key: {x: -2, y: -1, z: 3}
       Value: 1
     - Key: {x: -2, y: 0, z: 2}
       Value: 1
     - Key: {x: -2, y: 1, z: 1}
-      Value: 1
-    - Key: {x: -2, y: 2, z: 0}
       Value: 1
     - Key: {x: -2, y: 3, z: -1}
       Value: 1
@@ -47,8 +57,6 @@ MonoBehaviour:
     - Key: {x: -1, y: -1, z: 2}
       Value: 1
     - Key: {x: -1, y: 0, z: 1}
-      Value: 1
-    - Key: {x: -1, y: 1, z: 0}
       Value: 1
     - Key: {x: -1, y: 2, z: -1}
       Value: 1
@@ -60,8 +68,6 @@ MonoBehaviour:
       Value: 1
     - Key: {x: 0, y: -1, z: 1}
       Value: 1
-    - Key: {x: 0, y: 0, z: 0}
-      Value: 1
     - Key: {x: 0, y: 1, z: -1}
       Value: 1
     - Key: {x: 0, y: 2, z: -2}
@@ -72,8 +78,6 @@ MonoBehaviour:
       Value: 1
     - Key: {x: 1, y: -2, z: 1}
       Value: 1
-    - Key: {x: 1, y: -1, z: 0}
-      Value: 1
     - Key: {x: 1, y: 0, z: -1}
       Value: 1
     - Key: {x: 1, y: 1, z: -2}
@@ -82,15 +86,11 @@ MonoBehaviour:
       Value: 1
     - Key: {x: 2, y: -3, z: 1}
       Value: 1
-    - Key: {x: 2, y: -2, z: 0}
-      Value: 1
     - Key: {x: 2, y: -1, z: -1}
       Value: 1
     - Key: {x: 2, y: 0, z: -2}
       Value: 1
     - Key: {x: 2, y: 1, z: -3}
-      Value: 1
-    - Key: {x: 3, y: -3, z: 0}
       Value: 1
     - Key: {x: 3, y: -2, z: -1}
       Value: 1
@@ -98,56 +98,22 @@ MonoBehaviour:
       Value: 1
     - Key: {x: 3, y: 0, z: -3}
       Value: 1
-  <AOE>k__BackingField: {x: 2, y: 2, z: 2}
+  <AOE>k__BackingField: {x: 0, y: 0, z: 0}
   <AOEDictionary>k__BackingField:
     _serializedList:
-    - Key: {x: -2, y: 0, z: 2}
-      Value: 1
-    - Key: {x: -2, y: 1, z: 1}
-      Value: 1
-    - Key: {x: -2, y: 2, z: 0}
-      Value: 1
-    - Key: {x: -1, y: -1, z: 2}
-      Value: 1
-    - Key: {x: -1, y: 0, z: 1}
-      Value: 1
-    - Key: {x: -1, y: 1, z: 0}
-      Value: 1
-    - Key: {x: -1, y: 2, z: -1}
-      Value: 1
-    - Key: {x: 0, y: -2, z: 2}
-      Value: 1
-    - Key: {x: 0, y: -1, z: 1}
-      Value: 1
     - Key: {x: 0, y: 0, z: 0}
       Value: 1
-    - Key: {x: 0, y: 1, z: -1}
-      Value: 1
-    - Key: {x: 0, y: 2, z: -2}
-      Value: 1
-    - Key: {x: 1, y: -2, z: 1}
-      Value: 1
-    - Key: {x: 1, y: -1, z: 0}
-      Value: 1
-    - Key: {x: 1, y: 0, z: -1}
-      Value: 1
-    - Key: {x: 1, y: 1, z: -2}
-      Value: 1
-    - Key: {x: 2, y: -2, z: 0}
-      Value: 1
-    - Key: {x: 2, y: -1, z: -1}
-      Value: 1
-    - Key: {x: 2, y: 0, z: -2}
-      Value: 1
   <combatAbilityComponents>k__BackingField:
-  - rid: 8228692626273468418
+  - rid: 8228692799953043458
   references:
     version: 2
     RefIds:
-    - rid: 8228692626273468418
-      type: {class: DamageComponent, ns: , asm: Assembly-CSharp}
+    - rid: 8228692799953043458
+      type: {class: BuffComponent, ns: , asm: Assembly-CSharp}
       data:
-        name: DamageComponent
-        baseHealthDamage: 0
-        healthDamageIncreaseByLevel: 0
-        pauseTimeWhenHit: 0
+        name: BuffComponent
+        <buffEntries>k__BackingField:
+        - <selectedStat>k__BackingField: attackMultiplier
+          <durationTurn>k__BackingField: 3
+          <constantValueChange>k__BackingField: 0
+          <valueChange>k__BackingField: 0.2

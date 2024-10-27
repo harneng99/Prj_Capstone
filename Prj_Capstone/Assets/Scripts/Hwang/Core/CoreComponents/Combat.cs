@@ -37,7 +37,7 @@ public abstract class Combat : CoreComponent
         Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         if (Manager.Instance.gameManager.battlePhase)
         {
@@ -59,12 +59,12 @@ public abstract class Combat : CoreComponent
                         }
                         else
                         {
-                            aoeTilemap.ClearAllTiles();
+                            DrawAOE(Vector3Int.zero, null);
                         }
                     }
                     else
                     {
-                        aoeTilemap.ClearAllTiles();
+                        DrawAOE(Vector3Int.zero, null);
                     }
                 }
             }
@@ -79,52 +79,59 @@ public abstract class Combat : CoreComponent
     {
         entity.highlightedTilemap.ClearAllTiles();
 
-        foreach (Vector3Int rangeHexgridOffset in combatAbility.castingRangeDictionary.Keys)
+        if (combatAbility != null)
         {
-            if (combatAbility.castingRangeDictionary[rangeHexgridOffset] == false) continue;
-
-            Vector3Int currentRangeHexgrid = entity.entityMovement.currentHexgridPosition + rangeHexgridOffset;
-            Vector3Int currentRangeCellgrid = entity.entityMovement.pathfinder.HexgridToCellgrid(currentRangeHexgrid);
-
-            // if (!entity.entityMovement.pathfinder.moveableTilemap.GetTile(currentRangeCellgrid)) continue;
-            if (Manager.Instance.gameManager.OutOfRange(currentRangeCellgrid)) continue;
-
-            GridNode currentGridNode = entity.entityMovement.pathfinder.gridNodes.FirstOrDefault(node => node.cellgridPosition == currentRangeCellgrid);
-
-            if (currentGridNode != null && !currentGridNode.isObstacle)
+            foreach (Vector3Int rangeHexgridOffset in combatAbility.castingRangeDictionary.Keys)
             {
-                entity.highlightedTilemap.SetTile(currentRangeCellgrid, entity.entityCombat.combatAbilityRangeHighlightedTileBase);
+                if (combatAbility.castingRangeDictionary[rangeHexgridOffset] == false) continue;
+
+                Vector3Int currentRangeHexgrid = entity.entityMovement.currentHexgridPosition + rangeHexgridOffset;
+                Vector3Int currentRangeCellgrid = entity.entityMovement.pathfinder.HexgridToCellgrid(currentRangeHexgrid);
+
+                // if (!entity.entityMovement.pathfinder.moveableTilemap.GetTile(currentRangeCellgrid)) continue;
+                if (Manager.Instance.gameManager.OutOfRange(currentRangeCellgrid)) continue;
+
+                GridNode currentGridNode = entity.entityMovement.pathfinder.gridNodes.FirstOrDefault(node => node.cellgridPosition == currentRangeCellgrid);
+
+                if (currentGridNode != null && !currentGridNode.isObstacle)
+                {
+                    entity.highlightedTilemap.SetTile(currentRangeCellgrid, entity.entityCombat.combatAbilityRangeHighlightedTileBase);
+                }
             }
         }
     }
 
-    public void DrawAOE(Vector3Int cellgridCenterPosition, CombatAbility combatAbility)
+    public void DrawAOE(Vector3Int cellgridCenterPosition, CombatAbility combatAbility, bool addOn = false)
     {
-        aoeTilemap.ClearAllTiles();
-
-        foreach (Vector3Int rangeHexgridOffset in combatAbility.AOEDictionary.Keys)
+        if (!addOn)
         {
-            if (combatAbility.AOEDictionary[rangeHexgridOffset] == false) continue;
+            aoeTilemap.ClearAllTiles();
+        }
 
-            // Vector3Int currentRangeHexgrid = entity.entityMovement.pathfinder.CellgridToHexgrid(currentMouseCellgridPosition) + rangeHexgridOffset;
-            Vector3Int currentRangeCellgrid = cellgridCenterPosition + entity.entityMovement.pathfinder.HexgridToCellgrid(rangeHexgridOffset);
-
-            // if (!entity.entityMovement.pathfinder.moveableTilemap.GetTile(currentRangeCellgrid)) continue;
-            if (Manager.Instance.gameManager.OutOfRange(currentRangeCellgrid)) continue;
-
-            GridNode currentGridNode = entity.entityMovement.pathfinder.gridNodes.FirstOrDefault(node => node.cellgridPosition == currentRangeCellgrid);
-
-            if (currentGridNode != null && !currentGridNode.isObstacle)
+        if (combatAbility != null)
+        {
+            foreach (Vector3Int rangeHexgridOffset in combatAbility.AOEDictionary.Keys)
             {
-                aoeTilemap.SetTile(currentRangeCellgrid, entity.entityCombat.combatAbilityRangeHighlightedTileBase);
+                if (combatAbility.AOEDictionary[rangeHexgridOffset] == false) continue;
+
+                // Vector3Int currentRangeHexgrid = entity.entityMovement.pathfinder.CellgridToHexgrid(currentMouseCellgridPosition) + rangeHexgridOffset;
+                Vector3Int currentRangeCellgrid = cellgridCenterPosition + entity.entityMovement.pathfinder.HexgridToCellgrid(rangeHexgridOffset);
+
+                // if (!entity.entityMovement.pathfinder.moveableTilemap.GetTile(currentRangeCellgrid)) continue;
+                if (Manager.Instance.gameManager.OutOfRange(currentRangeCellgrid)) continue;
+
+                GridNode currentGridNode = entity.entityMovement.pathfinder.gridNodes.FirstOrDefault(node => node.cellgridPosition == currentRangeCellgrid);
+
+                if (currentGridNode != null && !currentGridNode.isObstacle)
+                {
+                    aoeTilemap.SetTile(currentRangeCellgrid, entity.entityCombat.combatAbilityRangeHighlightedTileBase);
+                }
             }
         }
     }
 
-    protected bool ExecuteCombatAbility(Vector3Int combatAbilityCenterGridPosition, GridType gridType, CombatAbility selectedCombatAbility)
+    protected void ExecuteCombatAbility(Vector3Int combatAbilityCenterGridPosition, GridType gridType, CombatAbility selectedCombatAbility)
     {
-        bool hasTargetInRange = false;
-
         Vector3Int combatAbilityCenterHexgridPosition = gridType.Equals(GridType.Cellgrid) ? entity.entityMovement.pathfinder.CellgridToHexgrid(combatAbilityCenterGridPosition) : combatAbilityCenterGridPosition;
 
         foreach (Vector3Int rangeHexgridOffset in selectedCombatAbility.AOEDictionary.Keys)
@@ -137,12 +144,8 @@ public abstract class Combat : CoreComponent
 
             foreach (Entity entity in Manager.Instance.gameManager.entities)
             {
-                if (!CheckAbilityCondition(entity, selectedCombatAbility)) continue;
-
                 if (entity.entityMovement.currentHexgridPosition.Equals(currentRangeHexgrid))
                 {
-                    hasTargetInRange = true;
-
                     foreach (CombatAbilityComponent combatAbilityComponent in selectedCombatAbility.combatAbilityComponents)
                     {
                         combatAbilityComponent.ApplyCombatAbility(entity);
@@ -150,30 +153,50 @@ public abstract class Combat : CoreComponent
                 }
             }
         }
-        
-        if (hasTargetInRange)
+
+        entity.entityStat.stamina.DecreaseCurrentValue(selectedCombatAbility.staminaCost);
+        DrawAOE(Vector3Int.zero, null);
+        DrawCastingRange(null);
+
+        if (entity.isSelected)
         {
-            entity.entityStat.stamina.DecreaseCurrentValue(selectedCombatAbility.staminaCost);
-            aoeTilemap.ClearAllTiles();
-            return true;
-        }
-        else
-        {
-            return false;
+            Manager.Instance.uiManager.SetInformationUI(entity, entity.entityDescription, entity.entityMovement.currentCellgridPosition);
         }
     }
 
-    protected bool CheckAbilityCondition(Entity target, CombatAbility selectedCombatAbility)
+    protected bool CheckAbilityCondition(Vector3Int combatAbilityCenterGridPosition, GridType gridType, CombatAbility selectedCombatAbility)
     {
-        if (!target.isActiveAndEnabled) return false;
+        Vector3Int combatAbilityCenterHexgridPosition = gridType.Equals(GridType.Cellgrid) ? entity.entityMovement.pathfinder.CellgridToHexgrid(combatAbilityCenterGridPosition) : combatAbilityCenterGridPosition;
 
-        /*if (selectedCombatAbility.canBeUsedToSelf && target.Equals(entity)) return false;
+        foreach (Vector3Int rangeHexgridOffset in selectedCombatAbility.AOEDictionary.Keys)
+        {
+            if (selectedCombatAbility.AOEDictionary[rangeHexgridOffset] == false) continue;
 
-        if (selectedCombatAbility.canBeUsedToAlly && target.GetType().Equals(entity.GetType())) return false;
+            Vector3Int currentRangeHexgrid = combatAbilityCenterHexgridPosition + rangeHexgridOffset;
 
-        if (selectedCombatAbility.canBeUsedToEnemy && !target.GetType().Equals(entity.GetType())) return false;*/
+            foreach (Entity entity in Manager.Instance.gameManager.entities)
+            {
+                if (entity.isActiveAndEnabled && entity.entityMovement.currentHexgridPosition.Equals(currentRangeHexgrid))
+                {
+                    if (selectedCombatAbility.availableTarget.HasFlag(AvailableTarget.Enemy) && entity.GetType().Equals(typeof(Enemy)))
+                    {
+                        return true;
+                    }
 
-        return true;
+                    if (selectedCombatAbility.availableTarget.HasFlag(AvailableTarget.Self) && entity.Equals(this.entity))
+                    {
+                        return true;
+                    }
+
+                    if (selectedCombatAbility.availableTarget.HasFlag(AvailableTarget.Mercenary) && entity.GetType().Equals(typeof(PlayerCharacter)))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     protected void ToggleCombatAbilityButtons(bool setActive)

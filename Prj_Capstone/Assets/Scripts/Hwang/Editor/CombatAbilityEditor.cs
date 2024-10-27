@@ -49,7 +49,7 @@ public class CombatAbilityEditor : Editor
         combatAbilityName = serializedObject.FindProperty("<combatAbilityName>k__BackingField");
         combatAbilityType = serializedObject.FindProperty("<combatAbilityType>k__BackingField");
         staminaCost = serializedObject.FindProperty("<staminaCost>k__BackingField");
-        turnDuration = serializedObject.FindProperty("<turnDuration>k__BackingField");
+        turnDuration = serializedObject.FindProperty("<castingTurnDuration>k__BackingField");
         availableTarget = serializedObject.FindProperty("<availableTarget>k__BackingField");
         maximumCastingAreaCount = serializedObject.FindProperty("<maximumCastingAreaCount>k__BackingField");
         combatAbilityDescription = serializedObject.FindProperty("<combatAbilityDescription>k__BackingField");
@@ -75,7 +75,7 @@ public class CombatAbilityEditor : Editor
             EditorGUILayout.PropertyField(staminaCost, new GUIContent("Stamina Cost"));
             EditorGUILayout.PropertyField(maximumCastingAreaCount, new GUIContent("Maximum Casting Area Count"));
         }
-        EditorGUILayout.PropertyField(turnDuration, new GUIContent("Turn Duration"));
+        EditorGUILayout.PropertyField(turnDuration, new GUIContent("Casting Turn Duration"));
         EditorGUILayout.PropertyField(availableTarget, new GUIContent("Available Target Type"));
         EditorGUILayout.PropertyField(combatAbilityDescription, new GUIContent("Combat Ability Description"));
 

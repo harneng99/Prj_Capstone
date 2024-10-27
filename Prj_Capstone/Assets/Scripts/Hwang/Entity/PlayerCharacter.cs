@@ -51,6 +51,7 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
                 }
                 else // moving success
                 {
+                    onInitialDeployment = false;
                     entityMovement.UpdateGridPositionData();
                     Manager.Instance.uiManager.mercenarySlotWindow.OnCharacterDrop();
                 }
@@ -74,6 +75,7 @@ public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndD
                     Manager.Instance.uiManager.mercenarySlotWindow.ReturnCharacter(gameObject);
                 }
                 Manager.Instance.uiManager.mercenarySlotWindow.ResetHighlights();
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
                 entityMovement.currentWorldgridPosition = null;
                 gameObject.SetActive(false);
             }

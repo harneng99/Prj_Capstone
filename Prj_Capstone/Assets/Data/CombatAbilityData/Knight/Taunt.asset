@@ -67,13 +67,19 @@ MonoBehaviour:
     - Key: {x: 2, y: 0, z: -2}
       Value: 1
   <combatAbilityComponents>k__BackingField:
-  - rid: 8404206510415020033
+  - rid: 8228692626273468417
   references:
     version: 2
     RefIds:
-    - rid: 8404206510415020033
+    - rid: 8228692626273468417
       type: {class: StatusEffectComponent, ns: , asm: Assembly-CSharp}
       data:
         name: StatusEffectComponent
-        <statusEffect>k__BackingField: 0
-        effectAmount: 0
+        <statusEffects>k__BackingField: 32
+        <statusEffectValues>k__BackingField:
+        - 0
+        - 0
+        - 0
+        - 0
+        - 0
+        - 100
