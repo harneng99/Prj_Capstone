@@ -34,7 +34,7 @@ public abstract class Combat : CoreComponent
         combatAbilityButtons = Manager.Instance.uiManager.GenerateCombatAbilityButtons(entity);
         ToggleCombatAbilityButtons(false);
 
-        Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
+        // Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
     }
 
     protected virtual void Update()
@@ -71,7 +71,7 @@ public abstract class Combat : CoreComponent
         }
     }
 
-    protected abstract void MouseRightClick();
+    public abstract void MouseRightClick();
 
     protected override void OnPointerClick(PointerEventData eventData) { }
 

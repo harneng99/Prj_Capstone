@@ -15,11 +15,15 @@ public class BattleManager : MonoBehaviour
     [field: SerializeField] public Camera mainCamera { get; private set; }
     [field: SerializeField] public CinemachineVirtualCamera virtualCamera { get; private set; }
     [field: SerializeField] public Transform virtualCameraFollowTransform { get; private set; }
+    [field: SerializeField] public int howManyShouldBeInTheGoal { get; private set; }
+    [field: SerializeField] public int turnLimit { get; private set; }
+    public int howManyCurrentInGoal { get; set; }
     public Entity currentSelectedEntity { get; private set; }
     public bool pieceDeploymentPhase { get; private set; } = true;
     public bool battlePhase { get; private set; } = false;
     public bool playerPhase { get; private set; } = false;
     public bool alreadyMoved { get; set; }
+    public bool gameFinished { get; set; }
     public bool enemyPhase { get; private set; } = false;
     public bool isAiming { get; set; } = false;
     public bool isAimingCopyForFunctionExecutionOrderCorrection { get; set; } = false; // TODO: A better way to implement this
@@ -160,30 +164,36 @@ public class BattleManager : MonoBehaviour
 
     public void StartBattlePhase()
     {
-            enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None).ToList();
-            entities = FindObjectsByType<Entity>(FindObjectsSortMode.None).ToList();
-            mercenaries = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None).ToList();
-            /*foreach (Entity entity in entities)
-            {
-                entity.highlightedTilemap.ClearAllTiles();
-            }*/
-            Manager.Instance.uiManager.turnCounter.SetActive(true);
+        enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None).ToList();
+        entities = FindObjectsByType<Entity>(FindObjectsSortMode.None).ToList();
+        mercenaries = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None).ToList();
+        /*foreach (Entity entity in entities)
+        {
+            entity.highlightedTilemap.ClearAllTiles();
+        }*/
+        Manager.Instance.uiManager.turnCounter.SetActive(true);
 
-            playerTurnStart?.Invoke();
-            ResetEntitySelected();
-            pieceDeploymentPhase = false;
-            battlePhase = true;
-            playerPhase = true;
-            enemyPhase = false;
-            Manager.Instance.uiManager.ShowPhaseInformationUI();
-            Manager.Instance.uiManager.HideSideInformationUI();
+        playerTurnStart?.Invoke();
+        ResetEntitySelected();
+        pieceDeploymentPhase = false;
+        battlePhase = true;
+        playerPhase = true;
+        enemyPhase = false;
+        Manager.Instance.uiManager.ShowPhaseInformationUI();
+        Manager.Instance.uiManager.HideSideInformationUI();
     }
 
     public async void TurnEnd()
     {
         if (continueTurn) return;
 
-        if (playerPhase)
+        if (playerPhase && currentTurnCount >= turnLimit && !gameFinished)
+        {
+            Manager.Instance.uiManager.ShowGameResultWindow("Stage Failed...");
+            gameFinished = true;
+        }
+
+        if (playerPhase && !gameFinished)
         {
             playerPhase = false;
             enemyPhase = true;
@@ -192,12 +202,37 @@ public class BattleManager : MonoBehaviour
             await Task.Delay((int)(Manager.Instance.uiManager.phaseInformationUI.GetComponent<PhaseInformationUI>().uiDuration * 1000));
             enemyTurnStart?.Invoke();
         }
-        else if (enemyPhase)
+        else if (enemyPhase && !gameFinished)
         {
             enemyPhase = false;
             playerPhase = true;
             
             enemyTurnEnd?.Invoke();
+            await Task.Delay((int)(Manager.Instance.uiManager.phaseInformationUI.GetComponent<PhaseInformationUI>().uiDuration * 1000));
+            playerTurnStart?.Invoke();
+        }
+    }
+
+    public async void TurnEndButton()
+    {
+        continueTurn = false;
+
+        if (playerPhase && !gameFinished)
+        {
+            playerPhase = false;
+            enemyPhase = true;
+            
+            playerTurnEnd?.Invoke();
+            await Task.Delay((int)(Manager.Instance.uiManager.phaseInformationUI.GetComponent<PhaseInformationUI>().uiDuration * 1000));
+            enemyTurnStart?.Invoke();
+        }
+        else if (enemyPhase && !gameFinished)
+        {
+            enemyPhase = false;
+            playerPhase = true;
+            
+            enemyTurnEnd?.Invoke();
+            await Task.Delay((int)(Manager.Instance.uiManager.phaseInformationUI.GetComponent<PhaseInformationUI>().uiDuration * 1000));
             playerTurnStart?.Invoke();
         }
     }
@@ -240,6 +275,8 @@ public class BattleManager : MonoBehaviour
                 enemy.enemyMovement.CheckAttackArea();
                 yield return new WaitUntil(() => iterateNextEnemy == true);
             }
+
+            if (gameFinished) break;
         }
         yield return new WaitForSeconds(0.5f);
         TurnEnd();

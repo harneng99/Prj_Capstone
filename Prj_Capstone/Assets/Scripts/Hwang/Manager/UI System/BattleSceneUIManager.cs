@@ -70,6 +70,7 @@ public class BattleSceneUIManager : UIManager
     [field: SerializeField] public GameObject combatAbilityDescriptionPopup { get; private set; }
     [field: SerializeField] public GameObject phaseInformationUI { get; private set; }
     [field: SerializeField] public GameObject turnCounter { get; private set; }
+    [field: SerializeField] public GameObject gameResultWindow { get; private set; }
     #endregion
 
     private void Awake()
@@ -161,6 +162,12 @@ public class BattleSceneUIManager : UIManager
     public void SetSideInformationUI(Vector3Int cellgridPosition)
     {
 
+    }
+
+    public void ShowGameResultWindow(string resultText)
+    {
+        gameResultWindow.SetActive(true);
+        gameResultWindow.GetComponentInChildren<TMP_Text>().text = resultText;
     }
 
     public void ShowSideInformationUI()

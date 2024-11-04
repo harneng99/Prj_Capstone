@@ -10,6 +10,16 @@ using UnityEngine.UI;
 public class PlayerCharacter : Entity, IPointerClickHandler
 {
     [field: SerializeField] public Canvas canvas { get; private set; }
+    public PlayerMovement playerMovement { get; private set; }
+    public PlayerCombat playerCombat { get; private set; }
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        playerMovement = entityMovement as PlayerMovement;
+        playerCombat = entityCombat as PlayerCombat;
+    }
 
     protected override void Start()
     {

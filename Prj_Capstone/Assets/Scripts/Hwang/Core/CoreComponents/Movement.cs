@@ -11,7 +11,7 @@ public enum GridType { Hexgrid, Cellgrid }
 public enum PieceType { Pawn, Knight, Bishop, Rook, Queen }
 
 [RequireComponent(typeof(Pathfinder))]
-public class Movement : CoreComponent
+public abstract class Movement : CoreComponent
 {
     [field: SerializeField] public Vector3Int moveRangeInHexGrid { get; protected set; }
     [field: SerializeField] public PieceType pieceType { get; protected set; }
@@ -71,19 +71,25 @@ public class Movement : CoreComponent
                     DrawMoveableTilemap(true);
                 }
             }*/
-            if (Manager.Instance.gameManager.currentSelectedEntity.Equals(entity))
+            if (Manager.Instance.gameManager.battlePhase && Manager.Instance.gameManager.playerPhase)
             {
-                DrawMoveableTilemap(UtilityFunctions.IsTilemapEmpty(entity.highlightedTilemap));
-            }
-            else
-            {
-                DrawMoveableTilemap(false);
-                DrawMoveableTilemap(true);
+                if (Manager.Instance.gameManager.currentSelectedEntity.Equals(entity))
+                {
+                    DrawMoveableTilemap(UtilityFunctions.IsTilemapEmpty(entity.highlightedTilemap));
+                }
+                else
+                {
+                    DrawMoveableTilemap(false);
+                    DrawMoveableTilemap(true);
+                }
             }
         }
         else if (eventData.button.Equals(PointerEventData.InputButton.Right))
         {
-            DrawMoveableTilemap(false);
+            if (Manager.Instance.gameManager.battlePhase && Manager.Instance.gameManager.playerPhase)
+            {
+                DrawMoveableTilemap(false);
+            }
         }
     }
 
@@ -238,13 +244,10 @@ public class Movement : CoreComponent
     /// Gets whether entity is going to show moveable tile area in bool value. True means it will show its moveable tile area, and vice versa.
     /// </summary>
     /// <param name="showTile"></param>
-    public virtual void DrawMoveableTilemap(bool showTile = true)
-    {
-        entity.highlightedTilemap.ClearAllTiles();
+    public abstract void DrawMoveableTilemap(bool showTile = true);
+        
 
-        if (!showTile) return;
-
-        entity.highlightedTilemap.SetTile(currentCellgridPosition, moveRangeHighlightedTileBase);
+        // entity.highlightedTilemap.SetTile(currentCellgridPosition, moveRangeHighlightedTileBase);
 
         /*for (int x = -moveRangeInHexGrid.x; x <= moveRangeInHexGrid.x; x++)
         {
@@ -273,7 +276,6 @@ public class Movement : CoreComponent
                 }
             }
         }*/
-    }
 
     public bool PathOutOfRange(Vector3Int currentHexgridPosition, PathInformation pathInformation)
     {

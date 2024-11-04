@@ -21,6 +21,7 @@ public class PlayerCombat : Combat
         base.Start();
 
         Manager.Instance.playerInputManager.controls.Map.MouseLeftClick.performed += _ => MouseLeftClick();
+        Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
     }
 
     protected override void Update()
@@ -66,7 +67,7 @@ public class PlayerCombat : Combat
     {
         if (eventData.button.Equals(PointerEventData.InputButton.Left))
         {
-            if (Manager.Instance.gameManager.battlePhase)
+            if (Manager.Instance.gameManager.battlePhase && Manager.Instance.gameManager.playerPhase)
             {
                 if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
                 {
@@ -81,7 +82,7 @@ public class PlayerCombat : Combat
         }
     }
 
-    protected override void MouseRightClick()
+    public override void MouseRightClick()
     {
         if (Manager.Instance.gameManager.battlePhase)
         {
@@ -119,11 +120,11 @@ public class PlayerCombat : Combat
         }
     }
 
-    private void MouseLeftClick()
+    public void MouseLeftClick()
     {
         if (!Manager.Instance.playerInputManager.IsPointerOverUI())
         {
-            if (Manager.Instance.gameManager.battlePhase)
+            if (Manager.Instance.gameManager.battlePhase && Manager.Instance.gameManager.playerPhase)
             {
                 if (aoeTilemap.HasTile(currentMouseCellgridPosition) && currentSelectedCombatAbility != null)
                 {

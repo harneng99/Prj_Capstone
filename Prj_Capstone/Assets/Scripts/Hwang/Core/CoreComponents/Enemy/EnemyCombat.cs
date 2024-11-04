@@ -66,7 +66,7 @@ public class EnemyCombat : Combat
         }
     }
 
-    protected override void MouseRightClick()
+    public override void MouseRightClick()
     {
         if (Manager.Instance.gameManager.battlePhase)
         {

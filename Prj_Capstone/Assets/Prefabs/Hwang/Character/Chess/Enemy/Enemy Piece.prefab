@@ -185,9 +185,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <moveRangeInHexGrid>k__BackingField: {x: 0, y: 0, z: 0}
-  pieceType: 2
+  <pieceType>k__BackingField: 0
   moveRangeHighlightedTileBase: {fileID: 11400000, guid: 28645d8737dbcec489a33b9e12d754f8, type: 2}
   attackRangeHighlightedTileBase: {fileID: 11400000, guid: 3c6884ad66936454598ab4f1ea47a748, type: 2}
+  wallTileBase: {fileID: 11400000, guid: cbf24997bee40254cb971e173cd3976e, type: 2}
+  swampTileBase: {fileID: 11400000, guid: 359348f6c03b3a9448f9536175339cd6, type: 2}
   maxMovementStamina: 0
   duration: 0.5
   destinationAlpha: 0
