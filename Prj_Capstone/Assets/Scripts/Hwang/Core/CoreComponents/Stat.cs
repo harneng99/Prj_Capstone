@@ -73,7 +73,7 @@ public class Stat : CoreComponent
     {
         health.OnCurrentValueMin += EntityDeath;
 
-        for (int i = 0; i < Enum.GetValues(typeof(StatusEffect)).Length; i++)
+        /*for (int i = 0; i < Enum.GetValues(typeof(StatusEffect)).Length; i++)
         {
             int endTurn = 0;
 
@@ -144,7 +144,7 @@ public class Stat : CoreComponent
 
                 Manager.Instance.gameManager.playerTurnStart += spreadHorror;
             }
-        }
+        }*/
     }
 
 

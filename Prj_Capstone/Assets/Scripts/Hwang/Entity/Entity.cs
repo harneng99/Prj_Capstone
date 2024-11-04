@@ -30,6 +30,7 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     public event Action<PointerEventData> onPointerClick;
     public bool isSelected { get; private set; }
     public Tilemap highlightedTilemap { get; private set; }
+    public Tilemap interactableTilemap { get; private set; }
     #endregion
 
     protected virtual void Awake()
@@ -44,6 +45,7 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         entityCombat = core.GetCoreComponent<Combat>();
 
         highlightedTilemap = GameObject.FindWithTag("HighlightedTilemap").GetComponent<Tilemap>();
+        interactableTilemap = GameObject.FindWithTag("InteractableTilemap").GetComponent<Tilemap>();
     }
 
     protected virtual void Start()
@@ -51,20 +53,10 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
     }
 
-
-    protected virtual void Update()
-    {
-        
-    }
-
     public virtual void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button.Equals(PointerEventData.InputButton.Left))
         {
-            /*if (!isSelected)
-            {
-                highlightedTilemap.ClearAllTiles();
-            }*/
             if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
             {
                 Manager.Instance.gameManager.Select(this);
@@ -81,8 +73,8 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         {
             if (Manager.Instance.gameManager.isAiming)
             {
-                Manager.Instance.uiManager.SetSideInformationUI(this, entityDescription);
-                Manager.Instance.uiManager.ShowSideInformationUI();
+                // Manager.Instance.uiManager.SetSideInformationUI(this, entityDescription);
+                // Manager.Instance.uiManager.ShowSideInformationUI();
             }
         }
     }
@@ -100,7 +92,7 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
 
     protected virtual void ShowInformation()
     {
-        if (Manager.Instance.gameManager.mercenaryDeploymentPhase)
+        /*if (Manager.Instance.gameManager.pieceDeploymentPhase)
         {
             Manager.Instance.uiManager.SetSideInformationUI(this, entityDescription);
             Manager.Instance.uiManager.ShowSideInformationUI();
@@ -109,7 +101,7 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         {
             Manager.Instance.uiManager.SetInformationUI(this, entityDescription, entityMovement.pathfinder.moveableTilemap.WorldToCell(GetEntityFeetPosition()));
             Manager.Instance.uiManager.ShowInformationUI();
-        }
+        }*/
     }
 
     protected void MouseRightClick()
@@ -125,7 +117,6 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     }
 
     public void Select() => isSelected = true;
-
     public void Deselect() => isSelected = false;
 
     /// <summary>
@@ -134,15 +125,16 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     /// <returns></returns>
     public Vector3 GetEntityFeetPosition()
     {
-        return new Vector3(entityCollider.bounds.center.x, entityCollider.bounds.min.y, entityCollider.bounds.center.z);
+        return transform.position;
+        // return new Vector3(entityCollider.bounds.center.x, entityCollider.bounds.min.y, entityCollider.bounds.center.z);
     }
 
     /// <summary>
     /// Gets world grid position and place the entity's feet position to it.
     /// </summary>
     /// <param name="position"></param>
-    public void SetEntityFeetPosition(Vector3 position)
+    public void SetEntityPosition(Vector3Int cellgridPosition)
     {
-        transform.position = position + Vector3.up * entityCollider.bounds.extents.y;
+        transform.position = cellgridPosition + new Vector3(0.5f, 0.5f, 0.0f);
     }
 }

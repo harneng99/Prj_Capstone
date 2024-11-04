@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -12,6 +13,7 @@ public class CustomTileDataEditor : Editor
     private SerializedProperty moveableTileLayer;
     private SerializedProperty objectTileLayer;
     private SerializedProperty interactableTileLayer;
+    private SerializedProperty entrance;
 
     private void OnEnable()
     {
@@ -22,6 +24,7 @@ public class CustomTileDataEditor : Editor
         moveableTileLayer = serializedObject.FindProperty("<moveableTileLayer>k__BackingField");
         objectTileLayer = serializedObject.FindProperty("<objectTileLayer>k__BackingField");
         interactableTileLayer = serializedObject.FindProperty("<interactableTileLayer>k__BackingField");
+        entrance = serializedObject.FindProperty("<entrance>k__BackingField");
     }
 
     public override void OnInspectorGUI()
@@ -41,6 +44,10 @@ public class CustomTileDataEditor : Editor
                 break;
             case TileType.Interactable:
                 EditorGUILayout.PropertyField(interactableTileLayer, new GUIContent("Interactable Tile Layer"));
+                if (interactableTileLayer.enumValueIndex == (int)InteractableTileLayer.UnidirectionalTeleport)
+                {
+                    EditorGUILayout.PropertyField(entrance, new GUIContent("Entrance"));
+                }
                 break;
             default:
                 break;

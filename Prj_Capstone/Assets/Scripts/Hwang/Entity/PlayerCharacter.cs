@@ -1,101 +1,54 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 
-public class PlayerCharacter : Entity, IPointerClickHandler, IDragHandler, IEndDragHandler
+public class PlayerCharacter : Entity, IPointerClickHandler
 {
-    private bool onInitialDeployment;
-    // above variable is for checking whether current deployment is the first one.
-    // it is because the player is simply going to click it to drop it on the first movement, not dragging it
+    [field: SerializeField] public Canvas canvas { get; private set; }
 
-    private void OnEnable()
+    protected override void Start()
     {
-        onInitialDeployment = true;
-    }
+        base.Start();
 
-    protected override void Update()
-    {
-        base.Update();
+        Button[] promotionButtons = canvas.gameObject.GetComponentsInChildren<Button>();
 
-        if (onInitialDeployment)
-        {
-            SetEntityFeetPosition(Manager.Instance.playerInputManager.GetMousePosition() + Vector3.down * entityCollider.bounds.extents.y * 0.2f);
-            // Add offset for visual
-        }
-    }
+        // TODO: (PieceType)index in for loop does not seems to work. Why?
+        promotionButtons[0].onClick.AddListener(() => entityMovement.ChangePieceType(PieceType.Knight));
+        promotionButtons[0].onClick.AddListener(() => canvas.gameObject.SetActive(false));
+        promotionButtons[1].onClick.AddListener(() => entityMovement.ChangePieceType(PieceType.Bishop));
+        promotionButtons[1].onClick.AddListener(() => canvas.gameObject.SetActive(false));
+        promotionButtons[2].onClick.AddListener(() => entityMovement.ChangePieceType(PieceType.Rook));
+        promotionButtons[2].onClick.AddListener(() => canvas.gameObject.SetActive(false));
+        promotionButtons[3].onClick.AddListener(() => entityMovement.ChangePieceType(PieceType.Queen));
+        promotionButtons[3].onClick.AddListener(() => canvas.gameObject.SetActive(false));
 
-    protected override void ShowInformation()
-    {
-        base.ShowInformation();
+        promotionButtons.Last().onClick.AddListener(() => canvas.gameObject.SetActive(false));
     }
 
     public override void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button.Equals(PointerEventData.InputButton.Left))
         {
-            if (Manager.Instance.gameManager.mercenaryDeploymentPhase)
-            {
-                if (!entityMovement.MoveToGrid(GetEntityFeetPosition(), true)) // failed moving
-                {
-                    if (entityMovement.currentWorldgridPosition.HasValue)
-                    {
-                        entityMovement.MoveToGrid(entityMovement.currentWorldgridPosition.Value, true);
-                    }
-                    else
-                    {
-                        Manager.Instance.uiManager.mercenarySlotWindow.ResetHighlights();
-                        gameObject.SetActive(false);
-                    }
-                }
-                else // moving success
-                {
-                    onInitialDeployment = false;
-                    entityMovement.UpdateGridPositionData();
-                    Manager.Instance.uiManager.mercenarySlotWindow.OnCharacterDrop();
-                }
-
-                if (!eventData.dragging)
-                {
-                    base.OnPointerClick(eventData);
-                }
-            }
-            else if (Manager.Instance.gameManager.battlePhase)
+            if (Manager.Instance.gameManager.battlePhase)
             {
                 base.OnPointerClick(eventData);
-            }
-        }
-        else if (eventData.button.Equals(PointerEventData.InputButton.Right))
-        {
-            if (Manager.Instance.gameManager.mercenaryDeploymentPhase)
-            {
-                if (!onInitialDeployment)
+
+                // TODO: Allow promotion only after movement?
+                if (entityMovement.pieceType == PieceType.Pawn && Manager.Instance.gameManager.alreadyMoved)
                 {
-                    Manager.Instance.uiManager.mercenarySlotWindow.ReturnCharacter(gameObject);
+                    CustomTileData currentTileData = interactableTilemap.GetInstantiatedObject(entityMovement.currentCellgridPosition)?.GetComponent<CustomTileData>();
+
+                    if (currentTileData != null && currentTileData.interactableTileLayer == InteractableTileLayer.Promotion)
+                    {
+                        canvas.gameObject.SetActive(true);
+                    }
                 }
-                Manager.Instance.uiManager.mercenarySlotWindow.ResetHighlights();
-                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
-                entityMovement.currentWorldgridPosition = null;
-                gameObject.SetActive(false);
             }
         }
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (Manager.Instance.gameManager.mercenaryDeploymentPhase)
-        {
-            Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(transform);
-            highlightedTilemap.ClearAllTiles();
-            Manager.Instance.gameManager.mercenaryDragging = this;
-            transform.position = Manager.Instance.playerInputManager.GetMousePosition();
-        }
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
-        Manager.Instance.gameManager.mercenaryDragging = null;
     }
 }

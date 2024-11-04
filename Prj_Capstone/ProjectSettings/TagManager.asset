@@ -7,10 +7,10 @@ TagManager:
   - MoveableTilemap
   - ObjectTilemap
   - HighlightedTilemap
-  - FogTilemap
+  - InteractableTilemap
+  - MainCanvas
   - SelectionTilemap
   - AOETilemap
-  - MainCanvas
   layers:
   - Default
   - TransparentFX

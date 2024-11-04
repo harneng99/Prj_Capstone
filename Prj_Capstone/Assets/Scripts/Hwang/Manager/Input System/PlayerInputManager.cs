@@ -80,7 +80,7 @@ public class PlayerInputManager : MonoBehaviour
 
     public void DisableInputSystemOnTurnChange()
     {
-        if (Manager.Instance.gameManager.mercenaryDeploymentPhase)
+        if (Manager.Instance.gameManager.pieceDeploymentPhase)
         {
             if (Manager.Instance.uiManager.mercenarySlotWindow.CanProceedToBattlePhase())
             {

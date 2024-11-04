@@ -16,9 +16,10 @@ public class BattleManager : MonoBehaviour
     [field: SerializeField] public CinemachineVirtualCamera virtualCamera { get; private set; }
     [field: SerializeField] public Transform virtualCameraFollowTransform { get; private set; }
     public Entity currentSelectedEntity { get; private set; }
-    public bool mercenaryDeploymentPhase { get; private set; } = true;
+    public bool pieceDeploymentPhase { get; private set; } = true;
     public bool battlePhase { get; private set; } = false;
     public bool playerPhase { get; private set; } = false;
+    public bool alreadyMoved { get; set; }
     public bool enemyPhase { get; private set; } = false;
     public bool isAiming { get; set; } = false;
     public bool isAimingCopyForFunctionExecutionOrderCorrection { get; set; } = false; // TODO: A better way to implement this
@@ -26,6 +27,7 @@ public class BattleManager : MonoBehaviour
     public Tilemap moveableTilemap { get; private set; }
     public Tilemap objectTilemap { get; private set; }
     public Tilemap selectionTilemap { get; private set; }
+    public Tilemap highlightedTilemap { get; private set; }
     public Tilemap fogTilemap { get; private set; }
     public PlayerCharacter mercenaryDragging { get; set; }
 
@@ -40,17 +42,23 @@ public class BattleManager : MonoBehaviour
     public event Action enemyTurnStart;
     public event Action enemyTurnEnd;
 
+    private Coroutine enemyAttackCoroutine;
+    public bool iterateNextEnemy { get; set; }
+    public bool continueTurn { get; set; }
+
     private void Awake()
     {
         moveableTilemap = GameObject.FindWithTag("MoveableTilemap").GetComponent<Tilemap>();
         objectTilemap = GameObject.FindWithTag("ObjectTilemap").GetComponent<Tilemap>();
         selectionTilemap = GameObject.FindWithTag("SelectionTilemap").GetComponent<Tilemap>();
+        highlightedTilemap = GameObject.FindWithTag("HighlightedTilemap").GetComponent<Tilemap>();
         // fogTilemap = GameObject.FindWithTag("FogTilemap").GetComponent<Tilemap>();
 
         playerTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(PlayerCharacter)); };
         playerTurnStart += () => { currentTurnCount += 1; };
         playerTurnStart += () => { Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount; };
         playerTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = true; };
+        playerTurnStart += () => { alreadyMoved = false; };
 
         // TODO: Below code deletes all the ClickHandler. Should find a way to fix this.
         // playerTurnEnd += Manager.Instance.playerInputManager.DisableInputSystemOnTurnChange;
@@ -58,10 +66,21 @@ public class BattleManager : MonoBehaviour
         playerTurnEnd += Manager.Instance.uiManager.ShowPhaseInformationUI;
 
         enemyTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(Enemy)); };
-        enemyTurnStart += () => { RunEnemyAI(); };
+        enemyTurnStart += () => { highlightedTilemap.ClearAllTiles(); };
+        // enemyTurnStart += () => { RunEnemyAI(); };
+        enemyTurnStart += () =>
+        {
+            if (enemyAttackCoroutine != null)
+            {
+                StopCoroutine(enemyAttackCoroutine);
+            }
+            StartCoroutine(EnemyAttack());
+        };
         enemyTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = false; };
 
         enemyTurnEnd += Manager.Instance.uiManager.ShowPhaseInformationUI;
+
+        StartBattlePhase();
     }
 
     private void Start()
@@ -127,7 +146,6 @@ public class BattleManager : MonoBehaviour
         ResetEntitySelected();
         entity.Select();
         currentSelectedEntity = entity;
-        // virtualCamera.Follow = entity.transform;
         Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(entity.transform);
     }
 
@@ -142,30 +160,29 @@ public class BattleManager : MonoBehaviour
 
     public void StartBattlePhase()
     {
-        if (Manager.Instance.gameManager.mercenaryDeploymentPhase && Manager.Instance.uiManager.mercenarySlotWindow.CanProceedToBattlePhase())
-        {
             enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None).ToList();
             entities = FindObjectsByType<Entity>(FindObjectsSortMode.None).ToList();
             mercenaries = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None).ToList();
-            foreach (Entity entity in entities)
+            /*foreach (Entity entity in entities)
             {
                 entity.highlightedTilemap.ClearAllTiles();
-            }
+            }*/
             Manager.Instance.uiManager.turnCounter.SetActive(true);
 
             playerTurnStart?.Invoke();
             ResetEntitySelected();
-            mercenaryDeploymentPhase = false;
+            pieceDeploymentPhase = false;
             battlePhase = true;
             playerPhase = true;
             enemyPhase = false;
             Manager.Instance.uiManager.ShowPhaseInformationUI();
             Manager.Instance.uiManager.HideSideInformationUI();
-        }
     }
 
     public async void TurnEnd()
     {
+        if (continueTurn) return;
+
         if (playerPhase)
         {
             playerPhase = false;
@@ -213,6 +230,21 @@ public class BattleManager : MonoBehaviour
         TurnEnd();
     }
 
+    private IEnumerator EnemyAttack()
+    {
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy.gameObject.activeSelf)
+            {
+                iterateNextEnemy = false;
+                enemy.enemyMovement.CheckAttackArea();
+                yield return new WaitUntil(() => iterateNextEnemy == true);
+            }
+        }
+        yield return new WaitForSeconds(0.5f);
+        TurnEnd();
+    }
+
     public bool OutOfRange(Vector3Int cellgridPosition)
     {
         bool inMoveable = moveableTilemap.HasTile(cellgridPosition);
@@ -230,16 +262,31 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public bool EntityExistsAt(Vector3Int cellgridPosition)
+    public Entity EntityExistsAt(Vector3Int cellgridPosition, bool findActive = false, Type entityType = null)
     {
         foreach (Entity entity in entities)
         {
-            if (entity.entityMovement.currentCellgridPosition.Equals(cellgridPosition))
+            if (findActive && !entity.gameObject.activeSelf)
             {
-                return true;
+                continue;
+            }
+
+            if (entityType == null)
+            {
+                if (entity.entityMovement.currentCellgridPosition.Equals(cellgridPosition))
+                {
+                    return entity;
+                }
+            }
+            else
+            {
+                if (entity.entityMovement.currentCellgridPosition.Equals(cellgridPosition) && entity.GetType().Equals(entityType))
+                {
+                    return entity;
+                }
             }
         }
 
-        return false;
+        return null;
     }
 }

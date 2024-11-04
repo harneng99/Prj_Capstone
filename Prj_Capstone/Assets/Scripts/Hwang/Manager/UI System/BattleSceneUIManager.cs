@@ -89,7 +89,7 @@ public class BattleSceneUIManager : UIManager
 
     public async void ShowWarningUI(string warningText)
     {
-        if (Manager.Instance.gameManager.mercenaryDeploymentPhase && mercenarySlotWindow.CanProceedToBattlePhase())
+        if (Manager.Instance.gameManager.pieceDeploymentPhase && mercenarySlotWindow.CanProceedToBattlePhase())
         {
             return;
         }
@@ -109,7 +109,7 @@ public class BattleSceneUIManager : UIManager
 
     public void ShowPhaseInformationUI()
     {
-        if (Manager.Instance.gameManager.mercenaryDeploymentPhase)
+        if (Manager.Instance.gameManager.pieceDeploymentPhase)
         {
             if (mercenarySlotWindow.CanProceedToBattlePhase())
             {
