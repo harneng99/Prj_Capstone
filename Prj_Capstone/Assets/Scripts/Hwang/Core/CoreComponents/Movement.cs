@@ -73,7 +73,7 @@ public abstract class Movement : CoreComponent
             }*/
             if (Manager.Instance.gameManager.battlePhase && Manager.Instance.gameManager.playerPhase)
             {
-                if (Manager.Instance.gameManager.currentSelectedEntity.Equals(entity))
+                if (Manager.Instance.gameManager.currentSelectedEntity.Equals(entity) && Manager.Instance.gameManager.currentSelectedEntity.Equals(Manager.Instance.gameManager.prevSelectedEntity))
                 {
                     DrawMoveableTilemap(UtilityFunctions.IsTilemapEmpty(entity.highlightedTilemap));
                 }
@@ -244,9 +244,8 @@ public abstract class Movement : CoreComponent
     /// Gets whether entity is going to show moveable tile area in bool value. True means it will show its moveable tile area, and vice versa.
     /// </summary>
     /// <param name="showTile"></param>
-    public abstract void DrawMoveableTilemap(bool showTile = true);
-        
-
+    public virtual void DrawMoveableTilemap(bool showTile = true)
+    {
         // entity.highlightedTilemap.SetTile(currentCellgridPosition, moveRangeHighlightedTileBase);
 
         /*for (int x = -moveRangeInHexGrid.x; x <= moveRangeInHexGrid.x; x++)
@@ -277,6 +276,256 @@ public abstract class Movement : CoreComponent
             }
         }*/
 
+        entity.highlightedTilemap.ClearAllTiles();
+
+        if (!showTile) return;
+
+        BoundsInt bounds = pathfinder.moveableTilemap.cellBounds;
+
+        if (pieceType == PieceType.Pawn)
+        {
+            if (entity.GetType().Equals(typeof(PlayerCharacter)))
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    Vector3Int moveableCellgridPosition = currentCellgridPosition + new Vector3Int(x, 1, 0);
+
+                    if (pathfinder.moveableTilemap.HasTile(moveableCellgridPosition))
+                    {
+                        if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) continue;
+
+                        Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+
+                        if (entity != null && entity.gameObject.activeSelf)
+                        {
+                            if (entity.GetType().Equals(typeof(Enemy)) && x != 0)
+                            {
+                                this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, attackRangeHighlightedTileBase);
+                            }
+                        }
+                        else if (x == 0)
+                        {
+                            this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, moveRangeHighlightedTileBase);
+                        }
+                    }
+                }
+            }
+            else if (entity.GetType().Equals(typeof(Enemy)))
+            {
+                for (int x = -1; x <= 1; x++)
+                {
+                    Vector3Int moveableCellgridPosition = currentCellgridPosition + new Vector3Int(x, -1, 0);
+
+                    if (pathfinder.moveableTilemap.HasTile(moveableCellgridPosition))
+                    {
+                        if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) continue;
+
+                        Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+
+                        if (entity != null && entity.gameObject.activeSelf)
+                        {
+                            if (entity.GetType().Equals(typeof(PlayerCharacter)) && x != 0)
+                            {
+                                this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, attackRangeHighlightedTileBase);
+                            }
+                        }
+                        else if (x == 0)
+                        {
+                            this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, moveRangeHighlightedTileBase);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (pieceType == PieceType.Knight)
+        {
+            // entity.highlightedTilemap.SetTile(currentCellgridPosition, null);
+
+            foreach (Vector3Int movement in knightMovements)
+            {
+                Vector3Int moveableCellgridPosition = currentCellgridPosition + movement;
+
+                if (pathfinder.moveableTilemap.HasTile(moveableCellgridPosition))
+                {
+                    if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) continue;
+
+                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+
+                    if (entity != null && entity.gameObject.activeSelf)
+                    {
+                        if (entity.GetType().Equals(this.entity.GetType()))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            entity.highlightedTilemap.SetTile(moveableCellgridPosition, attackRangeHighlightedTileBase);
+                        }
+                    }
+                    else
+                    {
+                        this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, moveRangeHighlightedTileBase);
+                    }
+                }
+            }
+        }
+
+        if (pieceType == PieceType.Rook || pieceType == PieceType.Queen)
+        {
+            for (int x = -1; x >= -bounds.size.x; x--)
+            {
+                Vector3Int moveableCellgridPosition = currentCellgridPosition + new Vector3Int(x, 0, 0);
+
+                if (pathfinder.moveableTilemap.HasTile(moveableCellgridPosition))
+                {
+                    if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
+
+                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+
+                    if (entity != null && entity.gameObject.activeSelf)
+                    {
+                        if (entity.GetType().Equals(this.entity.GetType()))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            entity.highlightedTilemap.SetTile(moveableCellgridPosition, attackRangeHighlightedTileBase);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, moveRangeHighlightedTileBase);
+                    }
+                }
+            }
+            for (int x = 1; x <= bounds.size.x; x++)
+            {
+                Vector3Int moveableCellgridPosition = currentCellgridPosition + new Vector3Int(x, 0, 0);
+
+                if (pathfinder.moveableTilemap.HasTile(moveableCellgridPosition))
+                {
+                    if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
+
+                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+
+                    if (entity != null && entity.gameObject.activeSelf)
+                    {
+                        if (entity.GetType().Equals(this.entity.GetType()))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            entity.highlightedTilemap.SetTile(moveableCellgridPosition, attackRangeHighlightedTileBase);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, moveRangeHighlightedTileBase);
+                    }
+                }
+            }
+
+            for (int y = -1; y >= -bounds.size.x; y--)
+            {
+                Vector3Int moveableCellgridPosition = currentCellgridPosition + new Vector3Int(0, y, 0);
+
+                if (pathfinder.moveableTilemap.HasTile(moveableCellgridPosition))
+                {
+                    if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
+
+                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+
+                    if (entity != null && entity.gameObject.activeSelf)
+                    {
+                        if (entity.GetType().Equals(this.entity.GetType()))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            entity.highlightedTilemap.SetTile(moveableCellgridPosition, attackRangeHighlightedTileBase);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, moveRangeHighlightedTileBase);
+                    }
+                }
+            }
+            for (int y = 1; y <= bounds.size.x; y++)
+            {
+                Vector3Int moveableCellgridPosition = currentCellgridPosition + new Vector3Int(0, y, 0);
+
+                if (pathfinder.moveableTilemap.HasTile(moveableCellgridPosition))
+                {
+                    if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
+
+                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+
+                    if (entity != null && entity.gameObject.activeSelf)
+                    {
+                        if (entity.GetType().Equals(this.entity.GetType()))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            entity.highlightedTilemap.SetTile(moveableCellgridPosition, attackRangeHighlightedTileBase);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, moveRangeHighlightedTileBase);
+                    }
+                }
+            }
+        }
+
+        if (pieceType == PieceType.Bishop || pieceType == PieceType.Queen)
+        {
+            int length = Mathf.Min(bounds.size.x, bounds.size.y);
+
+            foreach (Vector3Int direction in bishopDirections)
+            {
+                for (int i = 1; i < length; i++)
+                {
+                    Vector3Int moveableCellgridPosition = currentCellgridPosition + direction * i;
+
+                    if (pathfinder.moveableTilemap.HasTile(moveableCellgridPosition))
+                    {
+                        if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
+
+                        Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+
+                        if (entity != null && entity.gameObject.activeSelf)
+                        {
+                            if (entity.GetType().Equals(this.entity.GetType()))
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                entity.highlightedTilemap.SetTile(moveableCellgridPosition, attackRangeHighlightedTileBase);
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, moveRangeHighlightedTileBase);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public bool PathOutOfRange(Vector3Int currentHexgridPosition, PathInformation pathInformation)
     {
         foreach (GridNode gridNode in pathInformation.path)
@@ -293,8 +542,13 @@ public abstract class Movement : CoreComponent
     public virtual void ChangePieceType(PieceType pieceType)
     {
         this.pieceType = pieceType;
-        Manager.Instance.gameManager.continueTurn = false;
-        Manager.Instance.gameManager.TurnEnd();
+        entity.highlightedTilemap.ClearAllTiles();
+
+        if (Manager.Instance.gameManager.alreadyMoved)
+        {
+            Manager.Instance.gameManager.continueTurn = false;
+            Manager.Instance.gameManager.TurnEnd();
+        }
     }
 
     protected bool CheckMovementCondition(PieceType pieceType, Vector3Int cellgridPosition)

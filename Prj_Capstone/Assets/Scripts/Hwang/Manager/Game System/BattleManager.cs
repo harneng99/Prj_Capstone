@@ -18,6 +18,7 @@ public class BattleManager : MonoBehaviour
     [field: SerializeField] public int howManyShouldBeInTheGoal { get; private set; }
     [field: SerializeField] public int turnLimit { get; private set; }
     public int howManyCurrentInGoal { get; set; }
+    public Entity prevSelectedEntity { get; private set; }
     public Entity currentSelectedEntity { get; private set; }
     public bool pieceDeploymentPhase { get; private set; } = true;
     public bool battlePhase { get; private set; } = false;
@@ -147,6 +148,7 @@ public class BattleManager : MonoBehaviour
 
     public void Select(Entity entity)
     {
+        prevSelectedEntity = currentSelectedEntity;
         ResetEntitySelected();
         entity.Select();
         currentSelectedEntity = entity;
@@ -272,7 +274,10 @@ public class BattleManager : MonoBehaviour
             if (enemy.gameObject.activeSelf)
             {
                 iterateNextEnemy = false;
-                enemy.enemyMovement.CheckAttackArea();
+                if (enemy.enemyMovement.CheckAttackArea())
+                {
+                    yield return new WaitForSeconds(1.0f);
+                }
                 yield return new WaitUntil(() => iterateNextEnemy == true);
             }
 
