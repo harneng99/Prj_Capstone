@@ -49,7 +49,7 @@ public class PlayerCharacter : Entity, IPointerClickHandler
                 base.OnPointerClick(eventData);
 
                 // TODO: Allow promotion only after movement?
-                if (entityMovement.pieceType == PieceType.Pawn && Manager.Instance.gameManager.alreadyMoved)
+                if (entityMovement.pieceType == PieceType.Pawn && Manager.Instance.gameManager.didPlayerMovedAnythingThisTurn)
                 {
                     CustomTileData currentTileData = interactableTilemap.GetInstantiatedObject(entityMovement.currentCellgridPosition)?.GetComponent<CustomTileData>();
 

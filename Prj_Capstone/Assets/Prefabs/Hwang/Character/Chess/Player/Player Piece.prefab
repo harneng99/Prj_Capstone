@@ -695,17 +695,14 @@ MonoBehaviour:
   <pieceType>k__BackingField: 0
   moveRangeHighlightedTileBase: {fileID: 11400000, guid: 28645d8737dbcec489a33b9e12d754f8, type: 2}
   attackRangeHighlightedTileBase: {fileID: 11400000, guid: 3c6884ad66936454598ab4f1ea47a748, type: 2}
-  wallTileBase: {fileID: 11400000, guid: cbf24997bee40254cb971e173cd3976e, type: 2}
-  swampTileBase: {fileID: 11400000, guid: 359348f6c03b3a9448f9536175339cd6, type: 2}
   maxMovementStamina: 0
   duration: 0.5
   destinationAlpha: 0
   destinationOffset: {x: -0.3, y: 0.7, z: 0}
   destinationRotation: {x: 0, y: 0, z: 16}
-  promotionTileBase: {fileID: 11400000, guid: 9f519ec19efe8b2438df3fff54bef424, type: 2}
-  unidirectionalTeleportTileBaseEntrance: {fileID: 11400000, guid: 6ade1eee97ee2e34498462562f6c115c, type: 2}
-  unidirectionalTeleportTileBaseExit: {fileID: 11400000, guid: 61c512f1c560fab45905893c34f66dd5, type: 2}
-  bidirectionalTeleportTileBase: {fileID: 11400000, guid: 51493e396fce4a44d9743ea61a8f7823, type: 2}
+  queenAbilityTileBase: {fileID: 11400000, guid: 519e9e039739c9a41a905014dbaff427, type: 2}
+  foregroundDecorationTilemap: {fileID: 0}
+  pillarUpperPartTileBase: {fileID: 11400000, guid: d69f49a673f08054eb4ba591ddd0b6ba, type: 2}
 --- !u!1 &2119188027561312175
 GameObject:
   m_ObjectHideFlags: 0
@@ -1171,10 +1168,10 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 525957867
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.4509434, g: 0.46813336, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

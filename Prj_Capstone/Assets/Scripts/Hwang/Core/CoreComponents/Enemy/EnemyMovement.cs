@@ -4,9 +4,19 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Tilemaps;
 
 public class EnemyMovement : Movement
 {
+    private Entity attackTarget;
+
+    protected override void Start()
+    {
+        base.Start();
+
+        smoothMoveFinished += AttackPiece;
+    }
+
     protected override void OnPointerClick(PointerEventData eventData)
     {
         base.OnPointerClick(eventData);
@@ -25,6 +35,7 @@ public class EnemyMovement : Movement
 
     public bool CheckAttackArea()
     {
+        attackTarget = null;
         bool foundTarget = false;
 
         BoundsInt bounds = pathfinder.moveableTilemap.cellBounds;
@@ -39,20 +50,12 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) continue;
 
-                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
 
-                    if (entity != null && entity.gameObject.activeSelf)
+                    if (attackTarget != null && attackTarget.gameObject.activeSelf)
                     {
                         foundTarget = true;
                         MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
-                        Action attackPiece = null;
-                        attackPiece = () =>
-                        {
-                            entity.gameObject.SetActive(false);
-                            Manager.Instance.gameManager.iterateNextEnemy = true;
-                            smoothMoveFinished -= attackPiece;
-                        };
-                        smoothMoveFinished += attackPiece;
                         break;
                     }
                 }
@@ -69,20 +72,12 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) continue;
 
-                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
 
-                    if (entity != null && entity.gameObject.activeSelf)
+                    if (attackTarget != null && attackTarget.gameObject.activeSelf)
                     {
                         foundTarget = true;
                         MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
-                        Action attackPiece = null;
-                        attackPiece = () =>
-                        {
-                            entity.gameObject.SetActive(false);
-                            Manager.Instance.gameManager.iterateNextEnemy = true;
-                            smoothMoveFinished -= attackPiece;
-                        };
-                        smoothMoveFinished += attackPiece;
                         break;
                     }
                 }
@@ -99,20 +94,12 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
 
-                    if (entity != null && entity.gameObject.activeSelf)
+                    if (attackTarget != null && attackTarget.gameObject.activeSelf)
                     {
                         foundTarget = true;
                         MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
-                        Action attackPiece = null;
-                        attackPiece = () =>
-                        {
-                            entity.gameObject.SetActive(false);
-                            Manager.Instance.gameManager.iterateNextEnemy = true;
-                            smoothMoveFinished -= attackPiece;
-                        };
-                        smoothMoveFinished += attackPiece;
                         goto Next;
                     }
                 }
@@ -126,20 +113,12 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
 
-                    if (entity != null && entity.gameObject.activeSelf)
+                    if (attackTarget != null && attackTarget.gameObject.activeSelf)
                     {
                         foundTarget = true;
                         MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
-                        Action attackPiece = null;
-                        attackPiece = () =>
-                        {
-                            entity.gameObject.SetActive(false);
-                            Manager.Instance.gameManager.iterateNextEnemy = true;
-                            smoothMoveFinished -= attackPiece;
-                        };
-                        smoothMoveFinished += attackPiece;
                         goto Next;
                     }
                 }
@@ -153,20 +132,12 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
 
-                    if (entity != null && entity.gameObject.activeSelf)
+                    if (attackTarget != null && attackTarget.gameObject.activeSelf)
                     {
                         foundTarget = true;
                         MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
-                        Action attackPiece = null;
-                        attackPiece = () =>
-                        {
-                            entity.gameObject.SetActive(false);
-                            Manager.Instance.gameManager.iterateNextEnemy = true;
-                            smoothMoveFinished -= attackPiece;
-                        };
-                        smoothMoveFinished += attackPiece;
                         goto Next;
                     }
                 }
@@ -180,20 +151,12 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
 
-                    if (entity != null && entity.gameObject.activeSelf)
+                    if (attackTarget != null && attackTarget.gameObject.activeSelf)
                     {
                         foundTarget = true;
                         MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
-                        Action attackPiece = null;
-                        attackPiece = () =>
-                        {
-                            entity.gameObject.SetActive(false);
-                            Manager.Instance.gameManager.iterateNextEnemy = true;
-                            smoothMoveFinished -= attackPiece;
-                        };
-                        smoothMoveFinished += attackPiece;
                         goto Next;
                     }
                 }
@@ -215,20 +178,12 @@ public class EnemyMovement : Movement
                     {
                         if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                        Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                        attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
 
-                        if (entity != null && entity.gameObject.activeSelf)
+                        if (attackTarget != null && attackTarget.gameObject.activeSelf)
                         {
                             foundTarget = true;
                             MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
-                            Action attackPiece = null;
-                            attackPiece = () =>
-                            {
-                                entity.gameObject.SetActive(false);
-                                Manager.Instance.gameManager.iterateNextEnemy = true;
-                                smoothMoveFinished -= attackPiece;
-                            };
-                            smoothMoveFinished += attackPiece;
                             goto End;
                         }
                     }
@@ -244,21 +199,6 @@ public class EnemyMovement : Movement
         else
         {
             Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(entity.transform);
-        }
-
-        int availablePiece = 0;
-        foreach (PlayerCharacter mercenary in Manager.Instance.gameManager.mercenaries)
-        {
-            if (mercenary.gameObject.activeSelf)
-            {
-                availablePiece += 1;
-            }
-        }
-
-        if (Manager.Instance.gameManager.enemyPhase && availablePiece < Manager.Instance.gameManager.howManyShouldBeInTheGoal && !Manager.Instance.gameManager.gameFinished)
-        {
-            Manager.Instance.uiManager.ShowGameResultWindow("Stage Failed...");
-            Manager.Instance.gameManager.gameFinished = true;
         }
 
         return foundTarget;
@@ -405,5 +345,28 @@ public class EnemyMovement : Movement
         }
 
         return false;
+    }
+
+    private void AttackPiece()
+    {
+        attackTarget?.gameObject.SetActive(false);
+
+        int availablePiece = 0;
+
+        foreach (PlayerCharacter playerPiece in Manager.Instance.gameManager.mercenaries)
+        {
+            if (playerPiece.gameObject.activeSelf)
+            {
+                availablePiece += 1;
+            }
+        }
+
+        if (Manager.Instance.gameManager.enemyPhase && availablePiece < Manager.Instance.gameManager.howManyShouldBeInTheGoal && !Manager.Instance.gameManager.gameFinished)
+        {
+            Manager.Instance.uiManager.ShowGameResultWindow("Stage Failed...");
+            Manager.Instance.gameManager.gameFinished = true;
+        }
+
+        Manager.Instance.gameManager.iterateNextEnemy = true;
     }
 }

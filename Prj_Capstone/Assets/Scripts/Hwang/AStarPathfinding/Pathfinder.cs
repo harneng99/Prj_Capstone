@@ -49,7 +49,7 @@ public class Pathfinder : MonoBehaviour
         moveableTilemap = GameObject.FindWithTag("MoveableTilemap").GetComponent<Tilemap>();
         objectTilemap = GameObject.FindWithTag("ObjectTilemap").GetComponent<Tilemap>();
 
-        CreateNodes();
+        // CreateNodes();
     }
 
     private void CreateNodes()
@@ -80,6 +80,7 @@ public class Pathfinder : MonoBehaviour
                 }
             }
         }*/
+        gridNodes.Clear();
 
         BoundsInt bounds = moveableTilemap.cellBounds;
 
@@ -106,6 +107,8 @@ public class Pathfinder : MonoBehaviour
 
     private void Initialize()
     {
+        CreateNodes();
+
         foreach (GridNode hexgridNode in gridNodes)
         {
             hexgridNode.gCost = 0;

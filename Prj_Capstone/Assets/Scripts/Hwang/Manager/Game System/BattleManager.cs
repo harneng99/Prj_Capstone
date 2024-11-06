@@ -23,7 +23,7 @@ public class BattleManager : MonoBehaviour
     public bool pieceDeploymentPhase { get; private set; } = true;
     public bool battlePhase { get; private set; } = false;
     public bool playerPhase { get; private set; } = false;
-    public bool alreadyMoved { get; set; }
+    public bool didPlayerMovedAnythingThisTurn { get; set; }
     public bool gameFinished { get; set; }
     public bool enemyPhase { get; private set; } = false;
     public bool isAiming { get; set; } = false;
@@ -63,7 +63,14 @@ public class BattleManager : MonoBehaviour
         playerTurnStart += () => { currentTurnCount += 1; };
         playerTurnStart += () => { Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount; };
         playerTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = true; };
-        playerTurnStart += () => { alreadyMoved = false; };
+        playerTurnStart += () =>
+        { 
+            didPlayerMovedAnythingThisTurn = false;
+            foreach (Entity entity in entities)
+            {
+                entity.entityMovement.ResetEntityMovedBooleanVariable();
+            }
+        };
 
         // TODO: Below code deletes all the ClickHandler. Should find a way to fix this.
         // playerTurnEnd += Manager.Instance.playerInputManager.DisableInputSystemOnTurnChange;
@@ -84,13 +91,13 @@ public class BattleManager : MonoBehaviour
         enemyTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = false; };
 
         enemyTurnEnd += Manager.Instance.uiManager.ShowPhaseInformationUI;
-
-        StartBattlePhase();
     }
 
     private void Start()
     {
         Manager.Instance.playerInputManager.controls.Map.MouseLeftClick.performed += _ => MouseLeftClick();
+
+        StartBattlePhase();
     }
 
     private void Update()
@@ -188,6 +195,8 @@ public class BattleManager : MonoBehaviour
     public async void TurnEnd()
     {
         if (continueTurn) return;
+
+        highlightedTilemap.ClearAllTiles();
 
         if (playerPhase && currentTurnCount >= turnLimit && !gameFinished)
         {

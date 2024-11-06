@@ -17,8 +17,8 @@ public abstract class Movement : CoreComponent
     [field: SerializeField] public PieceType pieceType { get; protected set; }
     [SerializeField] protected TileBase moveRangeHighlightedTileBase;
     [SerializeField] protected TileBase attackRangeHighlightedTileBase;
-    [SerializeField] protected TileBase wallTileBase;
-    [SerializeField] protected TileBase swampTileBase;
+    // [SerializeField] protected TileBase wallTileBase;
+    // [SerializeField] protected TileBase swampTileBase;
     [SerializeField] protected int maxMovementStamina;
 
     [Header("Knight Animation")]
@@ -35,6 +35,7 @@ public abstract class Movement : CoreComponent
     public event Action smoothMoveFinished;
     
     public bool isMoving { get; protected set; }
+    protected bool didCurrentEntityMoveThisTurn;
     protected Coroutine smoothMovementCoroutine;
 
     protected Vector3Int[] knightMovements = { new Vector3Int(-1, 2, 0), new Vector3Int(1, 2, 0), new Vector3Int(2, 1, 0), new Vector3Int(2, -1, 0), new Vector3Int(1, -2, 0), new Vector3Int(-1, -2, 0), new Vector3Int(-2, 1, 0), new Vector3Int(-2, -1, 0) };
@@ -166,6 +167,7 @@ public abstract class Movement : CoreComponent
 
     protected virtual IEnumerator MoveEntitySmooth(List<GridNode> path)
     {
+        entity.spriteRenderer.sortingOrder = 1;
         GridNode startNode = path.First();
         GridNode destinationNode = path.Last();
 
@@ -238,6 +240,7 @@ public abstract class Movement : CoreComponent
         }
         smoothMoveFinished?.Invoke();
         isMoving = false;
+        entity.spriteRenderer.sortingOrder = 0;
     }
 
     /// <summary>
@@ -544,7 +547,7 @@ public abstract class Movement : CoreComponent
         this.pieceType = pieceType;
         entity.highlightedTilemap.ClearAllTiles();
 
-        if (Manager.Instance.gameManager.alreadyMoved)
+        if (Manager.Instance.gameManager.didPlayerMovedAnythingThisTurn)
         {
             Manager.Instance.gameManager.continueTurn = false;
             Manager.Instance.gameManager.TurnEnd();
@@ -571,7 +574,8 @@ public abstract class Movement : CoreComponent
 
         if (pieceType == PieceType.Rook)
         {
-            return !pathfinder.objectTilemap.HasTile(cellgridPosition) || pathfinder.objectTilemap.GetTile(cellgridPosition) == swampTileBase;
+            CustomTileData customTileData = pathfinder.objectTilemap.GetInstantiatedObject(cellgridPosition)?.GetComponent<CustomTileData>();
+            return !pathfinder.objectTilemap.HasTile(cellgridPosition) || customTileData?.objectTileLayer == ObjectTileLayer.Swamp;
         }
 
         if (pieceType == PieceType.Queen)
@@ -581,4 +585,6 @@ public abstract class Movement : CoreComponent
 
         return false;
     }
+
+    public void ResetEntityMovedBooleanVariable() => didCurrentEntityMoveThisTurn = false;
 }

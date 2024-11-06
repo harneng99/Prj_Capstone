@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 
 public enum TileType { Moveable, Object, Interactable, Highlight }
 [System.Flags] public enum MoveableTileLayer { Ground = 1 << 0, Water = 1 << 1 }
-public enum ObjectTileLayer { Swamp = 1 << 0, Wall = 1 << 1 }
+public enum ObjectTileLayer { Swamp, Wall }
 public enum InteractableTileLayer { Goal, UnidirectionalTeleport, BidirectionalTeleport, Promotion }
 
 public class CustomTileData : MonoBehaviour

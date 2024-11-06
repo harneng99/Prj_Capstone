@@ -188,8 +188,8 @@ MonoBehaviour:
   <pieceType>k__BackingField: 0
   moveRangeHighlightedTileBase: {fileID: 11400000, guid: 28645d8737dbcec489a33b9e12d754f8, type: 2}
   attackRangeHighlightedTileBase: {fileID: 11400000, guid: 3c6884ad66936454598ab4f1ea47a748, type: 2}
-  wallTileBase: {fileID: 11400000, guid: cbf24997bee40254cb971e173cd3976e, type: 2}
-  swampTileBase: {fileID: 11400000, guid: 359348f6c03b3a9448f9536175339cd6, type: 2}
+  wallTileBase: {fileID: 11400000, guid: 2512229f08cc5544f842ded3aa0b2629, type: 2}
+  swampTileBase: {fileID: 11400000, guid: 5a20b6c1dc70f1b4fb31379ba25235d9, type: 2}
   maxMovementStamina: 0
   duration: 0.5
   destinationAlpha: 0
@@ -504,10 +504,10 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 525957867
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.2924527, b: 0.2924527, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
