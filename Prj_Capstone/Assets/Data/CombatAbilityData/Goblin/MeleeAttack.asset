@@ -16,6 +16,9 @@ MonoBehaviour:
   <combatAbilityName>k__BackingField: Melee Attack
   <combatAbilityType>k__BackingField: 0
   <staminaCost>k__BackingField: 3
+  <turnDuration>k__BackingField: 0
+  <availableTarget>k__BackingField: 2
+  <maximumCastingAreaCount>k__BackingField: 1
   <combatAbilityDescription>k__BackingField: Deals damage to selected target.
   <castingRange>k__BackingField: {x: 1, y: 1, z: 1}
   <castingRangeDictionary>k__BackingField:
@@ -40,14 +43,14 @@ MonoBehaviour:
     - Key: {x: 0, y: 0, z: 0}
       Value: 1
   <combatAbilityComponents>k__BackingField:
-  - rid: 8228692461887422464
+  - rid: 8228692626273468416
   references:
     version: 2
     RefIds:
-    - rid: 8228692461887422464
+    - rid: 8228692626273468416
       type: {class: DamageComponent, ns: , asm: Assembly-CSharp}
       data:
         name: DamageComponent
-        baseHealthDamage: 10
-        healthDamageIncreaseByLevel: 10
+        baseHealthDamage: 0
+        healthDamageIncreaseByLevel: 0
         pauseTimeWhenHit: 0

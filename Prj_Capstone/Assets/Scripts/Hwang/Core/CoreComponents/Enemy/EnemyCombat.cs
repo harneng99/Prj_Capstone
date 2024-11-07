@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SocialPlatforms.Impl;
 
 public enum TargetType { Closest, LowestHealth, PotentialThreat }
 
 public class WhatToDo
 {
+    // TODO: Add logic about potential threat type mercenary
     public float score { get; private set; }
     public CombatAbility combatAbility { get; private set; }
     public Vector3Int enemyHexgridPosition { get; private set; }
@@ -50,8 +52,38 @@ public class EnemyCombat : Combat
         enemy = entity as Enemy;
     }
 
+    protected override void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button.Equals(PointerEventData.InputButton.Left))
+        {
+            if (Manager.Instance.gameManager.battlePhase)
+            {
+                if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
+                {
+                    Manager.Instance.uiManager.SetCombatAbilityButtons();
+                }
+            }
+        }
+    }
+
+    public override void MouseRightClick()
+    {
+        if (Manager.Instance.gameManager.battlePhase)
+        {
+            if (entity.isSelected)
+            {
+                currentSelectedCombatAbility = null;
+                Manager.Instance.gameManager.isAiming = false;
+                Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection = false;
+                entity.highlightedTilemap.ClearAllTiles();
+                aoeTilemap.ClearAllTiles();
+            }
+        }
+    }
+
     public async void RunEnemyAI()
     {
+        // TODO: Change camera position
         float currentMaxScore = float.MinValue;
         WhatToDo highestScoreWhatToDo = null;
 
@@ -66,6 +98,7 @@ public class EnemyCombat : Combat
             if (currentMaxScore < whatToDo.score * (1.0f - scoreMultiplierDecreaseAmount * i))
             {
                 highestScoreWhatToDo = whatToDo;
+                currentMaxScore = whatToDo.score * (1.0f - scoreMultiplierDecreaseAmount * i);
             }
         }
 
@@ -75,27 +108,87 @@ public class EnemyCombat : Combat
             return;
         }
 
-        if (!highestScoreWhatToDo.moveAfterAttack)
+        Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(enemy.transform);
+
+        if (highestScoreWhatToDo.moveAfterAttack)
         {
-            enemy.entityMovement.DrawMoveableTiles();
-            await Task.Delay(500);
-            enemy.entityMovement.MoveToGrid(highestScoreWhatToDo.enemyHexgridPosition, GridType.Hexgrid, false);
-            if (enemy.entityMovement.isMoving)
+            if (highestScoreWhatToDo.combatAbility != null)
             {
-                await Task.Delay(100);
+                await Task.Delay(200);
+                enemy.enemyCombat.DrawCastingRange(highestScoreWhatToDo.combatAbility);
+
+                await Task.Delay(200);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
+                Manager.Instance.gameManager.virtualCameraFollowTransform.position = enemy.entityMovement.pathfinder.HexgridToWorldgrid(highestScoreWhatToDo.combatAbilityHexgridCenter);
+                enemy.enemyCombat.DrawAOE(enemy.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.combatAbilityHexgridCenter), highestScoreWhatToDo.combatAbility);
+
+                await Task.Delay(200);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(enemy.transform);
+                enemy.highlightedTilemap.ClearAllTiles();
+                aoeTilemap.ClearAllTiles();
+                ExecuteCombatAbility(highestScoreWhatToDo.combatAbilityHexgridCenter, GridType.Hexgrid, highestScoreWhatToDo.combatAbility);
             }
-            await Task.Delay(200);
-            enemy.enemyCombat.DrawCastingRange(highestScoreWhatToDo.combatAbility);
-            await Task.Delay(200);
-            enemy.enemyCombat.DrawAOE(enemy.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.combatAbilityHexgridCenter), highestScoreWhatToDo.combatAbility);
-            await Task.Delay(200);
-            enemy.highlightedTilemap.ClearAllTiles();
-            aoeTilemap.ClearAllTiles();
-            ApplyCombatAbility(highestScoreWhatToDo.combatAbilityHexgridCenter, GridType.Hexgrid, highestScoreWhatToDo.combatAbility);
+
+            if (!highestScoreWhatToDo.enemyHexgridPosition.Equals(enemy.entityMovement.currentHexgridPosition))
+            {
+                await Task.Delay(200);
+                enemy.entityMovement.DrawMoveableTilemap();
+
+                await Task.Delay(200);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
+                Manager.Instance.gameManager.virtualCameraFollowTransform.position = enemy.entityMovement.pathfinder.HexgridToWorldgrid(highestScoreWhatToDo.enemyHexgridPosition);
+                Manager.Instance.gameManager.selectionTilemap.SetTile(entity.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.enemyHexgridPosition), Manager.Instance.gameManager.selectionTile);
+
+                await Task.Delay(200);
+                enemy.highlightedTilemap.ClearAllTiles();
+                Manager.Instance.gameManager.selectionTilemap.SetTile(entity.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.enemyHexgridPosition), null);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(enemy.transform);
+                enemy.entityMovement.MoveToGrid(highestScoreWhatToDo.enemyHexgridPosition, GridType.Hexgrid, false);
+                if (enemy.entityMovement.isMoving)
+                {
+                    await Task.Delay(100);
+                }
+            }
         }
         else
         {
+            if (!highestScoreWhatToDo.enemyHexgridPosition.Equals(enemy.entityMovement.currentHexgridPosition))
+            {
+                await Task.Delay(200);
+                enemy.entityMovement.DrawMoveableTilemap();
 
+                await Task.Delay(200);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
+                Manager.Instance.gameManager.virtualCameraFollowTransform.position = enemy.entityMovement.pathfinder.HexgridToWorldgrid(highestScoreWhatToDo.enemyHexgridPosition);
+                Manager.Instance.gameManager.selectionTilemap.SetTile(entity.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.enemyHexgridPosition), Manager.Instance.gameManager.selectionTile);
+
+                await Task.Delay(200);
+                enemy.highlightedTilemap.ClearAllTiles();
+                Manager.Instance.gameManager.selectionTilemap.SetTile(entity.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.enemyHexgridPosition), null);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(enemy.transform);
+                enemy.entityMovement.MoveToGrid(highestScoreWhatToDo.enemyHexgridPosition, GridType.Hexgrid, false);
+                while (enemy.entityMovement.isMoving)
+                {
+                    await Task.Delay(100);
+                }
+            }
+
+            if (highestScoreWhatToDo.combatAbility != null)
+            {
+                await Task.Delay(200);
+                enemy.enemyCombat.DrawCastingRange(highestScoreWhatToDo.combatAbility);
+
+                await Task.Delay(200);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(null);
+                Manager.Instance.gameManager.virtualCameraFollowTransform.position = enemy.entityMovement.pathfinder.HexgridToWorldgrid(highestScoreWhatToDo.combatAbilityHexgridCenter);
+                enemy.enemyCombat.DrawAOE(enemy.entityMovement.pathfinder.HexgridToCellgrid(highestScoreWhatToDo.combatAbilityHexgridCenter), highestScoreWhatToDo.combatAbility);
+
+                await Task.Delay(200);
+                Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(enemy.transform);
+                enemy.highlightedTilemap.ClearAllTiles();
+                aoeTilemap.ClearAllTiles();
+                ExecuteCombatAbility(highestScoreWhatToDo.combatAbilityHexgridCenter, GridType.Hexgrid, highestScoreWhatToDo.combatAbility);
+            }
         }
 
         await Task.Delay(500); // TODO: Wait until animation finishes
@@ -163,7 +256,7 @@ public class EnemyCombat : Combat
         else return null;
     }
 
-    // TODO: If there are many mercenaries with the same health, then sort through distance.
+    // TODO: If there are many mercenaries with the same health, then sort through distance or potential threat.
     private PlayerCharacter LowestHealth()
     {
         PlayerCharacter currentLowestHealthTarget = null;
@@ -176,6 +269,11 @@ public class EnemyCombat : Combat
                 currentLowestHealthTarget = mercenary;
                 lowestHealth = mercenary.entityStat.health.currentValue;
             }
+            /*else if (lowestHealth == mercenary.entityStat.health.currentValue)
+            {
+                PathInformation originalMiminumHealthPathInformation = entity.entityMovement.pathfinder.PathFinding(entity.entityMovement.currentCellgridPosition, currentLowestHealthTarget.entityMovement.currentCellgridPosition);
+                PathInformation newMinimumHealthPathInformation = entity.entityMovement.pathfinder.PathFinding(entity.entityMovement.currentCellgridPosition, mercenary.entityMovement.currentCellgridPosition);
+            }*/
         }
 
         return currentLowestHealthTarget;
@@ -202,12 +300,15 @@ public class EnemyCombat : Combat
                 foreach (Vector3Int hexgridCastingRangeOffset in combatAbility.castingRangeDictionary.Keys) // for all range of casting of the chosen combat ability
                 {
                     Vector3Int enemyHexgridPosition = combatAbilityHexgridCenterPosition - hexgridCastingRangeOffset; // decide where the enemy will go to cast its combat ability
+                    Vector3Int enemyCellgridPosition = enemy.entityMovement.pathfinder.HexgridToCellgrid(enemyHexgridPosition);
 
                     if (entity.entityMovement.pathfinder.GetHeuristicDistance(entity.entityMovement.currentHexgridPosition, enemyHexgridPosition) > entity.entityStat.stamina.currentValue) continue; // if heuristic distance is bigger than left over stamina, then the enemy can't use its combat ability, so skip
 
-                    PathInformation pathInformation = entity.entityMovement.pathfinder.PathFinding(entity.entityMovement.currentHexgridPosition, enemyHexgridPosition);
+                    PathInformation pathInformation = entity.entityMovement.pathfinder.PathFinding(entity.entityMovement.currentCellgridPosition, enemyCellgridPosition, false);
 
-                    if (pathInformation.requiredStamina + combatAbility.staminaCost > entity.entityStat.stamina.currentValue) continue; // if the stamina cost of the movement and the chosen combat ability is bigger than remaining stamina, then skip
+                    if (pathInformation == null || pathInformation.requiredStamina + combatAbility.staminaCost > entity.entityStat.stamina.currentValue) continue; // if the stamina cost of the movement and the chosen combat ability is bigger than remaining stamina, then skip
+
+                    if (enemy.entityMovement.PathOutOfRange(enemy.entityMovement.currentHexgridPosition, pathInformation)) continue;
 
                     float currentScore = CalculateScore(enemyHexgridPosition, combatAbilityHexgridCenterPosition, combatAbility); // calculate score for movement
 
@@ -222,7 +323,41 @@ public class EnemyCombat : Combat
             }
         }
 
-        return new WhatToDo(highestScore, highestScoreCombatAbility, highestScoreEnemyHexgridPosition, highestScoreCombatAbilityHexgridCenter, false);
+        bool moveAfterAttack = false;
+
+        if (highestScoreEnemyHexgridPosition.Equals(entity.entityMovement.currentHexgridPosition))
+        {
+            float highestDistanceScore = DistanceScore(highestScoreEnemyHexgridPosition);
+            moveAfterAttack = true;
+
+            for (int x = -entity.entityMovement.moveRangeInHexGrid.x; x <= entity.entityMovement.moveRangeInHexGrid.x; x++)
+            {
+                for (int y = -entity.entityMovement.moveRangeInHexGrid.y; y <= entity.entityMovement.moveRangeInHexGrid.y; y++)
+                {
+                    for (int z = -entity.entityMovement.moveRangeInHexGrid.z; z <= entity.entityMovement.moveRangeInHexGrid.z; z++)
+                    {
+                        if (x + y + z != 0) continue;
+
+                        Vector3Int moveableHexgridPosition = entity.entityMovement.currentHexgridPosition + new Vector3Int(x, y, z);
+                        Vector3Int moveableCellgridPosition = entity.entityMovement.pathfinder.HexgridToCellgrid(moveableHexgridPosition);
+
+                        PathInformation pathInformation = entity.entityMovement.pathfinder.PathFinding(entity.entityMovement.currentCellgridPosition, moveableCellgridPosition);
+
+                        if (pathInformation == null || entity.entityStat.stamina.currentValue < pathInformation.requiredStamina + highestScoreCombatAbility.staminaCost) continue;
+
+                        float currentDistanceScore = DistanceScore(moveableHexgridPosition);
+                        
+                        if (currentDistanceScore > highestDistanceScore)
+                        {
+                            highestDistanceScore = currentDistanceScore;
+                            highestScoreEnemyHexgridPosition = moveableHexgridPosition;
+                        }
+                    }
+                }
+            }
+        }
+
+        return new WhatToDo(highestScore, highestScoreCombatAbility, highestScoreEnemyHexgridPosition, highestScoreCombatAbilityHexgridCenter, moveAfterAttack);
     }
 
     private float CalculateScore(Vector3Int enemyHexgridPosition, Vector3Int combatAbilityHexgridCenterPosition, CombatAbility combatAbility)
@@ -236,6 +371,7 @@ public class EnemyCombat : Combat
 
     private float DistanceScore(Vector3Int enemyHexgridPosition)
     {
+        Vector3Int enemyCellgridPosition = enemy.entityMovement.pathfinder.HexgridToCellgrid(enemyHexgridPosition);
         int activeMercenariesCount = 0;
         int minimumStaminaCostFromMercenary = int.MaxValue;
         float meanStaminaCostFromMercenaries = 0;
@@ -245,7 +381,7 @@ public class EnemyCombat : Combat
             if (!mercenary.isActiveAndEnabled) continue;
 
             activeMercenariesCount += 1;
-            int staminaCostFromMercenary = entity.entityMovement.pathfinder.PathFinding(mercenary.entityMovement.currentHexgridPosition, enemyHexgridPosition).requiredStamina;
+            int staminaCostFromMercenary = entity.entityMovement.pathfinder.PathFinding(mercenary.entityMovement.currentCellgridPosition, enemyCellgridPosition).requiredStamina;
 
             meanStaminaCostFromMercenaries += staminaCostFromMercenary;
             minimumStaminaCostFromMercenary = Mathf.Min(minimumStaminaCostFromMercenary, staminaCostFromMercenary);

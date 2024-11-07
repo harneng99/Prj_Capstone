@@ -7,10 +7,12 @@ TagManager:
   - MoveableTilemap
   - ObjectTilemap
   - HighlightedTilemap
-  - FogTilemap
+  - InteractableTilemap
+  - MainCanvas
   - SelectionTilemap
   - AOETilemap
-  - MainCanvas
+  - FogTilemap
+  - ForegroundDecorationTilemap
   layers:
   - Default
   - TransparentFX
@@ -48,8 +50,11 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Tile
+  - name: Background
     uniqueID: 4294297219
+    locked: 0
+  - name: Interactable
+    uniqueID: 1071416589
     locked: 0
   - name: Object
     uniqueID: 935062579
@@ -57,9 +62,9 @@ TagManager:
   - name: Character
     uniqueID: 525957867
     locked: 0
-  - name: Fog
-    uniqueID: 4241487911
-    locked: 0
   - name: Selection
     uniqueID: 1116240881
+    locked: 0
+  - name: Foreground
+    uniqueID: 3276123115
     locked: 0

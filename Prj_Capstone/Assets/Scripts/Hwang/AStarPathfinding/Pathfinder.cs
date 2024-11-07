@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class PathInformation
 {
@@ -35,7 +36,7 @@ public class Pathfinder : MonoBehaviour
 
     private const float epsilon = 0.001f;
     private Vector3 cellSize;
-    private List<Vector3Int> hexgridNodeAroundOffsets = new List<Vector3Int>() { new Vector3Int(0, -1, 1), new Vector3Int(0, 1, -1), new Vector3Int(1, -1, 0), new Vector3Int(1, 0, -1), new Vector3Int(-1, 1, 0), new Vector3Int(-1, 0, 1) };
+    private List<Vector3Int> cellgridNodeAroundOffsets = new List<Vector3Int>() { new Vector3Int(1, 0, 0), new Vector3Int(-1, 0, 0), new Vector3Int(0, 1, 0), new Vector3Int(0, -1, 0), new Vector3Int(1, -1, 0), new Vector3Int(1, 1, 0), new Vector3Int(-1, 1, 0), new Vector3Int(-1, -1, 0) };
 
     private List<GridNode> openNodeList = new List<GridNode>();
     private List<GridNode> closedNodeList = new List<GridNode>();
@@ -48,12 +49,12 @@ public class Pathfinder : MonoBehaviour
         moveableTilemap = GameObject.FindWithTag("MoveableTilemap").GetComponent<Tilemap>();
         objectTilemap = GameObject.FindWithTag("ObjectTilemap").GetComponent<Tilemap>();
 
-        CreateNodes();
+        // CreateNodes();
     }
 
     private void CreateNodes()
     {
-        for (int x = -hexgridXWidth; x <= hexgridXWidth; x++)
+        /*for (int x = -hexgridXWidth; x <= hexgridXWidth; x++)
         {
             for (int y = -hexgridYHeight; y <= hexgridYHeight; y++)
             {
@@ -78,11 +79,36 @@ public class Pathfinder : MonoBehaviour
                     }
                 }
             }
+        }*/
+        gridNodes.Clear();
+
+        BoundsInt bounds = moveableTilemap.cellBounds;
+
+        for (int x = -bounds.size.x; x <= bounds.size.x; x++)
+        {
+            for (int y = -bounds.size.y; y <= bounds.size.y; y++)
+            {
+                Vector3Int cellgridPosition = new Vector3Int(x, y, 0);
+                Vector3 worldgridPosition = new Vector3(x + 0.5f, y + 0.5f, 0.0f);
+
+                GameObject tileGameObject = moveableTilemap.GetInstantiatedObject(cellgridPosition);
+
+                if (tileGameObject == null) continue;
+
+                CustomTileData customTileData = tileGameObject.GetComponent<CustomTileData>();
+
+                if (moveableLayerTypes.HasFlag(customTileData.moveableTileLayer))
+                {
+                    gridNodes.Add(new GridNode(Vector3Int.zero, cellgridPosition, worldgridPosition, IsObstacle(cellgridPosition), customTileData));
+                }
+            }
         }
     }
 
     private void Initialize()
     {
+        CreateNodes();
+
         foreach (GridNode hexgridNode in gridNodes)
         {
             hexgridNode.gCost = 0;
@@ -95,22 +121,26 @@ public class Pathfinder : MonoBehaviour
         closedNodeList.Clear();
     }
 
-    public int GetHeuristicDistance(Vector3Int hexgridStartPosition, Vector3Int hexgridDestinationPosition)
+    public float GetHeuristicDistance(Vector3Int hexgridStartPosition, Vector3Int hexgridDestinationPosition)
     {
-        return Mathf.Max(new int[] { Mathf.Abs(hexgridStartPosition.x - hexgridDestinationPosition.x), Mathf.Abs(hexgridStartPosition.y - hexgridDestinationPosition.y), Mathf.Abs(hexgridStartPosition.z - hexgridDestinationPosition.z) });
+        // return Mathf.Max(new int[] { Mathf.Abs(hexgridStartPosition.x - hexgridDestinationPosition.x), Mathf.Abs(hexgridStartPosition.y - hexgridDestinationPosition.y), Mathf.Abs(hexgridStartPosition.z - hexgridDestinationPosition.z) });
+
+        return Vector3Int.Distance(hexgridStartPosition, hexgridDestinationPosition);
     }
 
-    public PathInformation PathFinding(Vector3Int cellgridStartPosition, Vector3Int cellgridDestinationPosition)
+    public PathInformation PathFinding(Vector3Int cellgridStartPosition, Vector3Int cellgridDestinationPosition, bool allowOverlap = true)
     {
         Initialize();
 
         GridNode startNode = gridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridStartPosition);
         GridNode destinationNode = gridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridDestinationPosition);
 
-        if (destinationNode == null) return null;
+
+        if (allowOverlap == false && Manager.Instance.gameManager.EntityExistsAt(cellgridDestinationPosition) != null) return null;
+        if (startNode == null || destinationNode == null) return null;
 
         startNode.cameFromNode = null;
-        startNode.gCost = 0;
+        startNode.gCost = 0.0f;
         startNode.hCost = GetHeuristicDistance(startNode.hexgridPosition, destinationNode.hexgridPosition);
         startNode.fCost = startNode.gCost + startNode.fCost;
         openNodeList.Add(startNode);
@@ -122,16 +152,16 @@ public class Pathfinder : MonoBehaviour
             openNodeList.Remove(currentNode);
             closedNodeList.Add(currentNode);
 
-            int nextGCost = currentNode.gCost + 1;
+            float nextGCost = currentNode.gCost + 1;
 
             if (closedNodeList.Contains(destinationNode))
             {
                 break;
             }
             
-            foreach (Vector3Int hexgridNodeAroundOffset in hexgridNodeAroundOffsets)
+            foreach (Vector3Int cellgridNodeAroundOffset in cellgridNodeAroundOffsets)
             {
-                GridNode adjacentNode = gridNodes.FirstOrDefault(node => node.hexgridPosition == currentNode.hexgridPosition + hexgridNodeAroundOffset);
+                GridNode adjacentNode = gridNodes.FirstOrDefault(node => node.cellgridPosition == currentNode.cellgridPosition + cellgridNodeAroundOffset);
                 
                 if (adjacentNode != null) // if the node exists
                 {
@@ -143,7 +173,7 @@ public class Pathfinder : MonoBehaviour
                             {
                                 adjacentNode.cameFromNode = currentNode;
                                 adjacentNode.gCost = nextGCost;
-                                adjacentNode.hCost = GetHeuristicDistance(adjacentNode.hexgridPosition, destinationNode.hexgridPosition);
+                                adjacentNode.hCost = GetHeuristicDistance(adjacentNode.cellgridPosition, destinationNode.cellgridPosition);
                                 adjacentNode.fCost = adjacentNode.gCost + adjacentNode.hCost;
                                 openNodeList.Add(adjacentNode);
                             }
@@ -217,7 +247,14 @@ public class Pathfinder : MonoBehaviour
 
     public Vector3Int CellgridToHexgrid(Vector3Int cellgridPosition)
     {
-        return new Vector3Int(cellgridPosition.x - cellgridPosition.y / 2, cellgridPosition.y, -cellgridPosition.x - cellgridPosition.y / 2 - cellgridPosition.y % 2);
+        if (cellgridPosition.y < 0 && cellgridPosition.y % 2 != 0)
+        {
+            return new Vector3Int(cellgridPosition.x - cellgridPosition.y / 2, cellgridPosition.y, -cellgridPosition.x - cellgridPosition.y / 2 - cellgridPosition.y % 2) + new Vector3Int(1, 0, -1);
+        }
+        else
+        {
+            return new Vector3Int(cellgridPosition.x - cellgridPosition.y / 2, cellgridPosition.y, -cellgridPosition.x - cellgridPosition.y / 2 - cellgridPosition.y % 2);
+        }
         
         // GridNode cellgridNode = gridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridPosition);
         // return cellgridNode == null ? null : cellgridNode.cellgridPosition;
@@ -244,7 +281,7 @@ public class Pathfinder : MonoBehaviour
         }
     }
 
-    public bool isMoveable(Vector3Int cellgridPosition)
+    public bool IsMoveable(Vector3Int cellgridPosition)
     {
         TileBase moveableTile = moveableTilemap.GetTile(cellgridPosition);
 
@@ -257,45 +294,6 @@ public class Pathfinder : MonoBehaviour
             GameObject tileGameObject = moveableTilemap.GetInstantiatedObject(cellgridPosition);
             CustomTileData customTileData = tileGameObject.GetComponent<CustomTileData>();
             return moveableLayerTypes.HasFlag(customTileData.moveableTileLayer);
-        }
-    }
-
-    private void OnDrawGizmos()
-    {
-        Vector3 horizontalOffset = new Vector3(cellSize.x / 4, 0.0f, 0.0f);
-        Vector3 verticalOffset = new Vector3(0.0f, cellSize.y / 8, 0.0f);
-        Gizmos.color = Color.green;
-
-        for (int x = -hexgridXWidth; x <= hexgridXWidth; x++)
-        {
-            for (int y = -hexgridYHeight; y <= hexgridYHeight; y++)
-            {
-                for (int z = -hexgridZWidth; z <= hexgridZWidth; z++)
-                {
-                    if (x + y + z != 0) continue;
-
-                    // Draw Hexgrid
-                    Vector3Int currentHexgridPosition = new Vector3Int(x, y, z);
-                    Vector3 currentWorldgridPosition = HexgridToWorldgrid(currentHexgridPosition);
-                    Vector3Int currentCellgridPosition = HexgridToCellgrid(currentHexgridPosition);
-                    Vector3 worldgridTopPosition = currentWorldgridPosition + new Vector3(0.0f, cellSize.y / 2);
-                    Vector3 worldgridTopLeftPosition = currentWorldgridPosition - new Vector3(cellSize.x / 2, -cellSize.y / 4);
-                    Vector3 worldgridTopRightPosition = currentWorldgridPosition + new Vector3(cellSize.x / 2, cellSize.y / 4);
-                    Vector3 worldgridBottomPosition = currentWorldgridPosition - new Vector3(0.0f, cellSize.y / 2);
-                    Vector3 worldgridBottomLeftPosition = currentWorldgridPosition - new Vector3(cellSize.x / 2, cellSize.y / 4);
-                    Vector3 worldgridBottomRightPosition = currentWorldgridPosition + new Vector3(cellSize.x / 2, -cellSize.y / 4);
-
-                    Handles.Label(currentWorldgridPosition - horizontalOffset + verticalOffset, currentHexgridPosition.ToString());
-                    Handles.Label(currentWorldgridPosition - horizontalOffset - verticalOffset, new Vector2Int(currentCellgridPosition.x, currentCellgridPosition.y).ToString());
-
-                    Gizmos.DrawLine(worldgridTopPosition, worldgridTopRightPosition);
-                    Gizmos.DrawLine(worldgridTopRightPosition, worldgridBottomRightPosition);
-                    Gizmos.DrawLine(worldgridBottomRightPosition, worldgridBottomPosition);
-                    Gizmos.DrawLine(worldgridBottomPosition, worldgridBottomLeftPosition);
-                    Gizmos.DrawLine(worldgridBottomLeftPosition, worldgridTopLeftPosition);
-                    Gizmos.DrawLine(worldgridTopLeftPosition, worldgridTopPosition);
-                }
-            }
         }
     }
 }

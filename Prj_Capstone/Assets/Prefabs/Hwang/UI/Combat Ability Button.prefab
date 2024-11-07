@@ -200,7 +200,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: -5371363112418991891}
         m_TargetAssemblyTypeName: CombatAbilityButton, Assembly-CSharp
-        m_MethodName: ShowCombatAbilityCastRange
+        m_MethodName: ToggleCombatAbilityCastRange
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -267,5 +267,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6d168315e95f8f49b0dab885f34e6fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  entity: {fileID: 0}
-  combatAbility: {fileID: 0}

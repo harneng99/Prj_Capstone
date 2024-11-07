@@ -7,6 +7,10 @@ using UnityEngine;
 public class EntityConsistentData : ScriptableObject
 {
     [field: SerializeField] public float movementVelocity { get; private set; }
-    [field: SerializeField] public Vector3Int testingDictionaryRange { get; private set; }
-    [field: SerializeField] public SerializedDictionary<Vector3Int, bool> testingDictionary { get; private set; }
+
+    [field: Header("Knight Animation")]
+    [field: SerializeField] public float anmationDuration { get; private set; }
+    [field: SerializeField] protected float destinationAlpha { get; private set; }
+    [field: SerializeField] protected Vector3 destinationOffset { get; private set; }
+    [field: SerializeField] protected Vector3 destinationRotation { get; private set; }
 }

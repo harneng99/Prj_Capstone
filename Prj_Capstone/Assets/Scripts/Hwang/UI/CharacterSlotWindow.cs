@@ -36,7 +36,7 @@ public class CharacterSlotWindow : MonoBehaviour, IPointerExitHandler, IDropHand
 
             mercenarySlot.SetSlot(index, mercenaryGameObject);
             mercenarySlotRectTransform.SetParent(mercenarySlotBackgroundRectTransform);
-            mercenarySlotRectTransform.localPosition = mercenarySlotInitialRectTransform.localPosition + index * Vector3.right * distanceBetweenMercenarySlot;
+            mercenarySlotRectTransform.position = mercenarySlotInitialRectTransform.position + index * Vector3.right * distanceBetweenMercenarySlot;
             
             mercenarySlots.Add(mercenarySlotPrefab);
         }
@@ -131,7 +131,7 @@ public class CharacterSlotWindow : MonoBehaviour, IPointerExitHandler, IDropHand
             RectTransform mercenarySlotRectTransform = mercenarySlots[index].GetComponent<RectTransform>();
 
             mercenarySlot.slotIndex = index;
-            mercenarySlotRectTransform.DOAnchorPos(mercenarySlotInitialRectTransform.localPosition + index * Vector3.right * distanceBetweenMercenarySlot, mercenarySlotMoveDurationTime);
+            mercenarySlotRectTransform.DOMove(mercenarySlotInitialRectTransform.position + index * Vector3.right * distanceBetweenMercenarySlot, mercenarySlotMoveDurationTime);
         }
 
         selectedMercenarySlot.ReleaseObject();
@@ -145,7 +145,7 @@ public class CharacterSlotWindow : MonoBehaviour, IPointerExitHandler, IDropHand
         CharacterSlot characterSlot = mercenarySlotGameObject.GetComponent<CharacterSlot>();
         characterSlot.SetSlot(mercenarySlots.Count, returnedObject);
         mercenarySlots.Add(mercenarySlotGameObject);
-        mercenarySlotGameObject.GetComponent<RectTransform>().localPosition = mercenarySlotInitialRectTransform.localPosition + mercenariesList.Count * Vector3.right * distanceBetweenMercenarySlot;
+        mercenarySlotGameObject.GetComponent<RectTransform>().position = mercenarySlotInitialRectTransform.position + (mercenariesList.Count - 1) * Vector3.right * distanceBetweenMercenarySlot;
         RearrangeSlotPositions(0, true);
     }
 
@@ -159,7 +159,7 @@ public class CharacterSlotWindow : MonoBehaviour, IPointerExitHandler, IDropHand
                 RectTransform mercenarySlotRectTransform = mercenarySlots[index].GetComponent<RectTransform>();
 
                 mercenarySlot.slotIndex = index;
-                mercenarySlotRectTransform.DOAnchorPos(mercenarySlotInitialRectTransform.localPosition + index * Vector3.right * distanceBetweenMercenarySlot, mercenarySlotMoveDurationTime);
+                mercenarySlotRectTransform.DOMove(mercenarySlotInitialRectTransform.position + index * Vector3.right * distanceBetweenMercenarySlot, mercenarySlotMoveDurationTime);
             }
         }
         else

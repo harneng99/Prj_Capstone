@@ -29,9 +29,12 @@ public class CombatAbilityEditor : Editor
     private CombatAbility combatAbilityData;
     private SerializedProperty combatAbilityIcon;
     private SerializedProperty combatAbilityName;
-    private SerializedProperty combatAbilityDescription;
     private SerializedProperty combatAbilityType;
     private SerializedProperty staminaCost;
+    private SerializedProperty turnDuration;
+    private SerializedProperty availableTarget;
+    private SerializedProperty maximumCastingAreaCount;
+    private SerializedProperty combatAbilityDescription;
     private SerializedProperty castingRange;
     private SerializedProperty castingRangeDictionary;
     private SerializedProperty AOE;
@@ -46,6 +49,9 @@ public class CombatAbilityEditor : Editor
         combatAbilityName = serializedObject.FindProperty("<combatAbilityName>k__BackingField");
         combatAbilityType = serializedObject.FindProperty("<combatAbilityType>k__BackingField");
         staminaCost = serializedObject.FindProperty("<staminaCost>k__BackingField");
+        turnDuration = serializedObject.FindProperty("<castingTurnDuration>k__BackingField");
+        availableTarget = serializedObject.FindProperty("<availableTarget>k__BackingField");
+        maximumCastingAreaCount = serializedObject.FindProperty("<maximumCastingAreaCount>k__BackingField");
         combatAbilityDescription = serializedObject.FindProperty("<combatAbilityDescription>k__BackingField");
         castingRangeDictionary = serializedObject.FindProperty("<castingRangeDictionary>k__BackingField");
         castingRange = serializedObject.FindProperty("<castingRange>k__BackingField");
@@ -67,160 +73,170 @@ public class CombatAbilityEditor : Editor
         if (combatAbilityType.intValue == 0)
         {
             EditorGUILayout.PropertyField(staminaCost, new GUIContent("Stamina Cost"));
+            EditorGUILayout.PropertyField(maximumCastingAreaCount, new GUIContent("Maximum Casting Area Count"));
         }
+        EditorGUILayout.PropertyField(turnDuration, new GUIContent("Casting Turn Duration"));
+        EditorGUILayout.PropertyField(availableTarget, new GUIContent("Available Target Type"));
         EditorGUILayout.PropertyField(combatAbilityDescription, new GUIContent("Combat Ability Description"));
 
-        EditorGUILayout.Space(singleLineHeight);
-        EditorGUILayout.PropertyField(castingRange, new GUIContent("Casting Range"));
-        EditorGUILayout.PropertyField(castingRangeDictionary, new GUIContent("Casting Range Dictoniary"));
-        #region Set Casting Range Dictionary
-        for (int x = -combatAbilityData.castingRange.x; x <= combatAbilityData.castingRange.x; x++)
+        int maxGridCellCount;
+        float gridCellLength;
+        float centerXPos;
+
+        if (combatAbilityType.intValue == 0)
         {
-            for (int y = -combatAbilityData.castingRange.y; y <= combatAbilityData.castingRange.y; y++)
+            EditorGUILayout.Space(singleLineHeight);
+            EditorGUILayout.PropertyField(castingRange, new GUIContent("Casting Range"));
+            EditorGUILayout.PropertyField(castingRangeDictionary, new GUIContent("Casting Range Dictoniary"));
+            #region Set Casting Range Dictionary
+            for (int x = -combatAbilityData.castingRange.x; x <= combatAbilityData.castingRange.x; x++)
             {
-                for (int z = -combatAbilityData.castingRange.z; z <= combatAbilityData.castingRange.z; z++)
+                for (int y = -combatAbilityData.castingRange.y; y <= combatAbilityData.castingRange.y; y++)
                 {
-                    if (x + y + z != 0) continue;
-
-                    Vector3Int currentKey = new Vector3Int(x, y, z);
-
-                    if (!combatAbilityData.castingRangeDictionary.ContainsKey(currentKey))
-                    {
-                        combatAbilityData.castingRangeDictionary.Add(currentKey, true);
-                        EditorUtility.SetDirty(combatAbilityData);
-                    }
-                }
-            }
-        }
-        #endregion
-        #region Draw Casting Range Hexgrid
-        int maxGridCellCount = Mathf.Max(Mathf.Abs(combatAbilityData.castingRange.x), Mathf.Abs(combatAbilityData.castingRange.z));
-        float gridCellLength = Mathf.Min(maxGridCellLength, (currentViewWidth - gridCellInterval * (maxGridCellCount + 1.0f)) / (2.0f * maxGridCellCount + 1.0f));
-        float centerXPos = currentViewWidth / 2.0f - gridCellLength;
-
-        if (gridCellLength > gridCellInterval)
-        {
-            GUILayout.BeginVertical();
-
-            for (int y = combatAbilityData.castingRange.y; y >= -combatAbilityData.castingRange.y; y--)
-            {
-                float minXPos = float.MaxValue;
-
-                for (int x = -combatAbilityData.castingRange.x; x <= combatAbilityData.castingRange.x; x++)
-                {
-                    for (int z = combatAbilityData.castingRange.z; z >= -combatAbilityData.castingRange.z; z--)
-                    {
-                        if (x + y + z != 0) continue;
-
-                        float currentXPos = 0.5f * x - 0.5f * z;
-                        minXPos = Mathf.Min(minXPos, currentXPos);
-                    }
-                }
-
-                GUILayout.BeginHorizontal();
-
-                GUILayout.Space(centerXPos + minXPos * gridCellLength + Mathf.FloorToInt(minXPos) * gridCellInterval);
-
-                for (int x = -combatAbilityData.castingRange.x; x <= combatAbilityData.castingRange.x; x++)
-                {
-                    for (int z = combatAbilityData.castingRange.z; z >= -combatAbilityData.castingRange.z; z--)
+                    for (int z = -combatAbilityData.castingRange.z; z <= combatAbilityData.castingRange.z; z++)
                     {
                         if (x + y + z != 0) continue;
 
                         Vector3Int currentKey = new Vector3Int(x, y, z);
 
-                        if (combatAbilityData.castingRangeDictionary[currentKey] == true)
+                        if (!combatAbilityData.castingRangeDictionary.ContainsKey(currentKey))
                         {
-                            if (GUILayout.Button(gridCellTexture, GUILayout.Width(gridCellLength), GUILayout.Height(gridCellLength)))
-                            {
-                                combatAbilityData.castingRangeDictionary[currentKey] = false;
-
-                                EditorUtility.SetDirty(combatAbilityData);
-                            }
-                        }
-                        else
-                        {
-                            if (GUILayout.Button(emptyTexture, GUILayout.Width(gridCellLength), GUILayout.Height(gridCellLength)))
-                            {
-                                combatAbilityData.castingRangeDictionary[currentKey] = true;
-
-                                EditorUtility.SetDirty(combatAbilityData);
-                            }
+                            combatAbilityData.castingRangeDictionary.Add(currentKey, true);
+                            EditorUtility.SetDirty(combatAbilityData);
                         }
                     }
                 }
-
-                GUILayout.EndHorizontal();
             }
+            #endregion
+            #region Draw Casting Range Hexgrid
+            maxGridCellCount = Mathf.Max(Mathf.Abs(combatAbilityData.castingRange.x), Mathf.Abs(combatAbilityData.castingRange.z));
+            gridCellLength = Mathf.Min(maxGridCellLength, (currentViewWidth - gridCellInterval * (maxGridCellCount + 1.0f)) / (2.0f * maxGridCellCount + 1.0f));
+            centerXPos = currentViewWidth / 2.0f - gridCellLength;
 
-            GUILayout.EndVertical();
-        }
-        else
-        {
-            EditorGUILayout.HelpBox("Warning: Not enough inspector view width. Cannot show hexgrid.", MessageType.Warning);
-        }
-        #endregion
-        #region Draw Designer Supporting Buttons
-        hasValueInDictionary = false;
-
-        foreach (Vector3Int key in combatAbilityData.castingRangeDictionary.Keys)
-        {
-            if (combatAbilityData.castingRangeDictionary[key])
+            if (gridCellLength > gridCellInterval)
             {
-                hasValueInDictionary = true;
-            }
-        }
+                GUILayout.BeginVertical();
 
-        if (hasValueInDictionary)
-        {
-            if (GUILayout.Button("Clear"))
-            {
-                foreach (Vector3Int key in combatAbilityData.castingRangeDictionary.Keys.ToList())
+                for (int y = combatAbilityData.castingRange.y; y >= -combatAbilityData.castingRange.y; y--)
                 {
-                    combatAbilityData.castingRangeDictionary[key] = false;
-                }
+                    float minXPos = float.MaxValue;
 
-                EditorUtility.SetDirty(combatAbilityData);
-            }
-        }
-        else
-        {
-            if (GUILayout.Button("Fill"))
-            {
-                foreach (Vector3Int key in combatAbilityData.castingRangeDictionary.Keys.ToList())
-                {
-                    combatAbilityData.castingRangeDictionary[key] = true;
-                }
-
-                EditorUtility.SetDirty(combatAbilityData);
-            }
-        }
-
-        foreach (Vector3Int key in combatAbilityData.castingRangeDictionary.Keys)
-        {
-            if (!((-combatAbilityData.castingRange.x <= key.x && key.x <= combatAbilityData.castingRange.x) && (-combatAbilityData.castingRange.y <= key.y && key.y <= combatAbilityData.castingRange.y) && (-combatAbilityData.castingRange.z <= key.z && key.z <= combatAbilityData.castingRange.z)))
-            {
-                outOfRangeKeyInCastingRangeDictionary = true;
-                break;
-            }
-        }
-
-        if (outOfRangeKeyInCastingRangeDictionary)
-        {
-            if (GUILayout.Button("Organize"))
-            {
-                foreach (Vector3Int key in combatAbilityData.castingRangeDictionary.Keys.ToList())
-                {
-                    if (!((-combatAbilityData.castingRange.x <= key.x && key.x <= combatAbilityData.castingRange.x) && (-combatAbilityData.castingRange.y <= key.y && key.y <=      combatAbilityData.castingRange.y) && (-combatAbilityData.castingRange.z <= key.z && key.z <= combatAbilityData.castingRange.z)))
+                    for (int x = -combatAbilityData.castingRange.x; x <= combatAbilityData.castingRange.x; x++)
                     {
-                        combatAbilityData.castingRangeDictionary.Remove(key);
+                        for (int z = combatAbilityData.castingRange.z; z >= -combatAbilityData.castingRange.z; z--)
+                        {
+                            if (x + y + z != 0) continue;
+
+                            float currentXPos = 0.5f * x - 0.5f * z;
+                            minXPos = Mathf.Min(minXPos, currentXPos);
+                        }
                     }
+
+                    GUILayout.BeginHorizontal();
+
+                    GUILayout.Space(centerXPos + minXPos * gridCellLength + Mathf.FloorToInt(minXPos) * gridCellInterval);
+
+                    for (int x = -combatAbilityData.castingRange.x; x <= combatAbilityData.castingRange.x; x++)
+                    {
+                        for (int z = combatAbilityData.castingRange.z; z >= -combatAbilityData.castingRange.z; z--)
+                        {
+                            if (x + y + z != 0) continue;
+
+                            Vector3Int currentKey = new Vector3Int(x, y, z);
+
+                            if (combatAbilityData.castingRangeDictionary[currentKey] == true)
+                            {
+                                if (GUILayout.Button(gridCellTexture, GUILayout.Width(gridCellLength), GUILayout.Height(gridCellLength)))
+                                {
+                                    combatAbilityData.castingRangeDictionary[currentKey] = false;
+
+                                    EditorUtility.SetDirty(combatAbilityData);
+                                }
+                            }
+                            else
+                            {
+                                if (GUILayout.Button(emptyTexture, GUILayout.Width(gridCellLength), GUILayout.Height(gridCellLength)))
+                                {
+                                    combatAbilityData.castingRangeDictionary[currentKey] = true;
+
+                                    EditorUtility.SetDirty(combatAbilityData);
+                                }
+                            }
+                        }
+                    }
+
+                    GUILayout.EndHorizontal();
                 }
-                outOfRangeKeyInCastingRangeDictionary = false;
+
+                GUILayout.EndVertical();
             }
-            EditorGUILayout.HelpBox("Warning: Dictionary has out of range key value. Click the button to clean up.", MessageType.Warning);
+            else
+            {
+                EditorGUILayout.HelpBox("Warning: Not enough inspector view width. Cannot show hexgrid.", MessageType.Warning);
+            }
+            #endregion
+            #region Draw Designer Supporting Buttons
+            hasValueInDictionary = false;
+
+            foreach (Vector3Int key in combatAbilityData.castingRangeDictionary.Keys)
+            {
+                if (combatAbilityData.castingRangeDictionary[key])
+                {
+                    hasValueInDictionary = true;
+                }
+            }
+
+            if (hasValueInDictionary)
+            {
+                if (GUILayout.Button("Clear"))
+                {
+                    foreach (Vector3Int key in combatAbilityData.castingRangeDictionary.Keys.ToList())
+                    {
+                        combatAbilityData.castingRangeDictionary[key] = false;
+                    }
+
+                    EditorUtility.SetDirty(combatAbilityData);
+                }
+            }
+            else
+            {
+                if (GUILayout.Button("Fill"))
+                {
+                    foreach (Vector3Int key in combatAbilityData.castingRangeDictionary.Keys.ToList())
+                    {
+                        combatAbilityData.castingRangeDictionary[key] = true;
+                    }
+
+                    EditorUtility.SetDirty(combatAbilityData);
+                }
+            }
+
+            foreach (Vector3Int key in combatAbilityData.castingRangeDictionary.Keys)
+            {
+                if (!((-combatAbilityData.castingRange.x <= key.x && key.x <= combatAbilityData.castingRange.x) && (-combatAbilityData.castingRange.y <= key.y && key.y <= combatAbilityData.castingRange.y) && (-combatAbilityData.castingRange.z <= key.z && key.z <= combatAbilityData.castingRange.z)))
+                {
+                    outOfRangeKeyInCastingRangeDictionary = true;
+                    break;
+                }
+            }
+
+            if (outOfRangeKeyInCastingRangeDictionary)
+            {
+                if (GUILayout.Button("Organize"))
+                {
+                    foreach (Vector3Int key in combatAbilityData.castingRangeDictionary.Keys.ToList())
+                    {
+                        if (!((-combatAbilityData.castingRange.x <= key.x && key.x <= combatAbilityData.castingRange.x) && (-combatAbilityData.castingRange.y <= key.y && key.y <= combatAbilityData.castingRange.y) && (-combatAbilityData.castingRange.z <= key.z && key.z <= combatAbilityData.castingRange.z)))
+                        {
+                            combatAbilityData.castingRangeDictionary.Remove(key);
+                        }
+                    }
+                    outOfRangeKeyInCastingRangeDictionary = false;
+                }
+                EditorGUILayout.HelpBox("Warning: Dictionary has out of range key value. Click the button to clean up.", MessageType.Warning);
+            }
+            #endregion
         }
-        #endregion
 
         EditorGUILayout.Space(singleLineHeight);
         EditorGUILayout.PropertyField(AOE, new GUIContent("Area Of Effect"));
@@ -248,6 +264,7 @@ public class CombatAbilityEditor : Editor
         #region Draw AOE Hexgrid
         maxGridCellCount = Mathf.Max(Mathf.Abs(combatAbilityData.AOE.x), Mathf.Abs(combatAbilityData.AOE.z));
         gridCellLength = Mathf.Min(maxGridCellLength, (currentViewWidth - gridCellInterval * (maxGridCellCount + 1.0f)) / (2.0f * maxGridCellCount + 1.0f));
+        centerXPos = currentViewWidth / 2.0f - gridCellLength;
 
         if (gridCellLength > gridCellInterval)
         {

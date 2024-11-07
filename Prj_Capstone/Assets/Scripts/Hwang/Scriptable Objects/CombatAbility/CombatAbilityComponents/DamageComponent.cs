@@ -15,14 +15,14 @@ public class DamageComponent : CombatAbilityComponent
         {
             if (target.GetType().Equals(typeof(Enemy)))
             { 
-                target.entityStat.health.DecreaseCurrentValue(baseHealthDamage + healthDamageIncreaseByLevel * entity.level);
+                target.entityStat.health.DecreaseCurrentValue((baseHealthDamage + healthDamageIncreaseByLevel * entity.level) * entity.entityStat.attackMultiplier.currentValue * (1 - target.entityStat.defenseMultiplier.currentValue));
             }
         }
         else if (entity.GetType().Equals(typeof(Enemy)))
         {
             if (target.GetType().Equals(typeof(PlayerCharacter)))
             {
-                target.entityStat.health.DecreaseCurrentValue(baseHealthDamage + healthDamageIncreaseByLevel * entity.level);
+                target.entityStat.health.DecreaseCurrentValue((baseHealthDamage + healthDamageIncreaseByLevel * entity.level) * entity.entityStat.attackMultiplier.currentValue * (1 - target.entityStat.defenseMultiplier.currentValue));
             }
         }
     }
@@ -35,13 +35,13 @@ public class DamageComponent : CombatAbilityComponent
 
         if (target.GetType().Equals(typeof(PlayerCharacter)))
         {
-            if (target.entityStat.health.currentValue <= baseHealthDamage + healthDamageIncreaseByLevel * entity.level)
+            if (target.entityStat.health.currentValue <= (baseHealthDamage + healthDamageIncreaseByLevel * entity.level) * entity.entityStat.attackMultiplier.currentValue * (1 - target.entityStat.defenseMultiplier.currentValue))
             {
                 return enemy.enemyCombat.mercenaryKill;
             }
             else
             {
-                return (baseHealthDamage + healthDamageIncreaseByLevel * entity.level) / target.entityStat.health.maxValue * enemy.enemyCombat.mercenaryDamage;
+                return ((baseHealthDamage + healthDamageIncreaseByLevel * entity.level) * entity.entityStat.attackMultiplier.currentValue * (1 - target.entityStat.defenseMultiplier.currentValue)) / target.entityStat.health.maxValue * enemy.enemyCombat.mercenaryDamage;
             }
         }
 

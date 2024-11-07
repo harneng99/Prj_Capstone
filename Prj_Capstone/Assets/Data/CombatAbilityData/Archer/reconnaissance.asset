@@ -10,12 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 68d6fb54b938ba84a9232f2f19f37b3a, type: 3}
-  m_Name: Reconnaissance
+  m_Name: reconnaissance
   m_EditorClassIdentifier: 
   <combatAbilityIcon>k__BackingField: {fileID: 21300000, guid: 90869f142ef15164a9f320eeabb80b0d, type: 3}
   <combatAbilityName>k__BackingField: Reconnaissance
   <combatAbilityType>k__BackingField: 0
   <staminaCost>k__BackingField: 3
+  <turnDuration>k__BackingField: 0
+  <availableTarget>k__BackingField: 8
+  <maximumCastingAreaCount>k__BackingField: 0
   <combatAbilityDescription>k__BackingField: Get the sight of a large area around
     the selected spot.
   <castingRange>k__BackingField: {x: 5, y: 5, z: 5}

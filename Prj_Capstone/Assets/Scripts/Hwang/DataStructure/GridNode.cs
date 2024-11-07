@@ -8,9 +8,9 @@ public class GridNode
     public Vector3Int cellgridPosition;
     public Vector3 worldgridPosition;
 
-    public int gCost;
-    public int hCost;
-    public int fCost;
+    public float gCost;
+    public float hCost;
+    public float fCost;
     public bool isObstacle;
 
     public GridNode cameFromNode;

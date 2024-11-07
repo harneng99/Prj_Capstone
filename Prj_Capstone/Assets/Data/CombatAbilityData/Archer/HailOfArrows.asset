@@ -16,6 +16,9 @@ MonoBehaviour:
   <combatAbilityName>k__BackingField: Hail of Arrows
   <combatAbilityType>k__BackingField: 0
   <staminaCost>k__BackingField: 5
+  <turnDuration>k__BackingField: 0
+  <availableTarget>k__BackingField: 2
+  <maximumCastingAreaCount>k__BackingField: 0
   <combatAbilityDescription>k__BackingField: Deals damage to all targets the in selected
     area.
   <castingRange>k__BackingField: {x: 3, y: 3, z: 3}
@@ -137,14 +140,14 @@ MonoBehaviour:
     - Key: {x: 2, y: 0, z: -2}
       Value: 1
   <combatAbilityComponents>k__BackingField:
-  - rid: 8404206351252717568
+  - rid: 8228692626273468418
   references:
     version: 2
     RefIds:
-    - rid: 8404206351252717568
+    - rid: 8228692626273468418
       type: {class: DamageComponent, ns: , asm: Assembly-CSharp}
       data:
         name: DamageComponent
-        baseHealthDamage: 30
-        healthDamageIncreaseByLevel: 5
+        baseHealthDamage: 0
+        healthDamageIncreaseByLevel: 0
         pauseTimeWhenHit: 0
