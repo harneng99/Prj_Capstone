@@ -50,6 +50,7 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
 
     protected virtual void Start()
     {
+        animator.SetBool("Idle", true);
         Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
     }
 
@@ -136,5 +137,10 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     public void SetEntityPosition(Vector3Int cellgridPosition)
     {
         transform.position = cellgridPosition + new Vector3(0.5f, 0.5f, 0.0f);
+    }
+
+    public void PlayerDeathAnimation(Entity entity)
+    {
+        entity.animator.SetTrigger("Death");
     }
 }

@@ -6856,6 +6856,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1877429905133728455, guid: 0a96dd34e1f4efb498e6da90878d8e62, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 1257152239, guid: f142c488fdf0f0241b585c88618f3bba, type: 3}
+    - target: {fileID: 1877429905133728455, guid: 0a96dd34e1f4efb498e6da90878d8e62, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1877429905133728455, guid: 0a96dd34e1f4efb498e6da90878d8e62, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1877429905133728455, guid: 0a96dd34e1f4efb498e6da90878d8e62, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3799402691220566881, guid: 0a96dd34e1f4efb498e6da90878d8e62, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.46
@@ -11281,6 +11297,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1988043987475993868, guid: d3a5fc303a3a4b74b82424d90a62497e, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 2040659756, guid: 83b951a44eb503b46b5b94d7d759b544, type: 3}
+    - target: {fileID: 1988043987475993868, guid: d3a5fc303a3a4b74b82424d90a62497e, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1988043987475993868, guid: d3a5fc303a3a4b74b82424d90a62497e, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1988043987475993868, guid: d3a5fc303a3a4b74b82424d90a62497e, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3169673855719808131, guid: d3a5fc303a3a4b74b82424d90a62497e, type: 3}
       propertyPath: m_Name
       value: Pawn

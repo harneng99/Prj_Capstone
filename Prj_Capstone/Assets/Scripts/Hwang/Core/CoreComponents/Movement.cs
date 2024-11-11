@@ -24,7 +24,7 @@ public abstract class Movement : CoreComponent
     [Header("Knight Animation")]
     [SerializeField] protected float duration;
     [SerializeField] protected float destinationAlpha;
-    [SerializeField] protected Vector3 destinationOffset;
+    [SerializeField] protected Vector2 destinationOffset;
     [SerializeField] protected Vector3 destinationRotation;
 
     public Pathfinder pathfinder { get; private set; }
@@ -54,6 +54,15 @@ public abstract class Movement : CoreComponent
         currentHexgridPosition = pathfinder.CellgridToHexgrid(currentCellgridPosition);
         // entity.transform.position = pathfinder.moveableTilemap.CellToWorld(currentCellgridPosition);
         entity.SetEntityPosition(currentCellgridPosition);
+
+        smoothMoveFinished += () =>
+        {
+            foreach (AnimatorControllerParameter parameter in entity.animator.parameters)
+            {
+                entity.animator.SetBool(parameter.name, false);
+            }
+            entity.animator.SetBool("Idle", true);
+        };
     }
 
     protected override void OnPointerClick(PointerEventData eventData)
@@ -165,20 +174,112 @@ public abstract class Movement : CoreComponent
         }
     }
 
+    protected virtual IEnumerator MoveEntitySmooth(Entity entity, Vector2 destinationWorldgridPosition)
+    {
+        if (entity == null) yield break;
+
+        foreach (AnimatorControllerParameter parameter in entity.animator.parameters)
+        {
+            entity.animator.SetBool(parameter.name, false);
+        }
+        entity.animator.SetBool("Move", true);
+
+        while (Vector3.Distance(entity.transform.position, destinationWorldgridPosition) > epsilon)
+        {
+            entity.transform.position = Vector3.MoveTowards(entity.transform.position, destinationWorldgridPosition, entity.entityConsistentData.movementVelocity * Time.deltaTime);
+            yield return null;
+        }
+
+        entity.animator.SetBool("Move", false);
+        entity.animator.SetBool("Idle", true);
+    }
+
     protected virtual IEnumerator MoveEntitySmooth(List<GridNode> path)
     {
         entity.spriteRenderer.sortingOrder = 1;
-        GridNode startNode = path.First();
-        GridNode destinationNode = path.Last();
+        Vector2 startWorldgridPosition = path.First().worldgridPosition;
+        Vector2 destinationWorldgridPosition = path.Last().worldgridPosition;
+
+        if (entity.transform.right.x * (destinationWorldgridPosition.x - transform.position.x) < 0)
+        {
+            transform.Rotate(0.0f, 180.0f, 0.0f);
+        }
 
         path.RemoveAt(0);
         if (path.Count <= 0) yield break;
 
+        if (pieceType == PieceType.Pawn || pieceType == PieceType.Rook)
+        {
+            foreach (AnimatorControllerParameter parameter in entity.animator.parameters)
+            {
+                entity.animator.SetBool(parameter.name, false);
+            }
+            entity.animator.SetBool("Move", true);
+
+            Vector2 currentDestinationWorldgridPosition = path.First().worldgridPosition;
+
+            while (Vector3.Distance(entity.transform.position, destinationWorldgridPosition) > epsilon)
+            {
+                if (Vector3.Distance(entity.transform.position, currentDestinationWorldgridPosition) < epsilon)
+                {
+                    if (path.Count > 0)
+                    {
+                        path.RemoveAt(0);
+
+                        if (path.Count > 0)
+                        {
+                            if (path.Count == 1)
+                            {
+                                currentDestinationWorldgridPosition = path.First().worldgridPosition + Vector3.left * 0.5f;
+                                MoveEntitySmooth(entity.entityCombat.targetEntity, path.First().worldgridPosition + Vector3.right * 0.5f);
+                            }
+                            else
+                            {
+                                currentDestinationWorldgridPosition = path.First().worldgridPosition;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        isMoving = false;
+                        UpdateGridPositionData();
+                        break;
+                    }
+                }
+                else
+                {
+                    entity.transform.position = Vector3.MoveTowards(entity.transform.position, currentDestinationWorldgridPosition, entity.entityConsistentData.movementVelocity * Time.deltaTime);
+                }
+
+                yield return null;
+            }
+
+            if (entity.entityCombat.targetEntity != null)
+            {
+                entity.animator.SetTrigger("Attack");
+            }
+        }
+
+        if (pieceType == PieceType.Bishop)
+        {
+            foreach (AnimatorControllerParameter parameter in entity.animator.parameters)
+            {
+                entity.animator.SetBool(parameter.name, false);
+            }
+            entity.animator.SetTrigger("Attack");
+        }
+
         if (pieceType != PieceType.Knight)
         {
+            foreach (AnimatorControllerParameter parameter in entity.animator.parameters)
+            {
+                entity.animator.SetBool(parameter.name, false);
+            }
+            entity.animator.SetBool("Move", true);
+
             GridNode currentDestinationNode = path.First();
 
-            while (Vector3.Distance(entity.transform.position, destinationNode.worldgridPosition) > epsilon)
+            while (Vector3.Distance(entity.transform.position, destinationWorldgridPosition) > epsilon)
             {
                 if (Vector3.Distance(entity.transform.position, currentDestinationNode.worldgridPosition) < epsilon)
                 {
@@ -215,7 +316,7 @@ public abstract class Movement : CoreComponent
                 float newAlpha = Mathf.Lerp(1.0f, destinationAlpha, elapsedTime / duration);
                 entity.spriteRenderer.color = new Color(entity.spriteRenderer.color.r, entity.spriteRenderer.color.g, entity.spriteRenderer.color.b, newAlpha);
                 // entity.transform.position = Vector3.MoveTowards(startNode.worldgridPosition, startNode.worldgridPosition + destinationOffset, Vector3.Length(destinationOffset) / duration);
-                entity.transform.position = Vector3.Lerp(startNode.worldgridPosition, startNode.worldgridPosition + destinationOffset, elapsedTime / duration);
+                entity.transform.position = Vector3.Lerp(startWorldgridPosition, startWorldgridPosition + destinationOffset, elapsedTime / duration);
                 entity.transform.rotation = Quaternion.Lerp(Quaternion.identity, Quaternion.Euler(destinationRotation), elapsedTime / duration);
                 yield return null;
             }
@@ -227,7 +328,7 @@ public abstract class Movement : CoreComponent
                 elapsedTime += Time.deltaTime;
                 float newAlpha = Mathf.Lerp(destinationAlpha, 1.0f, elapsedTime / duration);
                 entity.spriteRenderer.color = new Color(entity.spriteRenderer.color.r, entity.spriteRenderer.color.g, entity.spriteRenderer.color.b, newAlpha);
-                entity.transform.position = Vector3.Lerp(destinationNode.worldgridPosition + destinationOffset, destinationNode.worldgridPosition, elapsedTime / duration);
+                entity.transform.position = Vector3.Lerp(destinationWorldgridPosition + destinationOffset, destinationWorldgridPosition, elapsedTime / duration);
                 entity.transform.rotation = Quaternion.Lerp(Quaternion.Euler(destinationOffset), Quaternion.identity, elapsedTime / duration);
                 yield return null;
             }

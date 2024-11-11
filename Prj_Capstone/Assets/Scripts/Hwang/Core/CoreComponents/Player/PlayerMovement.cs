@@ -132,7 +132,8 @@ public class PlayerMovement : Movement
                                 Action attackPiece = null;
                                 attackPiece = () =>
                                 {
-                                    Manager.Instance.gameManager.EntityExistsAt(destinationCellgridPosition, true, typeof(Enemy))?.gameObject.SetActive(false);
+                                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(destinationCellgridPosition, true, typeof(Enemy));
+                                    entity.entityCombat.targetEntity?.gameObject.SetActive(false);
 
                                     if (pieceType == PieceType.Bishop)
                                     {
