@@ -220,7 +220,7 @@ public class EnemyCombat : Combat
         PlayerCharacter lowestStaminaTarget = null;
         int lowestStaminaCost = int.MaxValue;
 
-        foreach (PlayerCharacter mercenary in Manager.Instance.gameManager.mercenaries)
+        foreach (PlayerCharacter mercenary in Manager.Instance.gameManager.playerPieces)
         {
             if (!mercenary.isActiveAndEnabled) continue;
 
@@ -262,7 +262,7 @@ public class EnemyCombat : Combat
         PlayerCharacter currentLowestHealthTarget = null;
         float lowestHealth = float.MaxValue;
 
-        foreach (PlayerCharacter mercenary in Manager.Instance.gameManager.mercenaries)
+        foreach (PlayerCharacter mercenary in Manager.Instance.gameManager.playerPieces)
         {
             if (lowestHealth > mercenary.entityStat.health.currentValue)
             {
@@ -376,7 +376,7 @@ public class EnemyCombat : Combat
         int minimumStaminaCostFromMercenary = int.MaxValue;
         float meanStaminaCostFromMercenaries = 0;
 
-        foreach (PlayerCharacter mercenary in Manager.Instance.gameManager.mercenaries)
+        foreach (PlayerCharacter mercenary in Manager.Instance.gameManager.playerPieces)
         {
             if (!mercenary.isActiveAndEnabled) continue;
 

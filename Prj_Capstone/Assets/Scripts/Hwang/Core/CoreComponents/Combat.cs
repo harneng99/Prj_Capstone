@@ -11,6 +11,7 @@ public abstract class Combat : CoreComponent
 {
     [field: SerializeField] public TileBase combatAbilityRangeHighlightedTileBase { get; private set; }
     [field: SerializeField] public TileBase combatAbilityAOEHighlightedTileBase { get; private set; }
+    [field: SerializeField] public int attackTypeCount { get; private set; }
     public CombatAbility currentSelectedCombatAbility { get; set; }
     public Entity targetEntity { get; set; }
     
@@ -67,19 +68,6 @@ public abstract class Combat : CoreComponent
                     }
                 }
             }
-        }
-    }
-
-    public bool AttackEntity()
-    {
-        if (entity == null)
-        {
-            return false;
-        }
-        else
-        {
-            entity.animator.SetTrigger("Death");
-            return true;
         }
     }
 

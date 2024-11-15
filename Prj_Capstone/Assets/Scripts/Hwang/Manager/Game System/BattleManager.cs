@@ -23,7 +23,7 @@ public class BattleManager : MonoBehaviour
     public bool pieceDeploymentPhase { get; private set; } = true;
     public bool battlePhase { get; private set; } = false;
     public bool playerPhase { get; private set; } = false;
-    public bool didPlayerMovedAnythingThisTurn { get; set; }
+    public bool didEntityMovedThisTurn { get; set; }
     public bool gameFinished { get; set; }
     public bool enemyPhase { get; private set; } = false;
     public bool isAiming { get; set; } = false;
@@ -39,7 +39,7 @@ public class BattleManager : MonoBehaviour
     [field: SerializeField] public TileBase selectionTile { get; private set; }
     public Vector3Int currentMouseCellgridPosition { get; private set; }
     public List<Entity> entities { get; private set; } = new List<Entity>();
-    public List<PlayerCharacter> mercenaries { get; private set; } = new List<PlayerCharacter>();
+    public List<PlayerCharacter> playerPieces { get; private set; } = new List<PlayerCharacter>();
     public List<Enemy> enemies { get; private set; } = new List<Enemy>();
 
     public event Action playerTurnStart;
@@ -65,10 +65,10 @@ public class BattleManager : MonoBehaviour
         playerTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = true; };
         playerTurnStart += () =>
         { 
-            didPlayerMovedAnythingThisTurn = false;
-            foreach (Entity entity in entities)
+            didEntityMovedThisTurn = false;
+            foreach (PlayerCharacter playerPiece in playerPieces)
             {
-                entity.entityMovement.ResetEntityMovedBooleanVariable();
+                playerPiece.playerMovement.ResetEntityBooleanVariables();
             }
         };
 
@@ -79,6 +79,13 @@ public class BattleManager : MonoBehaviour
 
         enemyTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(Enemy)); };
         enemyTurnStart += () => { highlightedTilemap.ClearAllTiles(); };
+        enemyTurnStart += () =>
+        {
+            foreach (Enemy enemy in enemies)
+            {
+                enemy.enemyMovement.ResetEntityBooleanVariables();
+            }
+        };
         // enemyTurnStart += () => { RunEnemyAI(); };
         enemyTurnStart += () =>
         {
@@ -175,7 +182,7 @@ public class BattleManager : MonoBehaviour
     {
         enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None).ToList();
         entities = FindObjectsByType<Entity>(FindObjectsSortMode.None).ToList();
-        mercenaries = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None).ToList();
+        playerPieces = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None).ToList();
         /*foreach (Entity entity in entities)
         {
             entity.highlightedTilemap.ClearAllTiles();
@@ -197,6 +204,18 @@ public class BattleManager : MonoBehaviour
         if (continueTurn) return;
 
         highlightedTilemap.ClearAllTiles();
+
+        while (true)
+        {
+            bool canProgress = false;
+            foreach (Entity entity in entities)
+            {
+                canProgress = entity.animator.GetCurrentAnimatorStateInfo(0).IsTag("Idle");
+            }
+            if (canProgress) break;
+
+            await Task.Delay(100);
+        }
 
         if (playerPhase && currentTurnCount >= turnLimit && !gameFinished)
         {
@@ -227,6 +246,10 @@ public class BattleManager : MonoBehaviour
     public async void TurnEndButton()
     {
         continueTurn = false;
+        highlightedTilemap.ClearAllTiles();
+        Manager.Instance.uiManager.endTurnButton.interactable = false;
+
+
 
         if (playerPhase && !gameFinished)
         {
@@ -280,9 +303,10 @@ public class BattleManager : MonoBehaviour
     {
         foreach (Enemy enemy in enemies)
         {
-            if (enemy.gameObject.activeSelf)
+            if (!enemy.isDead)
             {
                 iterateNextEnemy = false;
+
                 if (enemy.enemyMovement.CheckAttackArea())
                 {
                     yield return new WaitForSeconds(1.0f);
@@ -293,6 +317,7 @@ public class BattleManager : MonoBehaviour
             if (gameFinished) break;
         }
         yield return new WaitForSeconds(0.5f);
+        
         TurnEnd();
     }
 
@@ -313,11 +338,11 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public Entity EntityExistsAt(Vector3Int cellgridPosition, bool findActive = false, Type entityType = null)
+    public Entity EntityExistsAt(Vector3Int cellgridPosition, bool onlyFindActive = false, Type entityType = null)
     {
         foreach (Entity entity in entities)
         {
-            if (findActive && !entity.gameObject.activeSelf)
+            if (onlyFindActive && entity.isDead)
             {
                 continue;
             }

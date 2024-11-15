@@ -31,6 +31,8 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     public bool isSelected { get; private set; }
     public Tilemap highlightedTilemap { get; private set; }
     public Tilemap interactableTilemap { get; private set; }
+    public int facingDirection { get; private set; }
+    public bool isDead { get; set; }
     #endregion
 
     protected virtual void Awake()
@@ -51,6 +53,7 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     protected virtual void Start()
     {
         animator.SetBool("Idle", true);
+        facingDirection = transform.right.x > 0 ? 1 : -1;
         Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
     }
 
@@ -139,8 +142,48 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         transform.position = cellgridPosition + new Vector3(0.5f, 0.5f, 0.0f);
     }
 
-    public void PlayerDeathAnimation(Entity entity)
+    public void EntityDead()
     {
-        entity.animator.SetTrigger("Death");
+        // animator.SetTrigger("Death");
+        gameObject.SetActive(false);
+    }
+
+    public bool AttackEntity(int killTargetEntity)
+    {
+        if (entityCombat.targetEntity == null)
+        {
+            return false;
+        }
+        else
+        {
+            if (killTargetEntity == 0)
+            {
+                entityCombat.targetEntity.animator.SetTrigger("Death");
+            }
+            else
+            {
+                entityCombat.targetEntity.animator.SetTrigger("Hurt");
+            }
+            return true;
+        }
+    }
+
+    public int Flip(float? direction = null)
+    {
+        if (direction.HasValue && direction.Value != 0)
+        {
+            if (facingDirection * direction.Value < 0)
+            {
+                facingDirection *= -1;
+                transform.Rotate(0.0f, 180.0f, 0.0f);
+            }
+        }
+        else
+        {
+            facingDirection *= -1;
+            transform.Rotate(0.0f, 180.0f, 0.0f);
+        }
+
+        return facingDirection;
     }
 }

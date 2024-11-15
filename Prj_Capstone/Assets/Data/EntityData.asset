@@ -13,44 +13,7 @@ MonoBehaviour:
   m_Name: EntityData
   m_EditorClassIdentifier: 
   <movementVelocity>k__BackingField: 2
-  <testingDictionaryRange>k__BackingField: {x: 2, y: 2, z: 2}
-  <testingDictionary>k__BackingField:
-    _serializedList:
-    - Key: {x: 0, y: 0, z: 0}
-      Value: 0
-    - Key: {x: -1, y: 1, z: 0}
-      Value: 0
-    - Key: {x: 1, y: -1, z: 0}
-      Value: 0
-    - Key: {x: -1, y: 0, z: 1}
-      Value: 0
-    - Key: {x: 0, y: -1, z: 1}
-      Value: 0
-    - Key: {x: 0, y: 1, z: -1}
-      Value: 1
-    - Key: {x: 1, y: 0, z: -1}
-      Value: 1
-    - Key: {x: -2, y: 1, z: 1}
-      Value: 1
-    - Key: {x: 2, y: -1, z: -1}
-      Value: 1
-    - Key: {x: -2, y: 2, z: 0}
-      Value: 1
-    - Key: {x: -1, y: 2, z: -1}
-      Value: 1
-    - Key: {x: 1, y: -2, z: 1}
-      Value: 1
-    - Key: {x: 2, y: -2, z: 0}
-      Value: 1
-    - Key: {x: -2, y: 0, z: 2}
-      Value: 1
-    - Key: {x: -1, y: -1, z: 2}
-      Value: 1
-    - Key: {x: 0, y: -2, z: 2}
-      Value: 1
-    - Key: {x: 0, y: 2, z: -2}
-      Value: 1
-    - Key: {x: 1, y: 1, z: -2}
-      Value: 1
-    - Key: {x: 2, y: 0, z: -2}
-      Value: 1
+  <anmationDuration>k__BackingField: 0.5
+  <destinationAlpha>k__BackingField: 0
+  <destinationOffset>k__BackingField: {x: -0.3, y: 0.7, z: 0}
+  <destinationRotation>k__BackingField: {x: 0, y: 0, z: 16}

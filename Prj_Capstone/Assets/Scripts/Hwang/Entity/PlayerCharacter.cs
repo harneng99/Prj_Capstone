@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class PlayerCharacter : Entity, IPointerClickHandler
 {
@@ -49,7 +50,7 @@ public class PlayerCharacter : Entity, IPointerClickHandler
                 base.OnPointerClick(eventData);
 
                 // TODO: Allow promotion only after movement?
-                if (entityMovement.pieceType == PieceType.Pawn && Manager.Instance.gameManager.didPlayerMovedAnythingThisTurn)
+                if (entityMovement.pieceType == PieceType.Pawn && Manager.Instance.gameManager.didEntityMovedThisTurn)
                 {
                     CustomTileData currentTileData = interactableTilemap.GetInstantiatedObject(entityMovement.currentCellgridPosition)?.GetComponent<CustomTileData>();
 
@@ -60,5 +61,10 @@ public class PlayerCharacter : Entity, IPointerClickHandler
                 }
             }
         }
+    }
+
+    public void PieceAbility()
+    {
+        playerMovement.PieceAbility();
     }
 }
