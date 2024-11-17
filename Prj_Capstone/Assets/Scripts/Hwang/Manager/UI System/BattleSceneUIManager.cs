@@ -193,7 +193,7 @@ public class BattleSceneUIManager : UIManager
     {
         int count = 0;
 
-        foreach (PlayerCharacter mercenary in Manager.Instance.gameManager.playerPieces)
+        foreach (Player mercenary in Manager.Instance.gameManager.playerPieces)
         {
             if (mercenary.gameObject.activeSelf)
             {

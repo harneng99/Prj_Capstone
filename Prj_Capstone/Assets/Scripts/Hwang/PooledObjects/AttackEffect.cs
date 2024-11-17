@@ -4,58 +4,50 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class AttackEffect : MonoBehaviour
+public class AttackEffect : PooledObject
 {
     [SerializeField] private TileBase pillarUpperPartTileBase;
 
     private Tilemap objectTilemap;
-    private Tilemap foregroundDecorationTilemap;
     private Entity entity;
     private Vector3Int targetCellgridPosition;
 
     private void Awake()
     {
         objectTilemap = GameObject.FindWithTag("ObjectTilemap").GetComponent<Tilemap>();
-        foregroundDecorationTilemap = GameObject.FindWithTag("ForegroundDecorationTilemap").GetComponent<Tilemap>();
     }
 
-    public void SetTargetPosition(Entity entity, Vector3Int targetCellgridPosition)
+    public void SetAttackEffectTarget(Entity entity, Vector3Int targetCellgridPosition)
     {
         this.entity = entity;
         this.targetCellgridPosition = targetCellgridPosition;
+        transform.position = targetCellgridPosition + new Vector3(0.5f, 0.5f, 0.0f);
     }
 
-    public IEnumerator Attack()
+    public void Attack(int killTargetEntity = 0)
     {
-        Entity targetEntity = null;
-
-        if (entity == null) yield break;
-
-        if (entity.GetType().Equals(typeof(PlayerCharacter)))
+        if (entity == null)
         {
-            targetEntity = Manager.Instance.gameManager.EntityExistsAt(targetCellgridPosition, true, typeof(Enemy));
+            Manager.Instance.gameManager.continueTurn = false;
+            Manager.Instance.gameManager.TurnEnd();
+            return;
+        }
+
+        if (entity.GetType().Equals(typeof(Player)))
+        {
+            entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(targetCellgridPosition, false, typeof(Enemy));
         }
         else if (entity.GetType().Equals(typeof(Enemy)))
         {
-            targetEntity = Manager.Instance.gameManager.EntityExistsAt(targetCellgridPosition, true, typeof(PlayerCharacter));
+            entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(targetCellgridPosition, false, typeof(Player));
         }
 
-        targetEntity.animator.SetTrigger("Hurt");
+        entity.AttackEntity(killTargetEntity);
 
-        if (entity.GetType().Equals(typeof(PlayerCharacter)))
+        if (entity.GetType().Equals(typeof(Player)))
         {
-            objectTilemap.SetTile(targetCellgridPosition, null);
-            if (foregroundDecorationTilemap.GetTile(targetCellgridPosition + Vector3Int.up) == pillarUpperPartTileBase)
-            {
-                foregroundDecorationTilemap.SetTile(targetCellgridPosition + Vector3Int.up, null);
-            }
-            Destroy(objectTilemap.GetInstantiatedObject(targetCellgridPosition));
-
-            yield return new WaitForAnimationToFinish(targetEntity.animator, "Hurt");
-            yield return new WaitForAnimationToFinish(targetEntity.animator, "Death");
-
-            Manager.Instance.gameManager.continueTurn = false;
-            Manager.Instance.gameManager.TurnEnd();
+            CustomTileData customTileData = objectTilemap.GetInstantiatedObject(targetCellgridPosition)?.GetComponent<CustomTileData>();
+            customTileData?.ChangeToMoveableTile(targetCellgridPosition);
         }
     }
 }

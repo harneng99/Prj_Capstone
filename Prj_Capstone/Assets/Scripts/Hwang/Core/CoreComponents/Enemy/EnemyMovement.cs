@@ -23,7 +23,7 @@ public class EnemyMovement : Movement
         {
             if (Manager.Instance.gameManager.battlePhase && Manager.Instance.gameManager.playerPhase)
             {
-                if (Manager.Instance.gameManager.prevSelectedEntity != null && Manager.Instance.gameManager.prevSelectedEntity.GetType().Equals(typeof(PlayerCharacter)) && InAttackRange((PlayerCharacter)Manager.Instance.gameManager.prevSelectedEntity))
+                if (Manager.Instance.gameManager.prevSelectedEntity != null && Manager.Instance.gameManager.prevSelectedEntity.GetType().Equals(typeof(Player)) && InAttackRange((Player)Manager.Instance.gameManager.prevSelectedEntity))
                 {
                     DrawMoveableTilemap(false);
                 }
@@ -47,7 +47,7 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) continue;
 
-                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
                     if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                     {
@@ -69,7 +69,7 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) continue;
 
-                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
                     if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                     {
@@ -91,7 +91,7 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
                     if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                     {
@@ -110,7 +110,7 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
                     if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                     {
@@ -129,7 +129,7 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
                     if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                     {
@@ -148,7 +148,7 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
                     if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                     {
@@ -175,7 +175,7 @@ public class EnemyMovement : Movement
                     {
                         if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                        entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                        entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
                         if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                         {
@@ -212,7 +212,7 @@ public class EnemyMovement : Movement
         }
     }
 
-    public bool InAttackRange(PlayerCharacter playerCharacter)
+    public bool InAttackRange(Player playerCharacter)
     {
         if (playerCharacter.isDead || entity.isDead)
         {
@@ -348,7 +348,7 @@ public class EnemyMovement : Movement
     {
         int availablePiece = 0;
 
-        foreach (PlayerCharacter playerPiece in Manager.Instance.gameManager.playerPieces)
+        foreach (Player playerPiece in Manager.Instance.gameManager.playerPieces)
         {
             if (!playerPiece.isDead)
             {

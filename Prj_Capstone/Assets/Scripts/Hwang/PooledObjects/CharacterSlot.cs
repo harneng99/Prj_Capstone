@@ -23,8 +23,8 @@ public class CharacterSlot : PooledObject, IPointerClickHandler
     {
         this.slotIndex = slotIndex;
         this.assignedMercenary = assignedCharacter;
-        portrait.sprite = assignedCharacter.GetComponent<PlayerCharacter>().entityPortrait;
-        characterName.text = assignedCharacter.GetComponent<PlayerCharacter>().entityName;
+        portrait.sprite = assignedCharacter.GetComponent<Player>().entityPortrait;
+        characterName.text = assignedCharacter.GetComponent<Player>().entityName;
     }
 
     public void OnPointerClick(PointerEventData eventData)

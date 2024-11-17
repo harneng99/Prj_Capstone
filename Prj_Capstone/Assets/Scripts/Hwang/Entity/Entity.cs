@@ -52,7 +52,7 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
 
     protected virtual void Start()
     {
-        animator.SetBool("Idle", true);
+        animator.SetInteger("PieceType", (int)entityMovement.pieceType);
         facingDirection = transform.right.x > 0 ? 1 : -1;
         Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
     }
@@ -145,6 +145,7 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     public void EntityDead()
     {
         // animator.SetTrigger("Death");
+        isDead = true;
         gameObject.SetActive(false);
     }
 
@@ -156,19 +157,35 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         }
         else
         {
+            entityCombat.targetEntity.animator.SetTrigger("Hurt");
+
             if (killTargetEntity == 0)
             {
                 entityCombat.targetEntity.animator.SetTrigger("Death");
             }
-            else
-            {
-                entityCombat.targetEntity.animator.SetTrigger("Hurt");
-            }
+
             return true;
         }
     }
 
-    public int Flip(float? direction = null)
+    public bool GenerateAttackEffect()
+    {
+        string attackEffectName = GetType().Name + entityMovement.pieceType.ToString() + "AttackEffect" + animator.GetInteger("AttackType").ToString();
+        GameObject attackEffectGameObject = Manager.Instance.objectPoolingManager.GetGameObject(attackEffectName);
+        
+        if (attackEffectGameObject != null)
+        {
+            AttackEffect attackEffect = attackEffectGameObject.GetComponent<AttackEffect>();
+            attackEffect.SetAttackEffectTarget(this, entityCombat.targetEntity.entityMovement.currentCellgridPosition);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public virtual int Flip(float? direction = null)
     {
         if (direction.HasValue && direction.Value != 0)
         {

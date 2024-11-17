@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &2022548118409939245
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3234038238192257369, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 22100000, guid: e673ec87c67114a4d80d8b7ba6be5ccf, type: 2}
+    - target: {fileID: 4113780148170193790, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 1526600998, guid: 1e668e83b67e54c458c7b680095ea00c, type: 3}
+    - target: {fileID: 4113780148170193790, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4826212364575475231, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4826212364575475231, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4826212364575475231, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4826212364575475231, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4826212364575475231, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4826212364575475231, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4826212364575475231, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4826212364575475231, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4826212364575475231, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4826212364575475231, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5577324313407192231, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}
+      propertyPath: m_Name
+      value: EnemyBishopAttackEffect1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ce4bc2b4fb2307a4fa09b0cb1f8a380f, type: 3}

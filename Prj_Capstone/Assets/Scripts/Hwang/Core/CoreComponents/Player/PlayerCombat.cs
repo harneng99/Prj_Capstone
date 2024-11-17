@@ -6,14 +6,14 @@ using UnityEngine.Tilemaps;
 
 public class PlayerCombat : Combat
 {
-    private PlayerCharacter mercenary;
+    private Player mercenary;
     private List<Vector3Int> selectedCellgridPositions = new List<Vector3Int>();
 
     protected override void Awake()
     {
         base.Awake();
 
-        mercenary = entity as PlayerCharacter;
+        mercenary = entity as Player;
     }
 
     protected override void Start()

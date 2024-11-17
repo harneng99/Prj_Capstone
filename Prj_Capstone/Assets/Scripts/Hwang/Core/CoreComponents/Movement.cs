@@ -26,7 +26,7 @@ public abstract class Movement : CoreComponent
     [SerializeField] protected Vector3 destinationOffset;
 
     public Pathfinder pathfinder { get; private set; }
-    public Vector3? currentWorldgridPosition { get; set; }
+    public Vector3 currentWorldgridPosition { get; set; }
     public Vector3Int currentCellgridPosition { get; private set; }
     public Vector3Int currentHexgridPosition { get; private set; }
 
@@ -52,6 +52,7 @@ public abstract class Movement : CoreComponent
         currentHexgridPosition = pathfinder.CellgridToHexgrid(currentCellgridPosition);
         // entity.transform.position = pathfinder.moveableTilemap.CellToWorld(currentCellgridPosition);
         entity.SetEntityPosition(currentCellgridPosition);
+        UpdateGridPositionData();
 
         smoothMoveFinished += () =>
         {
@@ -187,6 +188,8 @@ public abstract class Movement : CoreComponent
 
     private IEnumerator MovementCoroutine(List<GridNode> path, int nthFromTheBack = 0)
     {
+        entity.animator.SetBool("Move", true);
+
         if (pieceType != PieceType.Knight)
         {
             while (path.Count > nthFromTheBack)
@@ -216,36 +219,24 @@ public abstract class Movement : CoreComponent
         }
         else
         {
-            float elapsedTime = 0.0f;
-            float duration = entity.animator.GetCurrentAnimatorStateInfo(0).normalizedTime / 2.0f;
-            Vector3 startWorldgridPosition = path.First().worldgridPosition;
+            entity.animator.SetBool("Jump", true);
+            float duration = 0.5f; // entity.animator.GetCurrentAnimatorStateInfo(0).normalizedTime / 2.0f;
             Vector3 destinationWorldgridPosition = path.Last().worldgridPosition;
             if (entity.entityCombat.targetEntity != null)
             {
                 destinationWorldgridPosition -= Vector3.right * entity.facingDirection;
             }
 
-            while (elapsedTime < duration)
-            {
-                elapsedTime += Time.deltaTime;
-                float newAlpha = Mathf.Lerp(1.0f, destinationAlpha, elapsedTime / duration);
-                entity.spriteRenderer.color = new Color(entity.spriteRenderer.color.r, entity.spriteRenderer.color.g, entity.spriteRenderer.color.b, newAlpha);
-                entity.transform.position = Vector3.Lerp(startWorldgridPosition, startWorldgridPosition + destinationOffset, elapsedTime / duration);
-                yield return null;
-            }
-            entity.spriteRenderer.color = new Color(entity.spriteRenderer.color.r, entity.spriteRenderer.color.g, entity.spriteRenderer.color.b, 0.0f);
+            yield return new WaitForSeconds(duration);
 
-            elapsedTime = 0.0f;
-            while (elapsedTime < duration)
+            entity.transform.position = destinationWorldgridPosition;
+            entity.animator.SetBool("Jump", false);
+
+            if (nthFromTheBack == 0)
             {
-                elapsedTime += Time.deltaTime;
-                float newAlpha = Mathf.Lerp(destinationAlpha, 1.0f, elapsedTime / duration);
-                entity.spriteRenderer.color = new Color(entity.spriteRenderer.color.r, entity.spriteRenderer.color.g, entity.spriteRenderer.color.b, newAlpha);
-                entity.transform.position = Vector3.Lerp(destinationWorldgridPosition + destinationOffset + pathfinder.gridBase.cellSize.x * 0.5f * Vector3.left, destinationWorldgridPosition + pathfinder.gridBase.cellSize.x * 0.5f * Vector3.left, elapsedTime / duration);
-                yield return null;
+                yield return new WaitForAnimationToFinish(entity.animator, "Jump");
             }
         }
-
         
         yield break;
     }
@@ -266,7 +257,6 @@ public abstract class Movement : CoreComponent
 
         #region Sprite Setting
         entity.spriteRenderer.sortingOrder = 1;
-        entity.animator.SetBool("Move", true);
 
         entity.Flip(destinationWorldgridPosition.x - initialWorldgridPosition.x);
         Vector3 direction = entity.facingDirection * Vector3.right;
@@ -281,25 +271,26 @@ public abstract class Movement : CoreComponent
             if (AttackBeforeMove(pieceType))
             {
                 entity.animator.SetInteger("AttackType", UnityEngine.Random.Range(0, entity.entityCombat.attackTypeCount));
-                GameObject attackEffect = Manager.Instance.objectPoolingManager.GetGameObject(entity.GetType().Name + pieceType.ToString() + "AttackEffect");
-                attackEffect.transform.position = destinationWorldgridPosition;
-
-                entity.animator.SetInteger("AttackType", UnityEngine.Random.Range(0, entity.entityCombat.attackTypeCount));
-                yield return entity.animator.PlayAndWait("Attack");
+                entity.animator.SetTrigger("Attack");
+                // string animationName = "Attack" + entity.animator.GetInteger("AttackType").ToString();
+                yield return new WaitForAnimationToStart(entity.entityCombat.targetEntity.animator, "Death");
+                yield return new WaitForAnimationToFinish(entity.entityCombat.targetEntity.animator, "Death");
 
                 yield return MovementCoroutine(path);
             }
             else if (AttackAfterMove(pieceType))
             {
                 yield return MovementCoroutine(path, 1);
-
                 yield return MoveToAttackPosition(destinationWorldgridPosition);
 
                 entity.animator.SetInteger("AttackType", UnityEngine.Random.Range(0, entity.entityCombat.attackTypeCount));
-                yield return entity.animator.PlayAndWait("Attack");
+                entity.animator.SetTrigger("Attack");
+                string animationName = "Attack" + entity.animator.GetInteger("AttackType").ToString();
+                yield return new WaitForAnimationToStart(entity.animator, animationName);
+                yield return new WaitForAnimationToFinish(entity.animator, animationName);
             }
 
-            if (!entity.entityCombat.targetEntity.isDead)
+            if (entity.entityCombat.targetEntity.gameObject.activeSelf)
             {
                 yield return new WaitForAnimationToFinish(entity.entityCombat.targetEntity.animator, "Hurt");
                 yield return new WaitForAnimationToFinish(entity.entityCombat.targetEntity.animator, "Death");
@@ -311,45 +302,6 @@ public abstract class Movement : CoreComponent
             entity.transform.position = Vector3.MoveTowards(entity.transform.position, destinationWorldgridPosition, entity.entityConsistentData.movementVelocity * Time.deltaTime);
             yield return null;
         }
-
-        /*if (pieceType != PieceType.Knight)
-        {
-            foreach (AnimatorControllerParameter parameter in entity.animator.parameters)
-            {
-                entity.animator.SetBool(parameter.name, false);
-            }
-            entity.animator.SetBool("Move", true);
-
-            GridNode currentDestinationNode = path.First();
-
-            while (Vector3.Distance(entity.transform.position, destinationWorldgridPosition) > epsilon)
-            {
-                if (Vector3.Distance(entity.transform.position, currentDestinationNode.worldgridPosition) < epsilon)
-                {
-                    if (path.Count > 0)
-                    {
-                        path.RemoveAt(0);
-
-                        if (path.Count > 0)
-                        {
-                            currentDestinationNode = path.First();
-                        }
-                    }
-                    else
-                    {
-                        isMoving = false;
-                        UpdateGridPositionData();
-                        break;
-                    }
-                }
-                else
-                {
-                    entity.transform.position = Vector3.MoveTowards(entity.transform.position, currentDestinationNode.worldgridPosition, entity.entityConsistentData.movementVelocity * Time.deltaTime);
-                }
-
-                yield return null;
-            }
-        }*/
 
         UpdateGridPositionData();
         smoothMoveFinished?.Invoke();
@@ -368,13 +320,13 @@ public abstract class Movement : CoreComponent
     {
         entity.highlightedTilemap.ClearAllTiles();
 
-        if (!showTile) return;
+        if (!showTile || entity.isDead) return;
 
         BoundsInt bounds = pathfinder.moveableTilemap.cellBounds;
 
         if (pieceType == PieceType.Pawn)
         {
-            if (entity.GetType().Equals(typeof(PlayerCharacter)))
+            if (entity.GetType().Equals(typeof(Player)))
             {
                 for (int x = -1; x <= 1; x++)
                 {
@@ -414,7 +366,7 @@ public abstract class Movement : CoreComponent
 
                         if (entity != null && !entity.isDead)
                         {
-                            if (entity.GetType().Equals(typeof(PlayerCharacter)) && x != 0)
+                            if (entity.GetType().Equals(typeof(Player)) && x != 0)
                             {
                                 this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, attackRangeHighlightedTileBase);
                             }

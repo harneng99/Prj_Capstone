@@ -34,12 +34,12 @@ public class BattleManager : MonoBehaviour
     public Tilemap selectionTilemap { get; private set; }
     public Tilemap highlightedTilemap { get; private set; }
     public Tilemap fogTilemap { get; private set; }
-    public PlayerCharacter mercenaryDragging { get; set; }
+    public Player mercenaryDragging { get; set; }
 
     [field: SerializeField] public TileBase selectionTile { get; private set; }
     public Vector3Int currentMouseCellgridPosition { get; private set; }
     public List<Entity> entities { get; private set; } = new List<Entity>();
-    public List<PlayerCharacter> playerPieces { get; private set; } = new List<PlayerCharacter>();
+    public List<Player> playerPieces { get; private set; } = new List<Player>();
     public List<Enemy> enemies { get; private set; } = new List<Enemy>();
 
     public event Action playerTurnStart;
@@ -59,14 +59,14 @@ public class BattleManager : MonoBehaviour
         highlightedTilemap = GameObject.FindWithTag("HighlightedTilemap").GetComponent<Tilemap>();
         // fogTilemap = GameObject.FindWithTag("FogTilemap").GetComponent<Tilemap>();
 
-        playerTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(PlayerCharacter)); };
+        playerTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(Player)); };
         playerTurnStart += () => { currentTurnCount += 1; };
         playerTurnStart += () => { Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount; };
         playerTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = true; };
         playerTurnStart += () =>
         { 
             didEntityMovedThisTurn = false;
-            foreach (PlayerCharacter playerPiece in playerPieces)
+            foreach (Player playerPiece in playerPieces)
             {
                 playerPiece.playerMovement.ResetEntityBooleanVariables();
             }
@@ -182,7 +182,7 @@ public class BattleManager : MonoBehaviour
     {
         enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None).ToList();
         entities = FindObjectsByType<Entity>(FindObjectsSortMode.None).ToList();
-        playerPieces = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None).ToList();
+        playerPieces = FindObjectsByType<Player>(FindObjectsSortMode.None).ToList();
         /*foreach (Entity entity in entities)
         {
             entity.highlightedTilemap.ClearAllTiles();
@@ -204,18 +204,6 @@ public class BattleManager : MonoBehaviour
         if (continueTurn) return;
 
         highlightedTilemap.ClearAllTiles();
-
-        while (true)
-        {
-            bool canProgress = false;
-            foreach (Entity entity in entities)
-            {
-                canProgress = entity.animator.GetCurrentAnimatorStateInfo(0).IsTag("Idle");
-            }
-            if (canProgress) break;
-
-            await Task.Delay(100);
-        }
 
         if (playerPhase && currentTurnCount >= turnLimit && !gameFinished)
         {

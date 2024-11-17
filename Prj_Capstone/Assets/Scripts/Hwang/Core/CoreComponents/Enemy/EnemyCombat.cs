@@ -29,7 +29,7 @@ public class WhatToDo
 
 public class EnemyCombat : Combat
 {
-    public PlayerCharacter currentTarget { get; private set; }
+    public Player currentTarget { get; private set; }
 
     [Header("AI Target")]
     [SerializeField, Tooltip("List components should not be duplicated. Score multiplier value decreases as the priority is low, by scoreMultiplierDecreaseAmount * priority.")] private List<TargetType> targetPriority;
@@ -89,7 +89,7 @@ public class EnemyCombat : Combat
 
         for (int i = 0; i < targetPriority.Count; i++)
         {
-            PlayerCharacter target = SetTarget(targetPriority[i]);
+            Player target = SetTarget(targetPriority[i]);
 
             if (target == null) continue;
 
@@ -194,7 +194,7 @@ public class EnemyCombat : Combat
         await Task.Delay(500); // TODO: Wait until animation finishes
     }
 
-    public PlayerCharacter SetTarget(TargetType targetType)
+    public Player SetTarget(TargetType targetType)
     {
         switch (targetType)
         {
@@ -212,15 +212,15 @@ public class EnemyCombat : Combat
         }
     }
 
-    private PlayerCharacter ClosestDistance()
+    private Player ClosestDistance()
     {
-        PlayerCharacter closestDistanceTarget = null;
+        Player closestDistanceTarget = null;
         int closestDistance = int.MaxValue;
         int closestDistanceStaminaCost = int.MaxValue;
-        PlayerCharacter lowestStaminaTarget = null;
+        Player lowestStaminaTarget = null;
         int lowestStaminaCost = int.MaxValue;
 
-        foreach (PlayerCharacter mercenary in Manager.Instance.gameManager.playerPieces)
+        foreach (Player mercenary in Manager.Instance.gameManager.playerPieces)
         {
             if (!mercenary.isActiveAndEnabled) continue;
 
@@ -257,12 +257,12 @@ public class EnemyCombat : Combat
     }
 
     // TODO: If there are many mercenaries with the same health, then sort through distance or potential threat.
-    private PlayerCharacter LowestHealth()
+    private Player LowestHealth()
     {
-        PlayerCharacter currentLowestHealthTarget = null;
+        Player currentLowestHealthTarget = null;
         float lowestHealth = float.MaxValue;
 
-        foreach (PlayerCharacter mercenary in Manager.Instance.gameManager.playerPieces)
+        foreach (Player mercenary in Manager.Instance.gameManager.playerPieces)
         {
             if (lowestHealth > mercenary.entityStat.health.currentValue)
             {
@@ -279,7 +279,7 @@ public class EnemyCombat : Combat
         return currentLowestHealthTarget;
     }
 
-    private WhatToDo DecideWhatToDo(PlayerCharacter targetMercenary)
+    private WhatToDo DecideWhatToDo(Player targetMercenary)
     {
         Vector3Int targetCellgridPosition = targetMercenary.entityMovement.currentCellgridPosition;
         Vector3Int targetHexgridPosition = targetMercenary.entityMovement.currentHexgridPosition;
@@ -376,7 +376,7 @@ public class EnemyCombat : Combat
         int minimumStaminaCostFromMercenary = int.MaxValue;
         float meanStaminaCostFromMercenaries = 0;
 
-        foreach (PlayerCharacter mercenary in Manager.Instance.gameManager.playerPieces)
+        foreach (Player mercenary in Manager.Instance.gameManager.playerPieces)
         {
             if (!mercenary.isActiveAndEnabled) continue;
 

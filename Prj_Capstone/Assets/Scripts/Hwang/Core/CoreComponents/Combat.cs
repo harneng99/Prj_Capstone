@@ -188,7 +188,7 @@ public abstract class Combat : CoreComponent
                         return true;
                     }
 
-                    if (selectedCombatAbility.availableTarget.HasFlag(AvailableTarget.Mercenary) && entity.GetType().Equals(typeof(PlayerCharacter)))
+                    if (selectedCombatAbility.availableTarget.HasFlag(AvailableTarget.Mercenary) && entity.GetType().Equals(typeof(Player)))
                     {
                         return true;
                     }
