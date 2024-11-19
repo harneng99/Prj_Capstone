@@ -8,8 +8,6 @@ using UnityEngine.Tilemaps;
 
 public class EnemyMovement : Movement
 {
-    private Entity attackTarget;
-
     protected override void Start()
     {
         base.Start();
@@ -25,7 +23,7 @@ public class EnemyMovement : Movement
         {
             if (Manager.Instance.gameManager.battlePhase && Manager.Instance.gameManager.playerPhase)
             {
-                if (Manager.Instance.gameManager.prevSelectedEntity != null && Manager.Instance.gameManager.prevSelectedEntity.GetType().Equals(typeof(PlayerCharacter)) && InAttackRange((PlayerCharacter)Manager.Instance.gameManager.prevSelectedEntity))
+                if (Manager.Instance.gameManager.prevSelectedEntity != null && Manager.Instance.gameManager.prevSelectedEntity.GetType().Equals(typeof(Player)) && InAttackRange((Player)Manager.Instance.gameManager.prevSelectedEntity))
                 {
                     DrawMoveableTilemap(false);
                 }
@@ -35,7 +33,6 @@ public class EnemyMovement : Movement
 
     public bool CheckAttackArea()
     {
-        attackTarget = null;
         bool foundTarget = false;
 
         BoundsInt bounds = pathfinder.moveableTilemap.cellBounds;
@@ -50,9 +47,9 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) continue;
 
-                    attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
-                    if (attackTarget != null && attackTarget.gameObject.activeSelf)
+                    if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                     {
                         foundTarget = true;
                         MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
@@ -72,9 +69,9 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) continue;
 
-                    attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
-                    if (attackTarget != null && attackTarget.gameObject.activeSelf)
+                    if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                     {
                         foundTarget = true;
                         MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
@@ -94,9 +91,9 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
-                    if (attackTarget != null && attackTarget.gameObject.activeSelf)
+                    if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                     {
                         foundTarget = true;
                         MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
@@ -113,9 +110,9 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
-                    if (attackTarget != null && attackTarget.gameObject.activeSelf)
+                    if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                     {
                         foundTarget = true;
                         MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
@@ -132,9 +129,9 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
-                    if (attackTarget != null && attackTarget.gameObject.activeSelf)
+                    if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                     {
                         foundTarget = true;
                         MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
@@ -151,9 +148,9 @@ public class EnemyMovement : Movement
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                    entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
-                    if (attackTarget != null && attackTarget.gameObject.activeSelf)
+                    if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                     {
                         foundTarget = true;
                         MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
@@ -178,9 +175,9 @@ public class EnemyMovement : Movement
                     {
                         if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                        attackTarget = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(PlayerCharacter));
+                        entity.entityCombat.targetEntity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, typeof(Player));
 
-                        if (attackTarget != null && attackTarget.gameObject.activeSelf)
+                        if (entity.entityCombat.targetEntity != null && !entity.entityCombat.targetEntity.isDead)
                         {
                             foundTarget = true;
                             MoveToGrid(moveableCellgridPosition, GridType.Cellgrid, false);
@@ -198,7 +195,7 @@ public class EnemyMovement : Movement
         }
         else
         {
-            Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(entity.transform);
+            // Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(entity.transform);
         }
 
         return foundTarget;
@@ -215,9 +212,9 @@ public class EnemyMovement : Movement
         }
     }
 
-    public bool InAttackRange(PlayerCharacter playerCharacter)
+    public bool InAttackRange(Player playerCharacter)
     {
-        if (!playerCharacter.gameObject.activeSelf || !entity.gameObject.activeSelf)
+        if (playerCharacter.isDead || entity.isDead)
         {
             return false;
         }
@@ -349,24 +346,45 @@ public class EnemyMovement : Movement
 
     private void AttackPiece()
     {
-        attackTarget?.gameObject.SetActive(false);
-
         int availablePiece = 0;
 
-        foreach (PlayerCharacter playerPiece in Manager.Instance.gameManager.mercenaries)
+        foreach (Player playerPiece in Manager.Instance.gameManager.playerPieces)
         {
-            if (playerPiece.gameObject.activeSelf)
+            if (!playerPiece.isDead)
             {
                 availablePiece += 1;
             }
         }
 
-        if (Manager.Instance.gameManager.enemyPhase && availablePiece < Manager.Instance.gameManager.howManyShouldBeInTheGoal && !Manager.Instance.gameManager.gameFinished)
+        if (Manager.Instance.gameManager.enemyPhase && availablePiece < Manager.Instance.gameManager.howManyShouldBeInTheGoal && !Manager.Instance.gameManager.gamePaused)
         {
             Manager.Instance.uiManager.ShowGameResultWindow("Stage Failed...");
-            Manager.Instance.gameManager.gameFinished = true;
+            Manager.Instance.gameManager.PauseGame();
         }
 
         Manager.Instance.gameManager.iterateNextEnemy = true;
+    }
+
+    protected override bool AttackBeforeMove(PieceType pieceType)
+    {
+        if (pieceType == PieceType.Bishop || pieceType == PieceType.Queen)
+        {
+            return true;
+        }
+        else return false;
+    }
+
+    protected override bool AttackAfterMove(PieceType pieceType)
+    {
+        if (pieceType != PieceType.Bishop && pieceType != PieceType.Queen)
+        {
+            return true;
+        }
+        else return false;
+    }
+
+    public override void ResetEntityBooleanVariables()
+    {
+        didCurrentEntityMovedThisTurn = false;
     }
 }

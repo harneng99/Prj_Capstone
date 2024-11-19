@@ -5,8 +5,8 @@ using UnityEngine;
 public class Manager : MonoBehaviour
 {
     public static Manager Instance { get; private set; }
-    public BattleManager gameManager { get; private set; }
-    public BattleSceneUIManager uiManager { get; private set; }
+    public GameManager gameManager { get; private set; }
+    public UIManager uiManager { get; private set; }
     public ObjectPoolingManager objectPoolingManager { get; private set; }
     public PlayerInputManager playerInputManager { get; private set; }
 
@@ -14,9 +14,9 @@ public class Manager : MonoBehaviour
     {
         Instance = this;
 
-        gameManager = GetComponentInChildren<BattleManager>();
+        gameManager = GetComponentInChildren<GameManager>();
         objectPoolingManager = GetComponentInChildren<ObjectPoolingManager>(); 
-        uiManager = GetComponentInChildren<BattleSceneUIManager>();
+        uiManager = GetComponentInChildren<UIManager>();
         playerInputManager = GetComponentInChildren<PlayerInputManager>();
     }
 }

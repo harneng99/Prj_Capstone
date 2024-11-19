@@ -14,8 +14,8 @@ public class DrawGrid : MonoBehaviour
     {
         Vector3 cellSize = gridBase.cellSize;
         Gizmos.color = Color.green;
-        Vector3 horizontalOffset = new Vector3(cellSize.x / 4, 0.0f, 0.0f);
-        Vector3 verticalOffset = new Vector3(0.0f, cellSize.y / 8, 0.0f);
+        Vector3 horizontalOffset = new Vector3(cellSize.x / 8, 0.0f, 0.0f);
+        Vector3 verticalOffset = new Vector3(0.0f, cellSize.y / 2, 0.0f);
 
         /*for (int x = -hexgridXWidth; x <= hexgridXWidth; x++)
         {
@@ -61,7 +61,7 @@ public class DrawGrid : MonoBehaviour
             Gizmos.DrawLine(worldgridBottomRightPosition, worldgridTopRightPosition);
             Gizmos.DrawLine(worldgridTopRightPosition, worldgridTopLeftPosition);
 
-            Handles.Label(worldgridTopLeftPosition - horizontalOffset - verticalOffset, new Vector2Int(cellgridPosition.x, cellgridPosition.y).ToString());
+            Handles.Label(worldgridTopLeftPosition + horizontalOffset - verticalOffset, new Vector2Int(cellgridPosition.x, cellgridPosition.y).ToString());
         }
     }
 }

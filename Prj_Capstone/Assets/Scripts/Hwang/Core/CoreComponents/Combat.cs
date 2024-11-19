@@ -11,9 +11,9 @@ public abstract class Combat : CoreComponent
 {
     [field: SerializeField] public TileBase combatAbilityRangeHighlightedTileBase { get; private set; }
     [field: SerializeField] public TileBase combatAbilityAOEHighlightedTileBase { get; private set; }
+    [field: SerializeField] public int attackTypeCount { get; private set; }
     public CombatAbility currentSelectedCombatAbility { get; set; }
-    public bool isCasting { get; private set; } // 정신집중
-    public bool isAttacking { get; private set; } // 공격 애니메이션 종료
+    public Entity targetEntity { get; set; }
     
     [field: SerializeField] public List<CombatAbility> combatAbilities { get; protected set; }
     public List<GameObject> combatAbilityButtons { get; protected set; } = new List<GameObject>();
@@ -188,7 +188,7 @@ public abstract class Combat : CoreComponent
                         return true;
                     }
 
-                    if (selectedCombatAbility.availableTarget.HasFlag(AvailableTarget.Mercenary) && entity.GetType().Equals(typeof(PlayerCharacter)))
+                    if (selectedCombatAbility.availableTarget.HasFlag(AvailableTarget.Mercenary) && entity.GetType().Equals(typeof(Player)))
                     {
                         return true;
                     }

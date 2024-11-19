@@ -16,6 +16,9 @@ MonoBehaviour:
   <combatAbilityName>k__BackingField: Default Combat Ability Name
   <combatAbilityType>k__BackingField: 0
   <staminaCost>k__BackingField: 7
+  <castingTurnDuration>k__BackingField: 0
+  <availableTarget>k__BackingField: 2
+  <maximumCastingAreaCount>k__BackingField: 1
   <combatAbilityDescription>k__BackingField: Deals large amount of damage to all
     targets around itself.
   <castingRange>k__BackingField: {x: 0, y: 0, z: 0}

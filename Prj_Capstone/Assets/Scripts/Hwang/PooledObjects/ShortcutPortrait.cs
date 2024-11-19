@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ShortcutPortrait : PooledObject
 {
-    public PlayerCharacter mercenary { get; set; }
+    public Player mercenary { get; set; }
 
     public void OnClick()
     {

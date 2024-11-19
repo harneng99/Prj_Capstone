@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
-using UnityEngine.UI;
+using Dev.ComradeVanti.WaitForAnim;
 
 public enum GridType { Hexgrid, Cellgrid }
 public enum PieceType { Pawn, Knight, Bishop, Rook, Queen }
@@ -22,20 +22,18 @@ public abstract class Movement : CoreComponent
     [SerializeField] protected int maxMovementStamina;
 
     [Header("Knight Animation")]
-    [SerializeField] protected float duration;
     [SerializeField] protected float destinationAlpha;
     [SerializeField] protected Vector3 destinationOffset;
-    [SerializeField] protected Vector3 destinationRotation;
 
     public Pathfinder pathfinder { get; private set; }
-    public Vector3? currentWorldgridPosition { get; set; }
+    public Vector3 currentWorldgridPosition { get; set; }
     public Vector3Int currentCellgridPosition { get; private set; }
     public Vector3Int currentHexgridPosition { get; private set; }
 
     public event Action smoothMoveFinished;
-    
+
     public bool isMoving { get; protected set; }
-    protected bool didCurrentEntityMoveThisTurn;
+    protected bool didCurrentEntityMovedThisTurn;
     protected Coroutine smoothMovementCoroutine;
 
     protected Vector3Int[] knightMovements = { new Vector3Int(-1, 2, 0), new Vector3Int(1, 2, 0), new Vector3Int(2, 1, 0), new Vector3Int(2, -1, 0), new Vector3Int(1, -2, 0), new Vector3Int(-1, -2, 0), new Vector3Int(-2, 1, 0), new Vector3Int(-2, -1, 0) };
@@ -44,7 +42,7 @@ public abstract class Movement : CoreComponent
     protected override void Awake()
     {
         base.Awake();
-        
+
         pathfinder = GetComponent<Pathfinder>();
     }
 
@@ -54,25 +52,21 @@ public abstract class Movement : CoreComponent
         currentHexgridPosition = pathfinder.CellgridToHexgrid(currentCellgridPosition);
         // entity.transform.position = pathfinder.moveableTilemap.CellToWorld(currentCellgridPosition);
         entity.SetEntityPosition(currentCellgridPosition);
+        UpdateGridPositionData();
+
+        smoothMoveFinished += () =>
+        {
+            isMoving = false;
+            entity.entityCombat.targetEntity = null;
+            entity.animator.SetBool("Move", false);
+        };
     }
 
     protected override void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button.Equals(PointerEventData.InputButton.Left))
         {
-            /*if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
-            {
-                if (!Manager.Instance.gameManager.currentSelectedEntity.Equals(entity))
-                {
-                    DrawMoveableTilemap(UtilityFunctions.IsTilemapEmpty(entity.highlightedTilemap));
-                }
-                else
-                {
-                    DrawMoveableTilemap(false);
-                    DrawMoveableTilemap(true);
-                }
-            }*/
-            if (Manager.Instance.gameManager.battlePhase && Manager.Instance.gameManager.playerPhase)
+            if (Manager.Instance.gameManager.battlePhase && Manager.Instance.gameManager.playerPhase && !isMoving)
             {
                 if (Manager.Instance.gameManager.currentSelectedEntity.Equals(entity) && Manager.Instance.gameManager.currentSelectedEntity.Equals(Manager.Instance.gameManager.prevSelectedEntity))
                 {
@@ -118,8 +112,11 @@ public abstract class Movement : CoreComponent
     {
         Vector3Int destinationCellgridPosition = gridType.Equals(GridType.Hexgrid) ? pathfinder.HexgridToCellgrid(destinationGridPosition) : destinationGridPosition;
 
-        // if (Manager.Instance.gameManager.EntityExistsAt(destinationCellgridPosition)) return false;
         if (currentCellgridPosition.Equals(destinationCellgridPosition)) return false;
+
+        didCurrentEntityMovedThisTurn = true;
+        Manager.Instance.gameManager.didEntityMovedThisTurn = true;
+        DrawMoveableTilemap(false);
 
         if (instantMove)
         {
@@ -129,6 +126,7 @@ public abstract class Movement : CoreComponent
             {
                 if (!pathfinder.IsObstacle(destinationCellgridPosition) && pathfinder.IsMoveable(destinationCellgridPosition))
                 {
+                    // TODO: When there is target entity
                     entity.SetEntityPosition(destinationCellgridPosition);
                     DrawMoveableTilemap(false);
                     UpdateGridPositionData();
@@ -142,19 +140,7 @@ public abstract class Movement : CoreComponent
         {
             PathInformation pathInformation = pathfinder.PathFinding(currentCellgridPosition, destinationCellgridPosition);
 
-            /*if (pathInformation.requiredStamina > entity.entityStat.stamina.currentValue)
-            {
-                Debug.LogWarning(entity.name + " is trying to move more than current stamina.");
-                return false;
-            }*/
-
             isMoving = true;
-            // entity.entityStat.stamina.DecreaseCurrentValue(pathInformation.requiredStamina);
-
-            if (entity.isSelected)
-            {
-                Manager.Instance.uiManager.SetInformationUI(entity, entity.entityDescription, currentCellgridPosition);
-            }
 
             if (smoothMovementCoroutine != null)
             {
@@ -165,83 +151,168 @@ public abstract class Movement : CoreComponent
         }
     }
 
-    protected virtual IEnumerator MoveEntitySmooth(List<GridNode> path)
+    protected virtual IEnumerator MoveToAttackPosition(Vector3 worldgridCellPosition)
     {
-        entity.spriteRenderer.sortingOrder = 1;
-        GridNode startNode = path.First();
-        GridNode destinationNode = path.Last();
+        if (entity.entityCombat.targetEntity == null)
+        {
+            Debug.LogWarning($"{entity}'s target entity value is null.");
+            yield break;
+        }
 
-        path.RemoveAt(0);
-        if (path.Count <= 0) yield break;
+        Vector3 direction = entity.facingDirection * Vector3.right;
+        entity.entityCombat.targetEntity.Flip(-direction.x);
+        entity.entityCombat.targetEntity.animator.SetBool("Move", true);
+
+        Vector3 entityDestinationWorldgridPosition = worldgridCellPosition - pathfinder.gridBase.cellSize.x * 0.5f * direction;
+        Vector3 targetDestinationWorldgridPosition = worldgridCellPosition + pathfinder.gridBase.cellSize.x * 0.5f * direction;
+
+        while (Vector3.Distance(entity.transform.position, entityDestinationWorldgridPosition) > epsilon || Vector3.Distance(entity.entityCombat.targetEntity.transform.position, targetDestinationWorldgridPosition) > epsilon)
+        {
+            entity.transform.position = Vector3.MoveTowards(entity.transform.position, entityDestinationWorldgridPosition, entity.entityConsistentData.movementVelocity * Time.deltaTime);
+            if (Vector3.Distance(entity.transform.position, entityDestinationWorldgridPosition) < epsilon)
+            {
+                entity.animator.SetBool("Move", false);
+            }
+
+            entity.entityCombat.targetEntity.transform.position = Vector3.MoveTowards(entity.entityCombat.targetEntity.transform.position, targetDestinationWorldgridPosition, entity.entityCombat.targetEntity.entityConsistentData.movementVelocity * Time.deltaTime);
+            if (Vector3.Distance(entity.entityCombat.targetEntity.transform.position, targetDestinationWorldgridPosition) < epsilon)
+            {
+                entity.entityCombat.targetEntity.animator.SetBool("Move", false);
+            }
+            yield return null;
+        }
+
+        yield break;
+    }
+
+    private IEnumerator MovementCoroutine(List<GridNode> path, int nthFromTheBack = 0)
+    {
+        entity.animator.SetBool("Move", true);
 
         if (pieceType != PieceType.Knight)
         {
-            GridNode currentDestinationNode = path.First();
-
-            while (Vector3.Distance(entity.transform.position, destinationNode.worldgridPosition) > epsilon)
+            while (path.Count > nthFromTheBack)
             {
-                if (Vector3.Distance(entity.transform.position, currentDestinationNode.worldgridPosition) < epsilon)
+                Vector3 currentDestinationWorldgridPosition = path.First().worldgridPosition;
+
+                if (Vector3.Distance(entity.transform.position, currentDestinationWorldgridPosition) < epsilon)
                 {
+                    UpdateGridPositionData();
+
+                    path.RemoveAt(0);
+
                     if (path.Count > 0)
                     {
-                        path.RemoveAt(0);
-
-                        if (path.Count > 0)
-                        {
-                            currentDestinationNode = path.First();
-                        }
+                        currentDestinationWorldgridPosition = path.First().worldgridPosition;
                     }
                     else
                     {
-                        isMoving = false;
-                        UpdateGridPositionData();
                         break;
                     }
                 }
-                else
-                {
-                    entity.transform.position = Vector3.MoveTowards(entity.transform.position, currentDestinationNode.worldgridPosition, entity.entityConsistentData.movementVelocity * Time.deltaTime);
-                }
+
+                entity.transform.position = Vector3.MoveTowards(entity.transform.position, currentDestinationWorldgridPosition, entity.entityConsistentData.movementVelocity * Time.deltaTime);
 
                 yield return null;
             }
         }
         else
         {
-            float elapsedTime = 0.0f;
-            while (elapsedTime < duration)
+            entity.animator.SetBool("Jump", true);
+            float duration = 0.5f; // entity.animator.GetCurrentAnimatorStateInfo(0).normalizedTime / 2.0f;
+            Vector3 destinationWorldgridPosition = path.Last().worldgridPosition;
+            if (entity.entityCombat.targetEntity != null)
             {
-                elapsedTime += Time.deltaTime;
-                float newAlpha = Mathf.Lerp(1.0f, destinationAlpha, elapsedTime / duration);
-                entity.spriteRenderer.color = new Color(entity.spriteRenderer.color.r, entity.spriteRenderer.color.g, entity.spriteRenderer.color.b, newAlpha);
-                // entity.transform.position = Vector3.MoveTowards(startNode.worldgridPosition, startNode.worldgridPosition + destinationOffset, Vector3.Length(destinationOffset) / duration);
-                entity.transform.position = Vector3.Lerp(startNode.worldgridPosition, startNode.worldgridPosition + destinationOffset, elapsedTime / duration);
-                entity.transform.rotation = Quaternion.Lerp(Quaternion.identity, Quaternion.Euler(destinationRotation), elapsedTime / duration);
-                yield return null;
+                destinationWorldgridPosition -= Vector3.right * entity.facingDirection;
             }
-            entity.spriteRenderer.color = new Color(entity.spriteRenderer.color.r, entity.spriteRenderer.color.g, entity.spriteRenderer.color.b, 0.0f);
 
-            elapsedTime = 0.0f;
-            while (elapsedTime < duration)
+            yield return new WaitForSeconds(duration);
+
+            entity.transform.position = destinationWorldgridPosition;
+            entity.animator.SetBool("Jump", false);
+
+            if (nthFromTheBack == 0)
             {
-                elapsedTime += Time.deltaTime;
-                float newAlpha = Mathf.Lerp(destinationAlpha, 1.0f, elapsedTime / duration);
-                entity.spriteRenderer.color = new Color(entity.spriteRenderer.color.r, entity.spriteRenderer.color.g, entity.spriteRenderer.color.b, newAlpha);
-                entity.transform.position = Vector3.Lerp(destinationNode.worldgridPosition + destinationOffset, destinationNode.worldgridPosition, elapsedTime / duration);
-                entity.transform.rotation = Quaternion.Lerp(Quaternion.Euler(destinationOffset), Quaternion.identity, elapsedTime / duration);
-                yield return null;
+                yield return new WaitForAnimationToFinish(entity.animator, "Jump");
             }
+        }
+        
+        yield break;
+    }
+
+    protected virtual IEnumerator MoveEntitySmooth(List<GridNode> path)
+    {
+        #region Initial Information Setting
+        Vector3 initialWorldgridPosition = path.First().worldgridPosition;
+        Vector3 destinationWorldgridPosition = path.Last().worldgridPosition;
+
+        path.RemoveAt(0);
+        if (path.Count <= 0)
+        {
+            Debug.LogWarning($"Wrong path calculation on entity {entity.name} from world grid {initialWorldgridPosition} to {destinationWorldgridPosition}.");
+            yield break;
+        }
+        #endregion
+
+        #region Sprite Setting
+        entity.spriteRenderer.sortingOrder = 1;
+
+        if (Mathf.Abs(destinationWorldgridPosition.x - initialWorldgridPosition.x) > epsilon)
+        {
+            entity.Flip(destinationWorldgridPosition.x - initialWorldgridPosition.x);
+            Vector3 direction = entity.facingDirection * Vector3.right;
+        }
+        #endregion
+
+        if (entity.entityCombat.targetEntity == null)
+        {
+            yield return MovementCoroutine(path);
+        }
+        else
+        {
+            if (AttackBeforeMove(pieceType))
+            {
+                entity.animator.SetInteger("AttackType", UnityEngine.Random.Range(0, entity.entityCombat.attackTypeCount));
+                entity.animator.SetTrigger("Attack");
+                // string animationName = "Attack" + entity.animator.GetInteger("AttackType").ToString();
+                yield return new WaitForAnimationToStart(entity.entityCombat.targetEntity.animator, "Death");
+                yield return new WaitForAnimationToFinish(entity.entityCombat.targetEntity.animator, "Death");
+
+                yield return MovementCoroutine(path);
+            }
+            else if (AttackAfterMove(pieceType))
+            {
+                yield return MovementCoroutine(path, 1);
+                yield return MoveToAttackPosition(destinationWorldgridPosition);
+
+                entity.animator.SetInteger("AttackType", UnityEngine.Random.Range(0, entity.entityCombat.attackTypeCount));
+                entity.animator.SetTrigger("Attack");
+                string animationName = "Attack" + entity.animator.GetInteger("AttackType").ToString();
+                yield return new WaitForAnimationToStart(entity.animator, animationName);
+                yield return new WaitForAnimationToFinish(entity.animator, animationName);
+            }
+
+            if (entity.entityCombat.targetEntity.gameObject.activeSelf)
+            {
+                yield return new WaitForAnimationToFinish(entity.entityCombat.targetEntity.animator, "Hurt");
+                yield return new WaitForAnimationToFinish(entity.entityCombat.targetEntity.animator, "Death");
+            }
+        }
+
+        while (Vector3.Distance(entity.transform.position, destinationWorldgridPosition) > epsilon)
+        {
+            entity.transform.position = Vector3.MoveTowards(entity.transform.position, destinationWorldgridPosition, entity.entityConsistentData.movementVelocity * Time.deltaTime);
+            yield return null;
         }
 
         UpdateGridPositionData();
-        if (entity.isSelected)
-        {
-            Manager.Instance.uiManager.SetInformationUI(entity, entity.entityDescription, currentCellgridPosition);
-        }
         smoothMoveFinished?.Invoke();
-        isMoving = false;
         entity.spriteRenderer.sortingOrder = 0;
     }
+
+    protected abstract bool AttackBeforeMove(PieceType pieceType);
+
+    protected abstract bool AttackAfterMove(PieceType pieceType);
 
     /// <summary>
     /// Gets whether entity is going to show moveable tile area in bool value. True means it will show its moveable tile area, and vice versa.
@@ -249,45 +320,15 @@ public abstract class Movement : CoreComponent
     /// <param name="showTile"></param>
     public virtual void DrawMoveableTilemap(bool showTile = true)
     {
-        // entity.highlightedTilemap.SetTile(currentCellgridPosition, moveRangeHighlightedTileBase);
-
-        /*for (int x = -moveRangeInHexGrid.x; x <= moveRangeInHexGrid.x; x++)
-        {
-            for (int y = -moveRangeInHexGrid.y; y <= moveRangeInHexGrid.y; y++)
-            {
-                for (int z = -moveRangeInHexGrid.z; z <= moveRangeInHexGrid.z; z++)
-                {
-                    if (x + y + z != 0) continue;
-
-                    Vector3Int moveableHexgridPosition = currentHexgridPosition + new Vector3Int(x, y, z);
-                    Vector3Int moveableCellgridPosition = pathfinder.HexgridToCellgrid(moveableHexgridPosition);
-
-                    GridNode moveableGridNode = pathfinder.gridNodes.FirstOrDefault(node => node.cellgridPosition == moveableCellgridPosition);
-
-                    if (moveableGridNode != null && !moveableGridNode.isObstacle)
-                    {
-                        PathInformation pathInformation = pathfinder.PathFinding(currentCellgridPosition, moveableCellgridPosition);
-
-                        if (pathInformation == null || entity.entityStat.stamina.currentValue < pathInformation.requiredStamina) continue;
-                        
-                        if (!PathOutOfRange(currentHexgridPosition, pathInformation))
-                        {
-                            entity.highlightedTilemap.SetTile(moveableCellgridPosition, moveRangeHighlightedTileBase);
-                        }
-                    }
-                }
-            }
-        }*/
-
         entity.highlightedTilemap.ClearAllTiles();
 
-        if (!showTile) return;
+        if (!showTile || entity.isDead) return;
 
         BoundsInt bounds = pathfinder.moveableTilemap.cellBounds;
 
         if (pieceType == PieceType.Pawn)
         {
-            if (entity.GetType().Equals(typeof(PlayerCharacter)))
+            if (entity.GetType().Equals(typeof(Player)))
             {
                 for (int x = -1; x <= 1; x++)
                 {
@@ -299,7 +340,7 @@ public abstract class Movement : CoreComponent
 
                         Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
 
-                        if (entity != null && entity.gameObject.activeSelf)
+                        if (entity != null && !entity.isDead)
                         {
                             if (entity.GetType().Equals(typeof(Enemy)) && x != 0)
                             {
@@ -325,9 +366,9 @@ public abstract class Movement : CoreComponent
 
                         Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
 
-                        if (entity != null && entity.gameObject.activeSelf)
+                        if (entity != null && !entity.isDead)
                         {
-                            if (entity.GetType().Equals(typeof(PlayerCharacter)) && x != 0)
+                            if (entity.GetType().Equals(typeof(Player)) && x != 0)
                             {
                                 this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, attackRangeHighlightedTileBase);
                             }
@@ -355,7 +396,7 @@ public abstract class Movement : CoreComponent
 
                     Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
 
-                    if (entity != null && entity.gameObject.activeSelf)
+                    if (entity != null && !entity.isDead)
                     {
                         if (entity.GetType().Equals(this.entity.GetType()))
                         {
@@ -386,7 +427,7 @@ public abstract class Movement : CoreComponent
 
                     Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
 
-                    if (entity != null && entity.gameObject.activeSelf)
+                    if (entity != null && !entity.isDead)
                     {
                         if (entity.GetType().Equals(this.entity.GetType()))
                         {
@@ -414,7 +455,7 @@ public abstract class Movement : CoreComponent
 
                     Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
 
-                    if (entity != null && entity.gameObject.activeSelf)
+                    if (entity != null && !entity.isDead)
                     {
                         if (entity.GetType().Equals(this.entity.GetType()))
                         {
@@ -443,7 +484,7 @@ public abstract class Movement : CoreComponent
 
                     Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
 
-                    if (entity != null && entity.gameObject.activeSelf)
+                    if (entity != null && !entity.isDead)
                     {
                         if (entity.GetType().Equals(this.entity.GetType()))
                         {
@@ -471,7 +512,7 @@ public abstract class Movement : CoreComponent
 
                     Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
 
-                    if (entity != null && entity.gameObject.activeSelf)
+                    if (entity != null && !entity.isDead)
                     {
                         if (entity.GetType().Equals(this.entity.GetType()))
                         {
@@ -507,7 +548,7 @@ public abstract class Movement : CoreComponent
 
                         Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
 
-                        if (entity != null && entity.gameObject.activeSelf)
+                        if (entity != null && !entity.isDead)
                         {
                             if (entity.GetType().Equals(this.entity.GetType()))
                             {
@@ -545,9 +586,14 @@ public abstract class Movement : CoreComponent
     public virtual void ChangePieceType(PieceType pieceType)
     {
         this.pieceType = pieceType;
+        entity.animator.SetInteger("PieceType", (int)pieceType);
+        if (pieceType == PieceType.Rook)
+        {
+            pathfinder.ChangeObjectLayerType(ObjectTileLayer.Swamp, false);
+        }
         entity.highlightedTilemap.ClearAllTiles();
 
-        if (Manager.Instance.gameManager.didPlayerMovedAnythingThisTurn)
+        if (Manager.Instance.gameManager.didEntityMovedThisTurn)
         {
             Manager.Instance.gameManager.continueTurn = false;
             Manager.Instance.gameManager.TurnEnd();
@@ -586,5 +632,5 @@ public abstract class Movement : CoreComponent
         return false;
     }
 
-    public void ResetEntityMovedBooleanVariable() => didCurrentEntityMoveThisTurn = false;
+    public abstract void ResetEntityBooleanVariables();
 }

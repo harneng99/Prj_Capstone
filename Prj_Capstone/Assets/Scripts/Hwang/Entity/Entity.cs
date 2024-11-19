@@ -31,6 +31,8 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     public bool isSelected { get; private set; }
     public Tilemap highlightedTilemap { get; private set; }
     public Tilemap interactableTilemap { get; private set; }
+    public int facingDirection { get; protected set; }
+    public bool isDead { get; set; }
     #endregion
 
     protected virtual void Awake()
@@ -50,6 +52,8 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
 
     protected virtual void Start()
     {
+        animator.SetInteger("PieceType", (int)entityMovement.pieceType);
+        facingDirection = transform.right.x > 0 ? 1 : -1;
         Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
     }
 
@@ -137,4 +141,70 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         transform.position = cellgridPosition + new Vector3(0.5f, 0.5f, 0.0f);
     }
+
+    public void EntityDead()
+    {
+        // animator.SetTrigger("Death");
+        isDead = true;
+        gameObject.SetActive(false);
+    }
+
+    public bool AttackEntity(int killTargetEntity)
+    {
+        if (entityCombat.targetEntity == null)
+        {
+            return false;
+        }
+        else
+        {
+            entityCombat.targetEntity.animator.SetTrigger("Hurt");
+
+            if (killTargetEntity == 0)
+            {
+                entityCombat.targetEntity.animator.SetTrigger("Death");
+            }
+
+            return true;
+        }
+    }
+
+    public bool GenerateAttackEffect()
+    {
+        string attackEffectName = GetType().Name + entityMovement.pieceType.ToString() + "AttackEffect" + animator.GetInteger("AttackType").ToString();
+        GameObject attackEffectGameObject = Manager.Instance.objectPoolingManager.GetGameObject(attackEffectName);
+        
+        if (attackEffectGameObject != null)
+        {
+            AttackEffect attackEffect = attackEffectGameObject.GetComponent<AttackEffect>();
+            attackEffect.SetAttackEffectTarget(this, entityCombat.targetEntity.entityMovement.currentCellgridPosition);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public int Flip(float? direction = null)
+    {
+        if (direction.HasValue)
+        {
+            if (direction.Value != 0 && facingDirection * direction.Value < 0)
+            {
+                FlipCanvas();
+                facingDirection *= -1;
+                transform.Rotate(0.0f, 180.0f, 0.0f);
+            }
+        }
+        else
+        {
+            FlipCanvas();
+            facingDirection *= -1;
+            transform.Rotate(0.0f, 180.0f, 0.0f);
+        }
+
+        return facingDirection;
+    }
+
+    protected virtual void FlipCanvas() { }
 }

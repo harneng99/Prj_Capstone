@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6837014900626600824}
   - component: {fileID: 1594911589576707346}
   - component: {fileID: 3011142018945163908}
+  - component: {fileID: 5499649154515318431}
   m_Layer: 0
   m_Name: Bidirectional Teleport
   m_TagString: Untagged
@@ -71,8 +72,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -670077
-  m_SortingLayer: 1
+  m_SortingLayerID: 1071416589
+  m_SortingLayer: 2
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 82f685b075e1bfe4492f839fe008628c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -104,3 +105,26 @@ MonoBehaviour:
   <interactableTileLayer>k__BackingField: 2
   <entrance>k__BackingField: 0
   <tileInformation>k__BackingField: 
+  destroyedPillarTileBase: {fileID: 0}
+  destroyedSpikeTileBase: {fileID: 0}
+--- !u!95 &5499649154515318431
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4276957714739793834}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 47d1d88a68f288742899e522eb699a4f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
