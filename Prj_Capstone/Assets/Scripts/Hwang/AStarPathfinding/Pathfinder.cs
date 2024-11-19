@@ -48,38 +48,10 @@ public class Pathfinder : MonoBehaviour
 
         moveableTilemap = GameObject.FindWithTag("MoveableTilemap").GetComponent<Tilemap>();
         objectTilemap = GameObject.FindWithTag("ObjectTilemap").GetComponent<Tilemap>();
-
-        // CreateNodes();
     }
 
     private void CreateNodes()
     {
-        /*for (int x = -hexgridXWidth; x <= hexgridXWidth; x++)
-        {
-            for (int y = -hexgridYHeight; y <= hexgridYHeight; y++)
-            {
-                for (int z = -hexgridZWidth; z <= hexgridZWidth; z++)
-                {
-                    if (x + y + z != 0) continue;
-
-                    Vector3Int hexgridPosition = new Vector3Int(x, y, z);
-                    Vector3 worldgridPosition = HexgridToWorldgrid(hexgridPosition);
-                    Vector3Int cellgridPosition = moveableTilemap.WorldToCell(worldgridPosition);
-                    
-                    GameObject tileGameObject = moveableTilemap.GetInstantiatedObject(cellgridPosition);
-
-                    if (tileGameObject == null) continue;
-
-                    CustomTileData customTileData = tileGameObject.GetComponent<CustomTileData>();
-                    // TileBase moveableTile = moveableTilemap.GetTile(cellgridPosition);
-
-                    if (moveableLayerTypes.HasFlag(customTileData.moveableTileLayer))
-                    {
-                        gridNodes.Add(new GridNode(hexgridPosition, cellgridPosition, worldgridPosition, IsObstacle(cellgridPosition), customTileData));
-                    }
-                }
-            }
-        }*/
         gridNodes.Clear();
 
         BoundsInt bounds = moveableTilemap.cellBounds;
@@ -123,8 +95,6 @@ public class Pathfinder : MonoBehaviour
 
     public float GetHeuristicDistance(Vector3Int hexgridStartPosition, Vector3Int hexgridDestinationPosition)
     {
-        // return Mathf.Max(new int[] { Mathf.Abs(hexgridStartPosition.x - hexgridDestinationPosition.x), Mathf.Abs(hexgridStartPosition.y - hexgridDestinationPosition.y), Mathf.Abs(hexgridStartPosition.z - hexgridDestinationPosition.z) });
-
         return Vector3Int.Distance(hexgridStartPosition, hexgridDestinationPosition);
     }
 
@@ -134,7 +104,6 @@ public class Pathfinder : MonoBehaviour
 
         GridNode startNode = gridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridStartPosition);
         GridNode destinationNode = gridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridDestinationPosition);
-
 
         if (allowOverlap == false && Manager.Instance.gameManager.EntityExistsAt(cellgridDestinationPosition) != null) return null;
         if (startNode == null || destinationNode == null) return null;
@@ -238,11 +207,7 @@ public class Pathfinder : MonoBehaviour
 
     public Vector3Int HexgridToCellgrid(Vector3Int hexgridPosition)
     {
-        // RoundToInt is not consistent due to the fundamental problem of floating point expression
         return new Vector3Int(Mathf.RoundToInt((hexgridPosition.x - hexgridPosition.z) / 2.0f - epsilon), hexgridPosition.y);
-        
-        // GridNode hexgridNode = gridNodes.FirstOrDefault(node => node.hexgridPosition == hexgridPosition);
-        // return hexgridNode == null ? null : hexgridNode.cellgridPosition;
     }
 
     public Vector3Int CellgridToHexgrid(Vector3Int cellgridPosition)
@@ -255,9 +220,6 @@ public class Pathfinder : MonoBehaviour
         {
             return new Vector3Int(cellgridPosition.x - cellgridPosition.y / 2, cellgridPosition.y, -cellgridPosition.x - cellgridPosition.y / 2 - cellgridPosition.y % 2);
         }
-        
-        // GridNode cellgridNode = gridNodes.FirstOrDefault(node => node.cellgridPosition == cellgridPosition);
-        // return cellgridNode == null ? null : cellgridNode.cellgridPosition;
     }
 
     /// <summary>
@@ -294,6 +256,18 @@ public class Pathfinder : MonoBehaviour
             GameObject tileGameObject = moveableTilemap.GetInstantiatedObject(cellgridPosition);
             CustomTileData customTileData = tileGameObject.GetComponent<CustomTileData>();
             return moveableLayerTypes.HasFlag(customTileData.moveableTileLayer);
+        }
+    }
+
+    public void ChangeObjectLayerType(ObjectTileLayer objectTileLayer, bool include)
+    {
+        if (include)
+        {
+            objectLayerTypes |= objectTileLayer;
+        }
+        else
+        {
+            objectLayerTypes &= ~objectTileLayer;
         }
     }
 }

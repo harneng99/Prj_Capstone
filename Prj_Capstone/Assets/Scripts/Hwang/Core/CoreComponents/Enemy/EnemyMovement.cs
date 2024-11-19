@@ -195,7 +195,7 @@ public class EnemyMovement : Movement
         }
         else
         {
-            Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(entity.transform);
+            // Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(entity.transform);
         }
 
         return foundTarget;
@@ -356,10 +356,10 @@ public class EnemyMovement : Movement
             }
         }
 
-        if (Manager.Instance.gameManager.enemyPhase && availablePiece < Manager.Instance.gameManager.howManyShouldBeInTheGoal && !Manager.Instance.gameManager.gameFinished)
+        if (Manager.Instance.gameManager.enemyPhase && availablePiece < Manager.Instance.gameManager.howManyShouldBeInTheGoal && !Manager.Instance.gameManager.gamePaused)
         {
             Manager.Instance.uiManager.ShowGameResultWindow("Stage Failed...");
-            Manager.Instance.gameManager.gameFinished = true;
+            Manager.Instance.gameManager.PauseGame();
         }
 
         Manager.Instance.gameManager.iterateNextEnemy = true;

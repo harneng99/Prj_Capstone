@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 
-public class BattleManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     [field: SerializeField] public Camera mainCamera { get; private set; }
     [field: SerializeField] public CinemachineVirtualCamera virtualCamera { get; private set; }
@@ -24,7 +24,7 @@ public class BattleManager : MonoBehaviour
     public bool battlePhase { get; private set; } = false;
     public bool playerPhase { get; private set; } = false;
     public bool didEntityMovedThisTurn { get; set; }
-    public bool gameFinished { get; set; }
+    public bool gamePaused { get; private set; }
     public bool enemyPhase { get; private set; } = false;
     public bool isAiming { get; set; } = false;
     public bool isAimingCopyForFunctionExecutionOrderCorrection { get; set; } = false; // TODO: A better way to implement this
@@ -57,11 +57,20 @@ public class BattleManager : MonoBehaviour
         objectTilemap = GameObject.FindWithTag("ObjectTilemap").GetComponent<Tilemap>();
         selectionTilemap = GameObject.FindWithTag("SelectionTilemap").GetComponent<Tilemap>();
         highlightedTilemap = GameObject.FindWithTag("HighlightedTilemap").GetComponent<Tilemap>();
-        // fogTilemap = GameObject.FindWithTag("FogTilemap").GetComponent<Tilemap>();
 
         playerTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(Player)); };
         playerTurnStart += () => { currentTurnCount += 1; };
-        playerTurnStart += () => { Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount; };
+        playerTurnStart += () =>
+        {
+            if (turnLimit < 999)
+            {
+                Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount + " / " + turnLimit;
+            }
+            else
+            {
+                Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount;
+            }
+        };
         playerTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = true; };
         playerTurnStart += () =>
         { 
@@ -72,8 +81,6 @@ public class BattleManager : MonoBehaviour
             }
         };
 
-        // TODO: Below code deletes all the ClickHandler. Should find a way to fix this.
-        // playerTurnEnd += Manager.Instance.playerInputManager.DisableInputSystemOnTurnChange;
         playerTurnEnd += Manager.Instance.uiManager.HideInformationUI;
         playerTurnEnd += Manager.Instance.uiManager.ShowPhaseInformationUI;
 
@@ -86,7 +93,7 @@ public class BattleManager : MonoBehaviour
                 enemy.enemyMovement.ResetEntityBooleanVariables();
             }
         };
-        // enemyTurnStart += () => { RunEnemyAI(); };
+
         enemyTurnStart += () =>
         {
             if (enemyAttackCoroutine != null)
@@ -109,28 +116,31 @@ public class BattleManager : MonoBehaviour
 
     private void Update()
     {
-        Vector3 mousePosition = Manager.Instance.gameManager.mainCamera.ScreenToWorldPoint(Input.mousePosition);
-
-        Vector3Int nextCellgridPosition;
-
-        if (mercenaryDragging != null)
+        if (!gamePaused)
         {
-            nextCellgridPosition = selectionTilemap.WorldToCell(mercenaryDragging.GetEntityFeetPosition());
-        }
-        else
-        {
-            nextCellgridPosition = selectionTilemap.WorldToCell(mousePosition);
-        }
-        nextCellgridPosition = new Vector3Int(nextCellgridPosition.x, nextCellgridPosition.y, 0);
+            Vector3 mousePosition = Manager.Instance.gameManager.mainCamera.ScreenToWorldPoint(Input.mousePosition);
 
-        if (currentMouseCellgridPosition != nextCellgridPosition)
-        {
-            currentMouseCellgridPosition = nextCellgridPosition;
-            selectionTilemap.ClearAllTiles();
+            Vector3Int nextCellgridPosition;
 
-            if (!OutOfRange(currentMouseCellgridPosition))
+            if (mercenaryDragging != null)
             {
-                selectionTilemap.SetTile(nextCellgridPosition, selectionTile);
+                nextCellgridPosition = selectionTilemap.WorldToCell(mercenaryDragging.GetEntityFeetPosition());
+            }
+            else
+            {
+                nextCellgridPosition = selectionTilemap.WorldToCell(mousePosition);
+            }
+            nextCellgridPosition = new Vector3Int(nextCellgridPosition.x, nextCellgridPosition.y, 0);
+
+            if (currentMouseCellgridPosition != nextCellgridPosition)
+            {
+                currentMouseCellgridPosition = nextCellgridPosition;
+                selectionTilemap.ClearAllTiles();
+
+                if (!OutOfRange(currentMouseCellgridPosition))
+                {
+                    selectionTilemap.SetTile(nextCellgridPosition, selectionTile);
+                }
             }
         }
     }
@@ -166,7 +176,7 @@ public class BattleManager : MonoBehaviour
         ResetEntitySelected();
         entity.Select();
         currentSelectedEntity = entity;
-        Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(entity.transform);
+        // Manager.Instance.gameManager.SetVirtualCameraFollowTransformTo(entity.transform);
     }
 
     public void ResetEntitySelected()
@@ -183,10 +193,7 @@ public class BattleManager : MonoBehaviour
         enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None).ToList();
         entities = FindObjectsByType<Entity>(FindObjectsSortMode.None).ToList();
         playerPieces = FindObjectsByType<Player>(FindObjectsSortMode.None).ToList();
-        /*foreach (Entity entity in entities)
-        {
-            entity.highlightedTilemap.ClearAllTiles();
-        }*/
+        
         Manager.Instance.uiManager.turnCounter.SetActive(true);
 
         playerTurnStart?.Invoke();
@@ -205,13 +212,13 @@ public class BattleManager : MonoBehaviour
 
         highlightedTilemap.ClearAllTiles();
 
-        if (playerPhase && currentTurnCount >= turnLimit && !gameFinished)
+        if (playerPhase && currentTurnCount >= turnLimit && !gamePaused)
         {
             Manager.Instance.uiManager.ShowGameResultWindow("Stage Failed...");
-            gameFinished = true;
+            gamePaused = true;
         }
 
-        if (playerPhase && !gameFinished)
+        if (playerPhase && !gamePaused)
         {
             playerPhase = false;
             enemyPhase = true;
@@ -220,7 +227,7 @@ public class BattleManager : MonoBehaviour
             await Task.Delay((int)(Manager.Instance.uiManager.phaseInformationUI.GetComponent<PhaseInformationUI>().uiDuration * 1000));
             enemyTurnStart?.Invoke();
         }
-        else if (enemyPhase && !gameFinished)
+        else if (enemyPhase && !gamePaused)
         {
             enemyPhase = false;
             playerPhase = true;
@@ -233,13 +240,13 @@ public class BattleManager : MonoBehaviour
 
     public async void TurnEndButton()
     {
+        if (gamePaused) return;
+
         continueTurn = false;
         highlightedTilemap.ClearAllTiles();
         Manager.Instance.uiManager.endTurnButton.interactable = false;
 
-
-
-        if (playerPhase && !gameFinished)
+        if (playerPhase && !gamePaused)
         {
             playerPhase = false;
             enemyPhase = true;
@@ -248,7 +255,7 @@ public class BattleManager : MonoBehaviour
             await Task.Delay((int)(Manager.Instance.uiManager.phaseInformationUI.GetComponent<PhaseInformationUI>().uiDuration * 1000));
             enemyTurnStart?.Invoke();
         }
-        else if (enemyPhase && !gameFinished)
+        else if (enemyPhase && !gamePaused)
         {
             enemyPhase = false;
             playerPhase = true;
@@ -302,7 +309,7 @@ public class BattleManager : MonoBehaviour
                 yield return new WaitUntil(() => iterateNextEnemy == true);
             }
 
-            if (gameFinished) break;
+            if (gamePaused) break;
         }
         yield return new WaitForSeconds(0.5f);
         
@@ -352,5 +359,17 @@ public class BattleManager : MonoBehaviour
         }
 
         return null;
+    }
+
+    public void PauseGame()
+    {
+        gamePaused = true;
+        Time.timeScale = 0.0f;
+    }
+
+    public void ResumeGame()
+    {
+        gamePaused = false;
+        Time.timeScale = 1.0f;
     }
 }

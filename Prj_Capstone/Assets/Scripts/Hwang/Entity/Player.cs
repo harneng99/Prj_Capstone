@@ -20,35 +20,21 @@ public class Player : Entity, IPointerClickHandler
 
         playerMovement = entityMovement as PlayerMovement;
         playerCombat = entityCombat as PlayerCombat;
+
+        canvas = GetComponentInChildren<Canvas>(true);
     }
 
     protected override void Start()
     {
         base.Start();
 
-        canvas = GetComponentInChildren<Canvas>(true);
-
         if (canvas != null)
         {
-            Button[] promotionButtons = canvas.gameObject.GetComponentsInChildren<Button>();
-
-            // TODO: (PieceType)index in for loop does not seems to work. Why?
-            /*promotionButtons[0].onClick.AddListener(() => entityMovement.ChangePieceType(PieceType.Knight));
-            promotionButtons[0].onClick.AddListener(() => canvas.gameObject.SetActive(false));
-            promotionButtons[1].onClick.AddListener(() => entityMovement.ChangePieceType(PieceType.Bishop));
-            promotionButtons[1].onClick.AddListener(() => canvas.gameObject.SetActive(false));
-            promotionButtons[2].onClick.AddListener(() => entityMovement.ChangePieceType(PieceType.Rook));
-            promotionButtons[2].onClick.AddListener(() => canvas.gameObject.SetActive(false));
-            promotionButtons[3].onClick.AddListener(() => entityMovement.ChangePieceType(PieceType.Queen));
-            promotionButtons[3].onClick.AddListener(() => canvas.gameObject.SetActive(false));*/
-
-            for (int i = 0; i < promotionButtons.Count() - 1; i++)
+            if (facingDirection != 1)
             {
-                promotionButtons[i].onClick.AddListener(() => entityMovement.ChangePieceType((PieceType)(i + 1)));
-                promotionButtons[i].onClick.AddListener(() => canvas.gameObject.SetActive(false));
+                canvas.transform.Rotate(0.0f, 180.0f, 0.0f);
+                canvas.transform.localPosition = new Vector3(-canvas.transform.localPosition.x, canvas.transform.localPosition.y, canvas.transform.localPosition.z);
             }
-
-            promotionButtons.Last().onClick.AddListener(() => canvas.gameObject.SetActive(false));
         }
     }
 
@@ -79,22 +65,12 @@ public class Player : Entity, IPointerClickHandler
         playerMovement.PieceAbility();
     }
 
-    public override int Flip(float? direction = null)
+    protected override void FlipCanvas()
     {
-        base.Flip(direction);
-
         if (canvas != null)
         {
-            if (facingDirection == 1)
-            {
-                canvas.transform.rotation = Quaternion.identity;
-            }
-            else
-            {
-                canvas.transform.rotation = Quaternion.Euler(0.0f, 180.0f, 0.0f);
-            }
+            canvas.transform.Rotate(0.0f, 180.0f, 0.0f);
+            canvas.transform.localPosition = new Vector3(-canvas.transform.localPosition.x, canvas.transform.localPosition.y, canvas.transform.localPosition.z);
         }
-
-        return facingDirection;
     }
 }

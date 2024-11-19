@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 1648637264, guid: 6030b29e290a3e64c9015d37dcbd264b, type: 3}
+    - target: {fileID: 5585337576891793787, guid: 310d520e3f17e634db92698dff749c7b, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7427594103538818094, guid: 310d520e3f17e634db92698dff749c7b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -51,6 +55,22 @@ PrefabInstance:
     - target: {fileID: 7427594103538818094, guid: 310d520e3f17e634db92698dff749c7b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7896869454005543280, guid: 310d520e3f17e634db92698dff749c7b, type: 3}
+      propertyPath: objectLayerTypes
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8068045045590461415, guid: 310d520e3f17e634db92698dff749c7b, type: 3}
+      propertyPath: <attackTypeCount>k__BackingField
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8259054327135383983, guid: 310d520e3f17e634db92698dff749c7b, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8750112189749020037, guid: 310d520e3f17e634db92698dff749c7b, type: 3}
+      propertyPath: <pieceType>k__BackingField
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 9072809322158278900, guid: 310d520e3f17e634db92698dff749c7b, type: 3}
       propertyPath: m_Name

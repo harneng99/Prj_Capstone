@@ -31,7 +31,7 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     public bool isSelected { get; private set; }
     public Tilemap highlightedTilemap { get; private set; }
     public Tilemap interactableTilemap { get; private set; }
-    public int facingDirection { get; private set; }
+    public int facingDirection { get; protected set; }
     public bool isDead { get; set; }
     #endregion
 
@@ -185,22 +185,26 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         }
     }
 
-    public virtual int Flip(float? direction = null)
+    public int Flip(float? direction = null)
     {
-        if (direction.HasValue && direction.Value != 0)
+        if (direction.HasValue)
         {
-            if (facingDirection * direction.Value < 0)
+            if (direction.Value != 0 && facingDirection * direction.Value < 0)
             {
+                FlipCanvas();
                 facingDirection *= -1;
                 transform.Rotate(0.0f, 180.0f, 0.0f);
             }
         }
         else
         {
+            FlipCanvas();
             facingDirection *= -1;
             transform.Rotate(0.0f, 180.0f, 0.0f);
         }
 
         return facingDirection;
     }
+
+    protected virtual void FlipCanvas() { }
 }

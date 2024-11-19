@@ -101,10 +101,12 @@ MonoBehaviour:
   <tileLayerType>k__BackingField: 1
   <tileLevel>k__BackingField: 0
   <moveableTileLayer>k__BackingField: 1
-  <objectTileLayer>k__BackingField: 0
+  <objectTileLayer>k__BackingField: 1
   <interactableTileLayer>k__BackingField: 0
   <entrance>k__BackingField: 0
   <tileInformation>k__BackingField: 
+  destroyedPillarTileBase: {fileID: 0}
+  destroyedSpikeTileBase: {fileID: 0}
 --- !u!95 &3340962890241258153
 Animator:
   serializedVersion: 5

@@ -112,7 +112,6 @@ public abstract class Movement : CoreComponent
     {
         Vector3Int destinationCellgridPosition = gridType.Equals(GridType.Hexgrid) ? pathfinder.HexgridToCellgrid(destinationGridPosition) : destinationGridPosition;
 
-        // if (Manager.Instance.gameManager.EntityExistsAt(destinationCellgridPosition)) return false;
         if (currentCellgridPosition.Equals(destinationCellgridPosition)) return false;
 
         didCurrentEntityMovedThisTurn = true;
@@ -258,8 +257,11 @@ public abstract class Movement : CoreComponent
         #region Sprite Setting
         entity.spriteRenderer.sortingOrder = 1;
 
-        entity.Flip(destinationWorldgridPosition.x - initialWorldgridPosition.x);
-        Vector3 direction = entity.facingDirection * Vector3.right;
+        if (Mathf.Abs(destinationWorldgridPosition.x - initialWorldgridPosition.x) > epsilon)
+        {
+            entity.Flip(destinationWorldgridPosition.x - initialWorldgridPosition.x);
+            Vector3 direction = entity.facingDirection * Vector3.right;
+        }
         #endregion
 
         if (entity.entityCombat.targetEntity == null)
@@ -585,6 +587,10 @@ public abstract class Movement : CoreComponent
     {
         this.pieceType = pieceType;
         entity.animator.SetInteger("PieceType", (int)pieceType);
+        if (pieceType == PieceType.Rook)
+        {
+            pathfinder.ChangeObjectLayerType(ObjectTileLayer.Swamp, false);
+        }
         entity.highlightedTilemap.ClearAllTiles();
 
         if (Manager.Instance.gameManager.didEntityMovedThisTurn)
