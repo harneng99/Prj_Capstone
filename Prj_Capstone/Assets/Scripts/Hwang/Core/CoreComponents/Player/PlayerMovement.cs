@@ -164,6 +164,11 @@ public class PlayerMovement : Movement
                         {
                             DrawMoveableTilemap(false);
                             queenAbilityCellgridPosition = Manager.Instance.playerInputManager.GetMousePosition(GridType.Cellgrid);
+                            Entity targetEntity = Manager.Instance.gameManager.EntityExistsAt(queenAbilityCellgridPosition);
+                            if (targetEntity != null)
+                            {
+                                targetEntity.isDead = true;
+                            }
                             entity.Flip(queenAbilityCellgridPosition.x - currentCellgridPosition.x);
                             entity.animator.SetTrigger("Ability");
                         }
@@ -203,10 +208,37 @@ public class PlayerMovement : Movement
                                         Action teleport = null;
                                         teleport = () =>
                                         {
+                                            Debug.Log("Unidirectional Teleport function called");
                                             MoveToGrid(teleportLabel.cellgridPosition, GridType.Cellgrid, true);
                                             smoothMoveFinished -= teleport;
                                         };
                                         smoothMoveFinished += teleport;
+
+                                        if (pieceType == PieceType.Queen)
+                                        {
+                                            invokePieceAbility = DrawQueenAbilityArea(false, teleportLabel.cellgridPosition);
+                                        }
+                                        else if (pieceType == PieceType.Bishop)
+                                        {
+                                            invokePieceAbility = false;
+
+                                            for (int x = -1; x <= 1; x++)
+                                            {
+                                                for (int y = -1; y <= 1; y++)
+                                                {
+                                                    if (x == 0 && y == 0) continue;
+
+                                                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(teleportLabel.cellgridPosition + new Vector3Int(x, y, 0), true, typeof(Enemy));
+                                                    TileBase objectTileBase = pathfinder.objectTilemap.GetTile(teleportLabel.cellgridPosition + new Vector3Int(x, y, 0));
+
+                                                    if (entity != null || objectTileBase != null)
+                                                    {
+                                                        invokePieceAbility = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
                                         break;
                                     }
                                 }
@@ -225,10 +257,37 @@ public class PlayerMovement : Movement
                                         Action teleport = null;
                                         teleport = () =>
                                         {
+                                            Debug.Log("Bidirectional Teleport function called");
                                             MoveToGrid(teleportLabel.cellgridPosition, GridType.Cellgrid, true);
                                             smoothMoveFinished -= teleport;
                                         };
                                         smoothMoveFinished += teleport;
+
+                                        if (pieceType == PieceType.Queen)
+                                        {
+                                            invokePieceAbility = DrawQueenAbilityArea(false, teleportLabel.cellgridPosition);
+                                        }
+                                        else if (pieceType == PieceType.Bishop)
+                                        {
+                                            invokePieceAbility = false;
+
+                                            for (int x = -1; x <= 1; x++)
+                                            {
+                                                for (int y = -1; y <= 1; y++)
+                                                {
+                                                    if (x == 0 && y == 0) continue;
+
+                                                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(teleportLabel.cellgridPosition + new Vector3Int(x, y, 0), true, typeof(Enemy));
+                                                    TileBase objectTileBase = pathfinder.objectTilemap.GetTile(teleportLabel.cellgridPosition + new Vector3Int(x, y, 0));
+
+                                                    if (entity != null || objectTileBase != null)
+                                                    {
+                                                        invokePieceAbility = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
                                         break;
                                     }
                                 }
@@ -595,7 +654,7 @@ public class PlayerMovement : Movement
         }
         else if (pieceType == PieceType.Queen)
         {
-            Entity entity = Manager.Instance.gameManager.EntityExistsAt(queenAbilityCellgridPosition, true, typeof(Enemy));
+            Entity entity = Manager.Instance.gameManager.EntityExistsAt(queenAbilityCellgridPosition, false, typeof(Enemy));
             CustomTileData customTileData = pathfinder.objectTilemap.GetInstantiatedObject(queenAbilityCellgridPosition)?.GetComponent<CustomTileData>();
 
             if (entity != null || customTileData != null)
