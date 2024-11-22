@@ -4,15 +4,23 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Enemy
+  - MoveableTilemap
+  - ObjectTilemap
+  - HighlightedTilemap
+  - InteractableTilemap
+  - MainCanvas
+  - SelectionTilemap
+  - AOETilemap
+  - FogTilemap
+  - ForegroundDecorationTilemap
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
-  - 
+  - Enemy
   - 
   - 
   - 
@@ -42,12 +50,21 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Tile
+  - name: Background
     uniqueID: 4294297219
+    locked: 0
+  - name: Interactable
+    uniqueID: 1071416589
     locked: 0
   - name: Object
     uniqueID: 935062579
     locked: 0
   - name: Character
     uniqueID: 525957867
+    locked: 0
+  - name: Selection
+    uniqueID: 1116240881
+    locked: 0
+  - name: Foreground
+    uniqueID: 3276123115
     locked: 0
