@@ -299,6 +299,7 @@ public abstract class Movement : CoreComponent
             }
         }
 
+        entity.animator.SetBool("Move", true);
         while (Vector3.Distance(entity.transform.position, destinationWorldgridPosition) > epsilon)
         {
             entity.transform.position = Vector3.MoveTowards(entity.transform.position, destinationWorldgridPosition, entity.entityConsistentData.movementVelocity * Time.deltaTime);
@@ -600,9 +601,10 @@ public abstract class Movement : CoreComponent
         }
     }
 
-    protected bool CheckMovementCondition(PieceType pieceType, Vector3Int cellgridPosition)
+    protected virtual bool CheckMovementCondition(PieceType pieceType, Vector3Int cellgridPosition)
     {
-        if (pieceType == PieceType.Pawn)
+        return pathfinder.IsMoveable(cellgridPosition) && !pathfinder.IsObstacle(cellgridPosition);
+        /*if (pieceType == PieceType.Pawn)
         {
             return !pathfinder.objectTilemap.HasTile(cellgridPosition);
         }
@@ -629,7 +631,7 @@ public abstract class Movement : CoreComponent
             return !pathfinder.objectTilemap.HasTile(cellgridPosition);
         }
 
-        return false;
+        return false;*/
     }
 
     public abstract void ResetEntityBooleanVariables();

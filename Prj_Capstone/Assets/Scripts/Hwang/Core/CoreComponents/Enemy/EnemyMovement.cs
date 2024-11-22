@@ -15,22 +15,6 @@ public class EnemyMovement : Movement
         smoothMoveFinished += AttackPiece;
     }
 
-    protected override void OnPointerClick(PointerEventData eventData)
-    {
-        base.OnPointerClick(eventData);
-
-        if (eventData.button.Equals(PointerEventData.InputButton.Left))
-        {
-            if (Manager.Instance.gameManager.battlePhase && Manager.Instance.gameManager.playerPhase)
-            {
-                if (Manager.Instance.gameManager.prevSelectedEntity != null && Manager.Instance.gameManager.prevSelectedEntity.GetType().Equals(typeof(Player)) && InAttackRange((Player)Manager.Instance.gameManager.prevSelectedEntity))
-                {
-                    DrawMoveableTilemap(false);
-                }
-            }
-        }
-    }
-
     public bool CheckAttackArea()
     {
         bool foundTarget = false;
@@ -386,5 +370,17 @@ public class EnemyMovement : Movement
     public override void ResetEntityBooleanVariables()
     {
         didCurrentEntityMovedThisTurn = false;
+    }
+
+    protected override bool CheckMovementCondition(PieceType pieceType, Vector3Int cellgridPosition)
+    {
+        if (Manager.Instance.gameManager.EntityExistsAt(cellgridPosition, true, typeof(Enemy)))
+        {
+            return false;
+        }
+        else
+        {
+            return base.CheckMovementCondition(pieceType, cellgridPosition);
+        }
     }
 }

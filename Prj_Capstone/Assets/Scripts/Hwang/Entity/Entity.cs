@@ -61,13 +61,15 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         if (eventData.button.Equals(PointerEventData.InputButton.Left))
         {
-            if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
+            /*if (!Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection)
             {
                 Manager.Instance.gameManager.Select(this);
                 ShowInformation();
-            }
+            }*/
+            Manager.Instance.gameManager.Select(this);
+            ShowInformation();
             onPointerClick?.Invoke(eventData);
-            Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection = Manager.Instance.gameManager.isAiming;
+            // Manager.Instance.gameManager.isAimingCopyForFunctionExecutionOrderCorrection = Manager.Instance.gameManager.isAiming;
         }
     }
 
