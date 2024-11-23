@@ -60,10 +60,7 @@ public class StageSelector : MonoBehaviour
         // 활성화된 스테이지라면 해당 씬으로 이동
         if (stage <= stageActivated)
         {
-            if(stage == 5)
-                SceneManager.LoadScene("Puzzle");
-            else
-                SceneManager.LoadScene("Stage " + stage.ToString());
+            SceneManager.LoadScene("Stage " + stage.ToString());
         }
     }
 }

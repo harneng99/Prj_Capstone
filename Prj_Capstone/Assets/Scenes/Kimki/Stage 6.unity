@@ -4469,7 +4469,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 152731e360d281942823444de46fc9a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  current_stage: 4
+  current_stage: 6
 --- !u!1 &615703426
 GameObject:
   m_ObjectHideFlags: 0
