@@ -16,6 +16,7 @@ public class PlayerMovement : Movement
 
     private Player player;
     private int knightConsecutiveMovesCount;
+    private bool dontInteractWithTile;
     private Vector3Int queenAbilityCellgridPosition;
 
     protected override void Awake()
@@ -162,6 +163,7 @@ public class PlayerMovement : Movement
                         }
                         else if (highlightedTile.Equals(queenAbilityTileBase))
                         {
+                            dontInteractWithTile = true;
                             DrawMoveableTilemap(false);
                             queenAbilityCellgridPosition = Manager.Instance.playerInputManager.GetMousePosition(GridType.Cellgrid);
                             Entity targetEntity = Manager.Instance.gameManager.EntityExistsAt(queenAbilityCellgridPosition);
@@ -185,7 +187,7 @@ public class PlayerMovement : Movement
                         GameObject interactableTileGameObject = entity.interactableTilemap.GetInstantiatedObject(destinationCellgridPosition);
                         CustomTileData customTileData = interactableTileGameObject?.GetComponent<CustomTileData>();
 
-                        if (interactableTile != null)
+                        if (interactableTile != null && !dontInteractWithTile)
                         {
                             if (customTileData.interactableTileLayer == InteractableTileLayer.Promotion)
                             {
@@ -203,7 +205,7 @@ public class PlayerMovement : Movement
                                 {
                                     CustomTileData currentCustomTileData = entity.interactableTilemap.GetInstantiatedObject(teleportLabel.cellgridPosition).GetComponent<CustomTileData>();
 
-                                    if (currentCustomTileData.interactableTileLayer == InteractableTileLayer.UnidirectionalTeleport && !currentCustomTileData.entrance && teleportLabel.teleportLabel == teleportEntranceLabel && !Manager.Instance.gameManager.EntityExistsAt(teleportLabel.cellgridPosition, true))
+                                    if (currentCustomTileData.interactableTileLayer == InteractableTileLayer.UnidirectionalTeleport && !currentCustomTileData.entrance && teleportLabel.teleportLabel == teleportEntranceLabel && !Manager.Instance.gameManager.EntityExistsAt(teleportLabel.cellgridPosition, true) && !(pieceType == PieceType.Queen && invokePieceAbility))
                                     {
                                         Action teleport = null;
                                         teleport = () =>
@@ -615,6 +617,7 @@ public class PlayerMovement : Movement
         knightConsecutiveMovesCount = 0;
         didCurrentEntityMovedThisTurn = false;
         invokePieceAbility = false;
+        dontInteractWithTile = false;
     }
 
     public void PieceAbility()

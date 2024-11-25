@@ -339,7 +339,7 @@ public abstract class Movement : CoreComponent
                     {
                         if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) continue;
 
-                        Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+                        Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, onlyFindActive: true);
 
                         if (entity != null && !entity.isDead)
                         {
@@ -365,7 +365,7 @@ public abstract class Movement : CoreComponent
                     {
                         if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) continue;
 
-                        Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+                        Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, onlyFindActive: true);
 
                         if (entity != null && !entity.isDead)
                         {
@@ -395,7 +395,7 @@ public abstract class Movement : CoreComponent
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) continue;
 
-                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, onlyFindActive: true);
 
                     if (entity != null && !entity.isDead)
                     {
@@ -426,7 +426,7 @@ public abstract class Movement : CoreComponent
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, onlyFindActive: true);
 
                     if (entity != null && !entity.isDead)
                     {
@@ -454,7 +454,7 @@ public abstract class Movement : CoreComponent
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, onlyFindActive: true);
 
                     if (entity != null && !entity.isDead)
                     {
@@ -483,7 +483,7 @@ public abstract class Movement : CoreComponent
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, onlyFindActive: true);
 
                     if (entity != null && !entity.isDead)
                     {
@@ -511,7 +511,7 @@ public abstract class Movement : CoreComponent
                 {
                     if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+                    Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, onlyFindActive: true);
 
                     if (entity != null && !entity.isDead)
                     {
@@ -547,7 +547,7 @@ public abstract class Movement : CoreComponent
                     {
                         if (!CheckMovementCondition(pieceType, moveableCellgridPosition)) break;
 
-                        Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true);
+                        Entity entity = Manager.Instance.gameManager.EntityExistsAt(moveableCellgridPosition, true, onlyFindActive: true);
 
                         if (entity != null && !entity.isDead)
                         {

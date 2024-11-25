@@ -340,10 +340,13 @@ public class EnemyMovement : Movement
             }
         }
 
-        if (Manager.Instance.gameManager.enemyPhase && availablePiece < Manager.Instance.gameManager.howManyShouldBeInTheGoal && !Manager.Instance.gameManager.gamePaused)
+        if (Manager.Instance.gameManager.enemyPhase && !Manager.Instance.gameManager.gamePaused)
         {
-            Manager.Instance.uiManager.ShowGameResultWindow("Stage Failed...");
-            Manager.Instance.gameManager.PauseGame();
+            if ((!Manager.Instance.gameManager.shouldKillAllEnemies && availablePiece < Manager.Instance.gameManager.howManyShouldBeInTheGoal) || (Manager.Instance.gameManager.shouldKillAllEnemies && availablePiece <= 0))
+            {
+                Manager.Instance.uiManager.ShowGameResultWindow("Stage Failed...");
+                Manager.Instance.gameManager.PauseGame();
+            }
         }
 
         Manager.Instance.gameManager.iterateNextEnemy = true;

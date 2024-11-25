@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     [field: SerializeField] public Transform virtualCameraFollowTransform { get; private set; }
     [field: SerializeField] public int howManyShouldBeInTheGoal { get; private set; }
     [field: SerializeField] public int turnLimit { get; private set; }
+    [field: SerializeField] public bool shouldKillAllEnemies { get; private set; }
     public int howManyCurrentInGoal { get; set; }
     public Entity prevSelectedEntity { get; private set; }
     public Entity currentSelectedEntity { get; private set; }
@@ -208,6 +209,24 @@ public class GameManager : MonoBehaviour
 
     public async void TurnEnd()
     {
+        if (playerPhase && currentTurnCount < turnLimit && shouldKillAllEnemies && !gamePaused)
+        {
+            bool gameClear = true;
+
+            foreach (Enemy enemy in enemies)
+            {
+                if (enemy.gameObject.activeSelf || !enemy.isDead)
+                {
+                    gameClear = false;
+                }
+            }
+
+            if (gameClear)
+            {
+                Manager.Instance.uiManager.ShowGameResultWindow("Stage Clear!");
+            }
+        }
+
         if (continueTurn) return;
 
         highlightedTilemap.ClearAllTiles();
@@ -215,7 +234,6 @@ public class GameManager : MonoBehaviour
         if (playerPhase && currentTurnCount >= turnLimit && !gamePaused)
         {
             Manager.Instance.uiManager.ShowGameResultWindow("Stage Failed...");
-            gamePaused = true;
         }
 
         if (playerPhase && !gamePaused)
@@ -333,11 +351,21 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public Entity EntityExistsAt(Vector3Int cellgridPosition, bool onlyFindActive = false, Type entityType = null)
+    public Entity EntityExistsAt(Vector3Int cellgridPosition, bool onlyFindAlive = false, Type entityType = null, bool onlyFindActive = false)
     {
+        if (cellgridPosition == new Vector3Int(-2, -4, 0))
+        {
+            Debug.Log("Debug Start");
+        }
+
         foreach (Entity entity in entities)
         {
-            if (onlyFindActive && entity.isDead)
+            if (onlyFindAlive && entity.isDead)
+            {
+                continue;
+            }
+
+            if (onlyFindActive && !entity.gameObject.activeSelf)
             {
                 continue;
             }
