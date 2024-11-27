@@ -9,6 +9,7 @@ public class Manager : MonoBehaviour
     public UIManager uiManager { get; private set; }
     public ObjectPoolingManager objectPoolingManager { get; private set; }
     public PlayerInputManager playerInputManager { get; private set; }
+    public SoundFXManager soundFXManager { get; private set; }
 
     private void Awake()
     {
@@ -18,5 +19,6 @@ public class Manager : MonoBehaviour
         objectPoolingManager = GetComponentInChildren<ObjectPoolingManager>(); 
         uiManager = GetComponentInChildren<UIManager>();
         playerInputManager = GetComponentInChildren<PlayerInputManager>();
+        soundFXManager = GetComponentInChildren<SoundFXManager>();
     }
 }

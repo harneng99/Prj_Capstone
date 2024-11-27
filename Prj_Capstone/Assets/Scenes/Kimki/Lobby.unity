@@ -10506,6 +10506,7 @@ MonoBehaviour:
   <virtualCameraFollowTransform>k__BackingField: {fileID: 156756943}
   <howManyShouldBeInTheGoal>k__BackingField: 1
   <turnLimit>k__BackingField: 999
+  <shouldKillAllEnemies>k__BackingField: 0
   <selectionTile>k__BackingField: {fileID: 11400000, guid: 061f0e249e11cda4dad6a8e852d8c430, type: 2}
 --- !u!1 &1650193178
 GameObject:
@@ -11705,6 +11706,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1713111619}
   m_CullTransparentMesh: 1
+--- !u!1 &1723739584
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1723739585}
+  - component: {fileID: 1723739586}
+  m_Layer: 0
+  m_Name: SoundFX Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1723739585
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1723739584}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1813632257}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1723739586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1723739584}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7649ca161a19eb54080248d689543740, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioMixer: {fileID: 24100000, guid: 0382db7a1d754034a9cce1ee07ff3bf9, type: 2}
+  soundFXObject: {fileID: 3059495059339844846, guid: 355961349cc27814da091505ce76eb9a, type: 3}
 --- !u!1 &1765275225
 GameObject:
   m_ObjectHideFlags: 0
@@ -12070,6 +12117,7 @@ Transform:
   - {fileID: 706248340}
   - {fileID: 1819637987}
   - {fileID: 597335297}
+  - {fileID: 1723739585}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1813632258
