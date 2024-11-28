@@ -191,6 +191,7 @@ public class GameManager : MonoBehaviour
 
     public void StartBattlePhase()
     {
+        Time.timeScale = 1.0f;
         enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None).ToList();
         entities = FindObjectsByType<Entity>(FindObjectsSortMode.None).ToList();
         playerPieces = FindObjectsByType<Player>(FindObjectsSortMode.None).ToList();

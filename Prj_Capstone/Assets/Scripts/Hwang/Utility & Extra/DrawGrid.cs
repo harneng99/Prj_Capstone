@@ -61,7 +61,7 @@ public class DrawGrid : MonoBehaviour
             Gizmos.DrawLine(worldgridBottomRightPosition, worldgridTopRightPosition);
             Gizmos.DrawLine(worldgridTopRightPosition, worldgridTopLeftPosition);
 
-            Handles.Label(worldgridTopLeftPosition + horizontalOffset - verticalOffset, new Vector2Int(cellgridPosition.x, cellgridPosition.y).ToString());
+            //Handles.Label(worldgridTopLeftPosition + horizontalOffset - verticalOffset, new Vector2Int(cellgridPosition.x, cellgridPosition.y).ToString());
         }
     }
 }

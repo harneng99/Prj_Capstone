@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Kimki/stage_select.unity
+    guid: ffe49d3c7497d634aa52cf8d7ceadad6
+  - enabled: 1
     path: Assets/Scenes/Kimki/Stage 1.unity
     guid: c003d3175f805644688e478ca8aea637
   - enabled: 1
@@ -40,17 +43,14 @@ EditorBuildSettings:
     guid: 740fd77cf911beb4296e7c45ced0f2e2
   - enabled: 1
     path: Assets/Scenes/Kimki/Stage 12.unity
-    guid: ee33a6749efe95b44bc1af51aa24de9d
+    guid: fe2fa2b9df74ced40866d9e7b40c76e7
   - enabled: 1
     path: Assets/Scenes/Kimki/Stage 13.unity
     guid: bdc9d66b6e3f5324fbacf41e1f4e9315
   - enabled: 1
     path: Assets/Scenes/Kimki/Stage 14.unity
-    guid: 64763bc2fb81bc644a8ae706d6148aa1
+    guid: ba4b700c65afe2c4ebef3270714fbc93
   - enabled: 1
     path: Assets/Scenes/Kimki/Stage 15.unity
     guid: adfe03f2e93aa4341bdbbbffd0b2d670
-  - enabled: 1
-    path: Assets/Scenes/Kimki/stage_select.unity
-    guid: ffe49d3c7497d634aa52cf8d7ceadad6
   m_configObjects: {}
