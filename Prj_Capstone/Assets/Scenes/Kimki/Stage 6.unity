@@ -9836,7 +9836,8 @@ MonoBehaviour:
   <virtualCamera>k__BackingField: {fileID: 1572526664}
   <virtualCameraFollowTransform>k__BackingField: {fileID: 156756943}
   <howManyShouldBeInTheGoal>k__BackingField: 1
-  <turnLimit>k__BackingField: 999
+  <turnLimit>k__BackingField: 5
+  <shouldKillAllEnemies>k__BackingField: 0
   <selectionTile>k__BackingField: {fileID: 11400000, guid: 061f0e249e11cda4dad6a8e852d8c430, type: 2}
 --- !u!1001 &1595841539
 PrefabInstance:
@@ -12526,6 +12527,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1936365060}
   m_CullTransparentMesh: 1
+--- !u!1001 &1944439302
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7526923472060698508, guid: c394dec407b6a46489f61632aff6c73b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7526923472060698508, guid: c394dec407b6a46489f61632aff6c73b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7526923472060698508, guid: c394dec407b6a46489f61632aff6c73b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7526923472060698508, guid: c394dec407b6a46489f61632aff6c73b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7526923472060698508, guid: c394dec407b6a46489f61632aff6c73b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7526923472060698508, guid: c394dec407b6a46489f61632aff6c73b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7526923472060698508, guid: c394dec407b6a46489f61632aff6c73b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7526923472060698508, guid: c394dec407b6a46489f61632aff6c73b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7526923472060698508, guid: c394dec407b6a46489f61632aff6c73b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7526923472060698508, guid: c394dec407b6a46489f61632aff6c73b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8252851253895568214, guid: c394dec407b6a46489f61632aff6c73b, type: 3}
+      propertyPath: m_Name
+      value: PlayerQueen
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c394dec407b6a46489f61632aff6c73b, type: 3}
 --- !u!1001 &1950278749
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13348,3 +13406,4 @@ SceneRoots:
   - {fileID: 1435492651}
   - {fileID: 1157111875}
   - {fileID: 1276841283}
+  - {fileID: 1944439302}

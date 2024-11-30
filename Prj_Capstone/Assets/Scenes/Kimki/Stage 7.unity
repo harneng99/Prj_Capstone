@@ -9436,7 +9436,8 @@ MonoBehaviour:
   <virtualCamera>k__BackingField: {fileID: 1572526664}
   <virtualCameraFollowTransform>k__BackingField: {fileID: 156756943}
   <howManyShouldBeInTheGoal>k__BackingField: 1
-  <turnLimit>k__BackingField: 999
+  <turnLimit>k__BackingField: 3
+  <shouldKillAllEnemies>k__BackingField: 1
   <selectionTile>k__BackingField: {fileID: 11400000, guid: 061f0e249e11cda4dad6a8e852d8c430, type: 2}
 --- !u!1 &1650193178
 GameObject:
