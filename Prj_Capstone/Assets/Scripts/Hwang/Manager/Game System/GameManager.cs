@@ -224,6 +224,7 @@ public class GameManager : MonoBehaviour
 
             if (gameClear)
             {
+                PlayerPrefs.SetInt("stageclear", 1);
                 Manager.Instance.uiManager.ShowGameResultWindow("Stage Clear!");
             }
         }
@@ -234,6 +235,7 @@ public class GameManager : MonoBehaviour
 
         if (playerPhase && currentTurnCount >= turnLimit && !gamePaused)
         {
+            PlayerPrefs.SetInt("stageclear", 0);
             Manager.Instance.uiManager.ShowGameResultWindow("Stage Failed...");
         }
 
