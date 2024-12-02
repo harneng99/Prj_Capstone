@@ -344,6 +344,7 @@ public class EnemyMovement : Movement
         {
             if ((!Manager.Instance.gameManager.shouldKillAllEnemies && availablePiece < Manager.Instance.gameManager.howManyShouldBeInTheGoal) || (Manager.Instance.gameManager.shouldKillAllEnemies && availablePiece <= 0))
             {
+                PlayerPrefs.SetInt("stageclear", 0);
                 Manager.Instance.uiManager.ShowGameResultWindow("Stage Failed...");
                 Manager.Instance.gameManager.PauseGame();
             }

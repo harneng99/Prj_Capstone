@@ -52,6 +52,7 @@ public class GameManager : MonoBehaviour
     public bool iterateNextEnemy { get; set; }
     public bool continueTurn { get; set; }
 
+
     private void Awake()
     {
         moveableTilemap = GameObject.FindWithTag("MoveableTilemap").GetComponent<Tilemap>();

@@ -306,6 +306,7 @@ public class PlayerMovement : Movement
 
                                     if (Manager.Instance.gameManager.howManyCurrentInGoal >= Manager.Instance.gameManager.howManyShouldBeInTheGoal)
                                     {
+                                        PlayerPrefs.SetInt("stageclear", 1);
                                         Manager.Instance.gameManager.PauseGame();
                                         Manager.Instance.uiManager.ShowGameResultWindow("Game Clear!");
                                     }
