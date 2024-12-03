@@ -51,13 +51,11 @@ public class HelpWindow : MonoBehaviour
         // 모든 페이지 비활성화
         foreach (GameObject page in helpPages)
         {
-            Debug.Log("1111");
             page.SetActive(false);
         }
 
         if (isHelpVisible)
         {
-            Debug.Log("2222");
             // 현재 페이지 활성화
             helpPages[currentPage - 1].SetActive(true);
 
