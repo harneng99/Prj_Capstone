@@ -2495,6 +2495,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1189870823}
     - target: {fileID: 7395499222833475010, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
+      propertyPath: <settingsWindow>k__BackingField
+      value: 
+      objectReference: {fileID: 1842986187}
+    - target: {fileID: 7395499222833475010, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
       propertyPath: <gamePauseButton>k__BackingField
       value: 
       objectReference: {fileID: 336040350}
@@ -4985,9 +4989,15 @@ PrefabInstance:
       addedObject: {fileID: 25254123}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 39c02ac92b506ea41b8799be323fc3c3, type: 3}
+<<<<<<< Updated upstream
 --- !u!224 &1842986187 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4131387012445211765, guid: 39c02ac92b506ea41b8799be323fc3c3, type: 3}
+=======
+--- !u!1 &1842986187 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1073396235356225449, guid: 39c02ac92b506ea41b8799be323fc3c3, type: 3}
+>>>>>>> Stashed changes
   m_PrefabInstance: {fileID: 1842986186}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1886668467

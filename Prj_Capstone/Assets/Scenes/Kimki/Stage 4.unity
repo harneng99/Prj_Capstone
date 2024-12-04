@@ -4998,6 +4998,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1660895937}
     - target: {fileID: 7395499222833475010, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
+      propertyPath: <settingsWindow>k__BackingField
+      value: 
+      objectReference: {fileID: 2015457207}
+    - target: {fileID: 7395499222833475010, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
       propertyPath: <gamePauseButton>k__BackingField
       value: 
       objectReference: {fileID: 1660895940}
@@ -5034,6 +5038,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
+--- !u!1 &2015457207 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1073396235356225449, guid: 39c02ac92b506ea41b8799be323fc3c3, type: 3}
+  m_PrefabInstance: {fileID: 1660895936}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2105421142
 GameObject:
   m_ObjectHideFlags: 0
