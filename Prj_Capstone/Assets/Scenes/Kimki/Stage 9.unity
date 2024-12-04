@@ -3614,6 +3614,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1607794984}
     - target: {fileID: 7395499222833475010, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
+      propertyPath: <settingsWindow>k__BackingField
+      value: 
+      objectReference: {fileID: 1829390796}
+    - target: {fileID: 7395499222833475010, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
       propertyPath: <gamePauseButton>k__BackingField
       value: 
       objectReference: {fileID: 1607794987}
@@ -5192,6 +5196,7 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+<<<<<<< Updated upstream
 --- !u!1 &1784521429
 GameObject:
   m_ObjectHideFlags: 0
@@ -5312,6 +5317,13 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1784521429}
   m_CullTransparentMesh: 1
+=======
+--- !u!1 &1829390796 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1073396235356225449, guid: 39c02ac92b506ea41b8799be323fc3c3, type: 3}
+  m_PrefabInstance: {fileID: 1607794983}
+  m_PrefabAsset: {fileID: 0}
+>>>>>>> Stashed changes
 --- !u!1001 &1829898814
 PrefabInstance:
   m_ObjectHideFlags: 0
