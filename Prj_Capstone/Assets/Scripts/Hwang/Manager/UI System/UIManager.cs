@@ -2,12 +2,10 @@ using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Windows;
 
 public class UIManager : MonoBehaviour
 {
@@ -19,7 +17,6 @@ public class UIManager : MonoBehaviour
     [field: Header("Pause Window")]
     [field: SerializeField] public GameObject gameResultWindow { get; private set; }
     [field: SerializeField] public GameObject gamePauseWindow { get; private set; }
-    [field: SerializeField] public GameObject settingsWindow { get; private set; }
     [field: SerializeField] public Button gamePauseButton { get; private set; }
 
 
@@ -27,11 +24,6 @@ public class UIManager : MonoBehaviour
     [field: SerializeField] public GameObject warningUI { get; private set; }
     [field: SerializeField] public GameObject phaseInformationUI { get; private set; }
     [field: SerializeField] public Button endTurnButton { get; private set; }
-
-    private Resolution[] resolutions;
-    private List<Resolution> filteredResolutions;
-    private RefreshRate currentRefreshRate;
-    private int currentResolutionIndex;
 
     private void Awake()
     {
@@ -51,12 +43,9 @@ public class UIManager : MonoBehaviour
                     button.onClick.AddListener(Manager.Instance.gameManager.RestartGame);
                     break;
                 case "Settings":
-                    button.onClick.AddListener(Manager.Instance.uiManager.ToggleGamePauseWindow);
-                    button.onClick.AddListener(Manager.Instance.uiManager.ToggleSettingsWindow);
+                    // TODO: fill in the function or add manualy in the inspector
                     break;
-                default:
-                    Debug.LogWarning($"Unknown button name \"{button.name}\" detected in Game Pause Window.");
-                    break;
+                default: break;
             }
         }
 
@@ -72,71 +61,9 @@ public class UIManager : MonoBehaviour
                 case "Restart":
                     button.onClick.AddListener(Manager.Instance.gameManager.RestartGame);
                     break;
-                default:
-                    Debug.LogWarning($"Unknown button name \"{button.name}\" detected in Game Result Window.");
-                    break;
+                default: break;
             }
         }
-
-        Slider[] settingsWindowSliders = settingsWindow.GetComponentsInChildren<Slider>();
-        foreach (Slider slider in settingsWindowSliders)
-        {
-            switch (slider.name)
-            {
-                case "Master Volume":
-                    slider.onValueChanged.AddListener(Manager.Instance.soundFXManager.SetMasterVolume);
-                    break;
-                case "BGM Volume":
-                    slider.onValueChanged.AddListener(Manager.Instance.soundFXManager.SetBGMVolume);
-                    break;
-                case "SFX Volume":
-                    slider.onValueChanged.AddListener(Manager.Instance.soundFXManager.SetSoundFXVolume);
-                    break;
-                default:
-                    Debug.LogWarning($"Unknown slider name \"{slider.name}\" detected in Game Settings Window.");
-                    break;
-            }
-        }
-        settingsWindow.GetComponentInChildren<Button>().onClick.AddListener(Manager.Instance.uiManager.ToggleSettingsWindow);
-        settingsWindow.GetComponentInChildren<Button>().onClick.AddListener(Manager.Instance.uiManager.ToggleGamePauseWindow);
-        TMP_Dropdown settingsWindowDropdown = settingsWindow.GetComponentInChildren<TMP_Dropdown>();
-
-        settingsWindowDropdown.ClearOptions();
-        
-        resolutions = Screen.resolutions;
-        filteredResolutions = new List<Resolution>();
-        currentRefreshRate = Screen.currentResolution.refreshRateRatio;
-
-        foreach (Resolution resolution in resolutions)
-        {
-            if (resolution.refreshRateRatio.Equals(currentRefreshRate))
-            {
-                filteredResolutions.Add(resolution);
-            }
-        }
-
-        List<string> options = new List<string>();
-        for (int i = 0; i < filteredResolutions.Count; i++)
-        {
-            string resolutionOption = filteredResolutions[i].width + "¡¿" + filteredResolutions[i].height;
-            options.Add(resolutionOption);
-
-            if (filteredResolutions[i].width == Screen.width && filteredResolutions[i].height == Screen.height)
-            {
-                currentResolutionIndex = i;
-            }
-        }
-
-        settingsWindowDropdown.AddOptions(options);
-        settingsWindowDropdown.value = currentResolutionIndex;
-        settingsWindowDropdown.RefreshShownValue();
-
-        settingsWindowDropdown.onValueChanged.AddListener((index) =>
-        {
-            Resolution selectedResolution = filteredResolutions[index];
-            Manager.Instance.gameManager.SetResolution(selectedResolution.width, selectedResolution.height);
-            Debug.Log($"Resolution set to {selectedResolution.width} ¡¿ {selectedResolution.height}");
-        });
 
         endTurnButton.onClick.AddListener(Manager.Instance.gameManager.TurnEndButton);
     }
@@ -209,15 +136,6 @@ public class UIManager : MonoBehaviour
         {
             gamePauseWindow.SetActive(!gamePauseWindow.activeSelf);
             gamePauseButton.interactable = !gamePauseWindow.activeSelf;
-        }
-    }
-
-    public void ToggleSettingsWindow()
-    {
-        if (!gameResultWindow.activeSelf)
-        {
-            settingsWindow.SetActive(!settingsWindow.activeSelf);
-            gamePauseButton.interactable = false;
         }
     }
 
