@@ -303,6 +303,7 @@ public class PlayerMovement : Movement
                                 {
                                     entity.gameObject.SetActive(false);
                                     Manager.Instance.gameManager.howManyCurrentInGoal += 1;
+                                    Manager.Instance.uiManager.SetGoalCounter(true, "Goal " + Manager.Instance.gameManager.howManyCurrentInGoal + " / " + Manager.Instance.gameManager.howManyShouldBeInTheGoal);
 
                                     if (Manager.Instance.gameManager.howManyCurrentInGoal >= Manager.Instance.gameManager.howManyShouldBeInTheGoal)
                                     {

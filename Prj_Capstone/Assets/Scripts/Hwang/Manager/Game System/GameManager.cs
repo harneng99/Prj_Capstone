@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 
@@ -83,7 +84,6 @@ public class GameManager : MonoBehaviour
             }
         };
 
-        playerTurnEnd += Manager.Instance.uiManager.HideInformationUI;
         playerTurnEnd += Manager.Instance.uiManager.ShowPhaseInformationUI;
 
         enemyTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(Enemy)); };
@@ -111,8 +111,6 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        Manager.Instance.playerInputManager.controls.Map.MouseLeftClick.performed += _ => MouseLeftClick();
-
         StartBattlePhase();
     }
 
@@ -147,31 +145,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void MouseLeftClick()
-    {
-        if (battlePhase)
-        {
-            Ray ray = Manager.Instance.gameManager.mainCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit rayHit;
-
-            if (Physics.Raycast(ray, out rayHit))
-            {
-                if (rayHit.collider.gameObject.GetComponent<CustomTileData>() != null)
-                {
-                    if (currentSelectedEntity == null)
-                    {
-                        Manager.Instance.uiManager.SetInformationUI(null, null, currentMouseCellgridPosition);
-                    }
-                    else
-                    {
-                        Manager.Instance.uiManager.SetTileData(currentMouseCellgridPosition);
-                    }
-                    Manager.Instance.uiManager.ShowInformationUI();
-                }
-            }
-        }
-    }
-
     public void Select(Entity entity)
     {
         prevSelectedEntity = currentSelectedEntity;
@@ -198,6 +171,14 @@ public class GameManager : MonoBehaviour
         playerPieces = FindObjectsByType<Player>(FindObjectsSortMode.None).ToList();
         
         Manager.Instance.uiManager.turnCounter.SetActive(true);
+        if (shouldKillAllEnemies)
+        {
+            Manager.Instance.uiManager.enemyCounter.SetActive(true);
+        }
+        else
+        {
+            Manager.Instance.uiManager.SetGoalCounter(true, "Goal " + howManyCurrentInGoal + " / " + howManyShouldBeInTheGoal);
+        }
 
         playerTurnStart?.Invoke();
         ResetEntitySelected();
@@ -206,7 +187,6 @@ public class GameManager : MonoBehaviour
         playerPhase = true;
         enemyPhase = false;
         Manager.Instance.uiManager.ShowPhaseInformationUI();
-        Manager.Instance.uiManager.HideSideInformationUI();
     }
 
     public async void TurnEnd()
@@ -403,5 +383,10 @@ public class GameManager : MonoBehaviour
     {
         gamePaused = false;
         Time.timeScale = 1.0f;
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

@@ -82,11 +82,9 @@ public class PlayerInputManager : MonoBehaviour
     {
         if (Manager.Instance.gameManager.pieceDeploymentPhase)
         {
-            if (Manager.Instance.uiManager.mercenarySlotWindow.CanProceedToBattlePhase())
-            {
-                controls.Disable();
-                preventInputTimer.StartSingleUseTimer();
-            }
+
+            controls.Disable();
+            preventInputTimer.StartSingleUseTimer();
         }
         else if (Manager.Instance.gameManager.battlePhase)
         {

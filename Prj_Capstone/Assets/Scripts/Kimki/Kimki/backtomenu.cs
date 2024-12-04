@@ -2,10 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class backtomenu : MonoBehaviour
 {
-    public int current_stage;
+    private int current_stage;
+
+    private void Awake()
+    {
+        if (GetComponentInParent<Button>().name.Contains("Select"))
+        {
+            current_stage = 0;
+        }
+        else
+        {
+            current_stage = int.Parse(SceneManager.GetActiveScene().name.Replace("Stage", ""));
+        }
+    }
 
     public void backmenu()
     {

@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
 using static UnityEngine.EventSystems.EventTrigger;
 
-public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
 {
     #region Entity Components
     [field: SerializeField] public Sprite entityPortrait { get; private set; }
@@ -85,17 +85,6 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         }
     }
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (Manager.Instance.gameManager.battlePhase)
-        {
-            if (Manager.Instance.gameManager.isAiming)
-            {
-                Manager.Instance.uiManager.HideSideInformationUI();
-            }
-        }
-    }
-
     protected virtual void ShowInformation()
     {
         /*if (Manager.Instance.gameManager.pieceDeploymentPhase)
@@ -119,7 +108,6 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
             entityCombat.currentSelectedCombatAbility = null;
         }
         Manager.Instance.gameManager.ResetEntitySelected();
-        Manager.Instance.uiManager.HideSideInformationUI();
     }
 
     public void Select() => isSelected = true;

@@ -31,7 +31,6 @@ public abstract class Combat : CoreComponent
 
     protected virtual void Start()
     {
-        combatAbilityButtons = Manager.Instance.uiManager.GenerateCombatAbilityButtons(entity);
         ToggleCombatAbilityButtons(false);
 
         // Manager.Instance.playerInputManager.controls.Map.MouseRightClick.performed += _ => MouseRightClick();
@@ -160,7 +159,7 @@ public abstract class Combat : CoreComponent
 
         if (entity.isSelected)
         {
-            Manager.Instance.uiManager.SetInformationUI(entity, entity.entityDescription, entity.entityMovement.currentCellgridPosition);
+            
         }
     }
 
