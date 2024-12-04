@@ -1788,6 +1788,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 336574017}
     - target: {fileID: 7395499222833475010, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
+      propertyPath: <settingsWindow>k__BackingField
+      value: 
+      objectReference: {fileID: 1882574845}
+    - target: {fileID: 7395499222833475010, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
       propertyPath: <gamePauseButton>k__BackingField
       value: 
       objectReference: {fileID: 336574020}
@@ -4639,6 +4643,11 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1 &1882574845 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1477047651648792026, guid: 39c02ac92b506ea41b8799be323fc3c3, type: 3}
+  m_PrefabInstance: {fileID: 336574016}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1886668467
 GameObject:
   m_ObjectHideFlags: 0

@@ -4679,6 +4679,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2127630236}
     - target: {fileID: 7395499222833475010, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
+      propertyPath: <settingsWindow>k__BackingField
+      value: 
+      objectReference: {fileID: 2089942993}
+    - target: {fileID: 7395499222833475010, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
       propertyPath: <gamePauseButton>k__BackingField
       value: 
       objectReference: {fileID: 2127630239}
@@ -4790,6 +4794,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1967778187}
   m_CullTransparentMesh: 1
+--- !u!1 &2089942993 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1477047651648792026, guid: 39c02ac92b506ea41b8799be323fc3c3, type: 3}
+  m_PrefabInstance: {fileID: 2127630235}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2105421142
 GameObject:
   m_ObjectHideFlags: 0
