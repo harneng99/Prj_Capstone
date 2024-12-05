@@ -56,4 +56,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Kimki/Stage 15.unity
     guid: adfe03f2e93aa4341bdbbbffd0b2d670
+  - enabled: 1
+    path: Assets/Scenes/Kimki/Setting.unity
+    guid: 0af36ccd398ea0946bccfc657fe280fc
+  - enabled: 1
+    path: Assets/Scenes/Kimki/MainMenu.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects: {}
