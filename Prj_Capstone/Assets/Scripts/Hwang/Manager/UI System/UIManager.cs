@@ -186,6 +186,8 @@ public class UIManager : MonoBehaviour
     public void ShowGameResultWindow(string resultText)
     {
         Manager.Instance.gameManager.PauseGame();
+        phaseInformationUI.SetActive(false);
+        warningUI.SetActive(false);
         gameResultWindow.SetActive(true);
         gameResultWindow.GetComponentInChildren<TMP_Text>().text = resultText;
     }

@@ -1610,6 +1610,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 336574018}
     - target: {fileID: 8184804418855344094, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
+      propertyPath: <turnLimit>k__BackingField
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8184804418855344094, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
       propertyPath: <mainCamera>k__BackingField
       value: 
       objectReference: {fileID: 2105421144}
@@ -1619,7 +1623,7 @@ PrefabInstance:
       objectReference: {fileID: 1572526664}
     - target: {fileID: 8184804418855344094, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
       propertyPath: <howManyShouldBeInTheGoal>k__BackingField
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8184804418855344094, guid: 5c569c89f19a6294983222ba14bfab50, type: 3}
       propertyPath: <virtualCameraFollowTransform>k__BackingField

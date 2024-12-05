@@ -145,7 +145,7 @@ public class EnemyMovement : Movement
         }
 
     Next:
-        if (pieceType == PieceType.Bishop || pieceType == PieceType.Queen)
+        if (pieceType == PieceType.Bishop || (pieceType == PieceType.Queen && !foundTarget))
         {
             int length = Mathf.Min(bounds.size.x, bounds.size.y);
 

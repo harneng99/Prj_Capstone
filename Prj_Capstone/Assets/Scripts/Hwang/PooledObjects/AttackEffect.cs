@@ -22,6 +22,10 @@ public class AttackEffect : PooledObject
         this.entity = entity;
         this.targetCellgridPosition = targetCellgridPosition;
         transform.position = targetCellgridPosition + new Vector3(0.5f, 0.5f, 0.0f);
+        if (gameObject.name.Contains("EnemyQueenAttackEffect1"))
+        {
+            transform.position += new Vector3(-0.1f, 1.0f, 0.0f);
+        }
     }
 
     public void Attack(int killTargetEntity = 0)
