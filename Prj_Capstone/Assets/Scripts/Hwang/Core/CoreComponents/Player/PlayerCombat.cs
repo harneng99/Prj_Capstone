@@ -149,7 +149,6 @@ public class PlayerCombat : Combat
                             selectedCellgridPositions.Clear();
 
                             Manager.Instance.gameManager.isAiming = false;
-                            Manager.Instance.uiManager.HideSideInformationUI();
                         }
                         else if (selectedCellgridPositions.Count < currentSelectedCombatAbility.maximumCastingAreaCount && !selectedCellgridPositions.Contains(currentMouseCellgridPosition))
                         {

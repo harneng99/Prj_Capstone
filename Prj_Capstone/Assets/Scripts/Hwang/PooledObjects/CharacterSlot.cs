@@ -29,6 +29,6 @@ public class CharacterSlot : PooledObject, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        Manager.Instance.uiManager.mercenarySlotWindow.CharacterSlotSelected(this);
+        
     }
 }

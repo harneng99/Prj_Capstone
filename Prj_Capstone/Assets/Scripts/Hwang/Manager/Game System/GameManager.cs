@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 
@@ -17,6 +18,7 @@ public class GameManager : MonoBehaviour
     [field: SerializeField] public Transform virtualCameraFollowTransform { get; private set; }
     [field: SerializeField] public int howManyShouldBeInTheGoal { get; private set; }
     [field: SerializeField] public int turnLimit { get; private set; }
+    [field: SerializeField] public bool shouldKillAllEnemies { get; private set; }
     public int howManyCurrentInGoal { get; set; }
     public Entity prevSelectedEntity { get; private set; }
     public Entity currentSelectedEntity { get; private set; }
@@ -51,6 +53,7 @@ public class GameManager : MonoBehaviour
     public bool iterateNextEnemy { get; set; }
     public bool continueTurn { get; set; }
 
+
     private void Awake()
     {
         moveableTilemap = GameObject.FindWithTag("MoveableTilemap").GetComponent<Tilemap>();
@@ -81,7 +84,6 @@ public class GameManager : MonoBehaviour
             }
         };
 
-        playerTurnEnd += Manager.Instance.uiManager.HideInformationUI;
         playerTurnEnd += Manager.Instance.uiManager.ShowPhaseInformationUI;
 
         enemyTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(Enemy)); };
@@ -109,8 +111,6 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        Manager.Instance.playerInputManager.controls.Map.MouseLeftClick.performed += _ => MouseLeftClick();
-
         StartBattlePhase();
     }
 
@@ -145,31 +145,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void MouseLeftClick()
-    {
-        if (battlePhase)
-        {
-            Ray ray = Manager.Instance.gameManager.mainCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit rayHit;
-
-            if (Physics.Raycast(ray, out rayHit))
-            {
-                if (rayHit.collider.gameObject.GetComponent<CustomTileData>() != null)
-                {
-                    if (currentSelectedEntity == null)
-                    {
-                        Manager.Instance.uiManager.SetInformationUI(null, null, currentMouseCellgridPosition);
-                    }
-                    else
-                    {
-                        Manager.Instance.uiManager.SetTileData(currentMouseCellgridPosition);
-                    }
-                    Manager.Instance.uiManager.ShowInformationUI();
-                }
-            }
-        }
-    }
-
     public void Select(Entity entity)
     {
         prevSelectedEntity = currentSelectedEntity;
@@ -190,11 +165,20 @@ public class GameManager : MonoBehaviour
 
     public void StartBattlePhase()
     {
+        Time.timeScale = 1.0f;
         enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None).ToList();
         entities = FindObjectsByType<Entity>(FindObjectsSortMode.None).ToList();
         playerPieces = FindObjectsByType<Player>(FindObjectsSortMode.None).ToList();
         
         Manager.Instance.uiManager.turnCounter.SetActive(true);
+        if (shouldKillAllEnemies)
+        {
+            Manager.Instance.uiManager.enemyCounter.SetActive(true);
+        }
+        else
+        {
+            Manager.Instance.uiManager.SetGoalCounter(true, "Goal " + howManyCurrentInGoal + " / " + howManyShouldBeInTheGoal);
+        }
 
         playerTurnStart?.Invoke();
         ResetEntitySelected();
@@ -203,19 +187,37 @@ public class GameManager : MonoBehaviour
         playerPhase = true;
         enemyPhase = false;
         Manager.Instance.uiManager.ShowPhaseInformationUI();
-        Manager.Instance.uiManager.HideSideInformationUI();
     }
 
     public async void TurnEnd()
     {
+        if (playerPhase && currentTurnCount < turnLimit && shouldKillAllEnemies && !gamePaused)
+        {
+            bool gameClear = true;
+
+            foreach (Enemy enemy in enemies)
+            {
+                if (enemy.gameObject.activeSelf || !enemy.isDead)
+                {
+                    gameClear = false;
+                }
+            }
+
+            if (gameClear)
+            {
+                PlayerPrefs.SetInt("stageclear", 1);
+                Manager.Instance.uiManager.ShowGameResultWindow("Stage Clear!");
+            }
+        }
+
         if (continueTurn) return;
 
         highlightedTilemap.ClearAllTiles();
 
         if (playerPhase && currentTurnCount >= turnLimit && !gamePaused)
         {
+            PlayerPrefs.SetInt("stageclear", 0);
             Manager.Instance.uiManager.ShowGameResultWindow("Stage Failed...");
-            gamePaused = true;
         }
 
         if (playerPhase && !gamePaused)
@@ -333,11 +335,21 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public Entity EntityExistsAt(Vector3Int cellgridPosition, bool onlyFindActive = false, Type entityType = null)
+    public Entity EntityExistsAt(Vector3Int cellgridPosition, bool onlyFindAlive = false, Type entityType = null, bool onlyFindActive = false)
     {
+        if (cellgridPosition == new Vector3Int(-2, -4, 0))
+        {
+            Debug.Log("Debug Start");
+        }
+
         foreach (Entity entity in entities)
         {
-            if (onlyFindActive && entity.isDead)
+            if (onlyFindAlive && entity.isDead)
+            {
+                continue;
+            }
+
+            if (onlyFindActive && !entity.gameObject.activeSelf)
             {
                 continue;
             }
@@ -371,5 +383,29 @@ public class GameManager : MonoBehaviour
     {
         gamePaused = false;
         Time.timeScale = 1.0f;
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void SetResolution(int setWidth, int setHeight)
+    {
+        int deviceWidth = Screen.width;
+        int deviceHeight = Screen.height;
+
+        Screen.SetResolution(setWidth, (int)(((float)deviceHeight / deviceWidth) * setWidth), true);
+
+        if ((float)setWidth / setHeight < (float)deviceWidth / deviceHeight)
+        {
+            float newWidth = ((float)setWidth / setHeight) / ((float)deviceWidth / deviceHeight);
+            Camera.main.rect = new Rect((1f - newWidth) / 2f, 0f, newWidth, 1f);
+        }
+        else
+        {
+            float newHeight = ((float)deviceWidth / deviceHeight) / ((float)setWidth / setHeight);
+            Camera.main.rect = new Rect(0f, (1f - newHeight) / 2f, 1f, newHeight);
+        }
     }
 }
