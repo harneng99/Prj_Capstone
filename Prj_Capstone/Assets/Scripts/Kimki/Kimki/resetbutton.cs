@@ -20,7 +20,8 @@ public class resetbutton : MonoBehaviour
     }
     public void openstage()
     {
-        PlayerPrefs.SetInt("stageActivated", 20);
+        int currentStage = PlayerPrefs.GetInt("stageActivated", 1);
+        PlayerPrefs.SetInt("stageActivated", currentStage + 1);
         PlayerPrefs.Save();
         SceneManager.LoadScene("stage_select");
     }

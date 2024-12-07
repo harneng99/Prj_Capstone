@@ -374,7 +374,7 @@ public abstract class Movement : CoreComponent
                                 this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, attackRangeHighlightedTileBase);
                             }
                         }
-                        else if (x == 0)
+                        else if (x != 0)
                         {
                             this.entity.highlightedTilemap.SetTile(moveableCellgridPosition, moveRangeHighlightedTileBase);
                         }
