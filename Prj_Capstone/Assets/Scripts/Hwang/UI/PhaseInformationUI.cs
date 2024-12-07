@@ -14,5 +14,9 @@ public class PhaseInformationUI : MonoBehaviour
     private void DisableGameObject()
     {
         gameObject.SetActive(false);
+        if (Manager.Instance.gameManager.playerPhase)
+        {
+            Manager.Instance.uiManager.endTurnButton.interactable = true;
+        }
     }
 }

@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
     public bool enemyPhase { get; private set; } = false;
     public bool isAiming { get; set; } = false;
     public bool isAimingCopyForFunctionExecutionOrderCorrection { get; set; } = false; // TODO: A better way to implement this
-    public int currentTurnCount { get; private set; }
+    public int currentTurnCount { get; private set; } = 1;
     public Tilemap moveableTilemap { get; private set; }
     public Tilemap objectTilemap { get; private set; }
     public Tilemap selectionTilemap { get; private set; }
@@ -62,18 +62,6 @@ public class GameManager : MonoBehaviour
         highlightedTilemap = GameObject.FindWithTag("HighlightedTilemap").GetComponent<Tilemap>();
 
         playerTurnStart += () => { if (battlePhase) EntityStatsRecovery(typeof(Player)); };
-        playerTurnStart += () => { currentTurnCount += 1; };
-        playerTurnStart += () =>
-        {
-            if (turnLimit < 999)
-            {
-                Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount + " / " + turnLimit;
-            }
-            else
-            {
-                Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount;
-            }
-        };
         playerTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = true; };
         playerTurnStart += () =>
         { 
@@ -106,6 +94,18 @@ public class GameManager : MonoBehaviour
         };
         enemyTurnStart += () => { Manager.Instance.uiManager.endTurnButton.interactable = false; };
 
+        enemyTurnEnd += () => { currentTurnCount += 1; };
+        enemyTurnEnd += () =>
+        {
+            if (turnLimit < 999)
+            {
+                Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount + " / " + turnLimit;
+            }
+            else
+            {
+                Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount;
+            }
+        };
         enemyTurnEnd += Manager.Instance.uiManager.ShowPhaseInformationUI;
     }
 
@@ -169,7 +169,7 @@ public class GameManager : MonoBehaviour
         enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None).ToList();
         entities = FindObjectsByType<Entity>(FindObjectsSortMode.None).ToList();
         playerPieces = FindObjectsByType<Player>(FindObjectsSortMode.None).ToList();
-        
+
         Manager.Instance.uiManager.turnCounter.SetActive(true);
         if (shouldKillAllEnemies)
         {
@@ -181,11 +181,20 @@ public class GameManager : MonoBehaviour
         }
 
         playerTurnStart?.Invoke();
+        if (turnLimit < 999)
+        {
+            Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount + " / " + turnLimit;
+        }
+        else
+        {
+            Manager.Instance.uiManager.turnCounter.GetComponent<TMP_Text>().text = "Turn " + currentTurnCount;
+        }
         ResetEntitySelected();
         pieceDeploymentPhase = false;
         battlePhase = true;
         playerPhase = true;
         enemyPhase = false;
+        Manager.Instance.uiManager.endTurnButton.interactable = false;
         Manager.Instance.uiManager.ShowPhaseInformationUI();
     }
 
@@ -207,6 +216,7 @@ public class GameManager : MonoBehaviour
             {
                 PlayerPrefs.SetInt("stageclear", 1);
                 Manager.Instance.uiManager.ShowGameResultWindow("Stage Clear!");
+                return;
             }
         }
 
@@ -337,11 +347,6 @@ public class GameManager : MonoBehaviour
 
     public Entity EntityExistsAt(Vector3Int cellgridPosition, bool onlyFindAlive = false, Type entityType = null, bool onlyFindActive = false)
     {
-        if (cellgridPosition == new Vector3Int(-2, -4, 0))
-        {
-            Debug.Log("Debug Start");
-        }
-
         foreach (Entity entity in entities)
         {
             if (onlyFindAlive && entity.isDead)

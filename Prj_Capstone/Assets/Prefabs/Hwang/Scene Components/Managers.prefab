@@ -321,6 +321,9 @@ MonoBehaviour:
   - objectName: EnemyBishopAttackEffect1
     prefab: {fileID: 5617346712544206206, guid: 6576f4b3d09adc3439dbb78cbf501101, type: 3}
     defaultCapacity: 0
+  - objectName: EnemyQueenAttackEffect0
+    prefab: {fileID: 2953597692836777160, guid: 05249b6749b40ec4daa0d725c1883ee6, type: 3}
+    defaultCapacity: 0
 --- !u!1 &6925104978869976371
 GameObject:
   m_ObjectHideFlags: 0
@@ -411,14 +414,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8376ccdb5d95cd44ab0f88a99402a3ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <phaseInformationUI>k__BackingField: {fileID: 0}
   <turnCounter>k__BackingField: {fileID: 0}
   <goalCounter>k__BackingField: {fileID: 0}
   <enemyCounter>k__BackingField: {fileID: 0}
   <gameResultWindow>k__BackingField: {fileID: 0}
   <gamePauseWindow>k__BackingField: {fileID: 0}
+  <settingsWindow>k__BackingField: {fileID: 0}
   <gamePauseButton>k__BackingField: {fileID: 0}
+  <warningUI>k__BackingField: {fileID: 0}
+  <phaseInformationUI>k__BackingField: {fileID: 0}
   <endTurnButton>k__BackingField: {fileID: 0}
-  warningUI: {fileID: 0}
-  warningText: {fileID: 0}
-  warningUIBackground: {fileID: 0}

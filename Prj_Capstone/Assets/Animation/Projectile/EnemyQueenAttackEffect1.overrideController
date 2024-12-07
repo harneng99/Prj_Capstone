@@ -6,6 +6,8 @@ AnimatorOverrideController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: EnemyQueenAttackEffect
+  m_Name: EnemyQueenAttackEffect1
   m_Controller: {fileID: 9100000, guid: b85838335a9dcdb408580b75e150ff33, type: 2}
-  m_Clips: []
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: b95ffeeef0d9027438e27444d8a55f11, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 67b40f3d602b74940ae564b3314bbf4d, type: 2}

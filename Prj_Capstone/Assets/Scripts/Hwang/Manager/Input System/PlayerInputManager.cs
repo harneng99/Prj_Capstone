@@ -23,7 +23,7 @@ public class PlayerInputManager : MonoBehaviour
         controls = new Controls();
         preventInputTimer = new Timer(preventInputTimeOnTurnChange);
         preventInputTimer.timerAction += () => { controls.Enable(); };
-        preventInputTimer.timerAction += () => { Manager.Instance.uiManager.phaseInformationUI.SetActive(false); };
+        // preventInputTimer.timerAction += () => { Manager.Instance.uiManager.phaseInformationUI.SetActive(false); };
     }
 
     private void OnEnable()

@@ -10,20 +10,13 @@ public class backtomenu : MonoBehaviour
 
     private void Awake()
     {
-        if (GetComponentInParent<Button>().name.Contains("Select"))
-        {
-            current_stage = 0;
-        }
-        else
-        {
-            current_stage = int.Parse(SceneManager.GetActiveScene().name.Replace("Stage", ""));
-        }
+        current_stage = int.Parse(SceneManager.GetActiveScene().name.Replace("Stage", ""));
     }
 
     public void backmenu()
     {
         // current_stage와 stageActivated를 비교하여 값 갱신
-        if(PlayerPrefs.GetInt("stageclear", 1) == 0)
+        if (PlayerPrefs.GetInt("stageclear", 1) == 0)
         {
             SceneManager.LoadScene("stage_select");
         }
@@ -37,5 +30,6 @@ public class backtomenu : MonoBehaviour
             }
             SceneManager.LoadScene("stage_select");
         }
+        PlayerPrefs.SetInt("stageclear", 0);
     }
 }
