@@ -14,6 +14,8 @@ public class Player : Entity, IPointerClickHandler
     public PlayerCombat playerCombat { get; private set; }
     public Canvas canvas { get; private set; }
 
+    [SerializeField] private AudioClip abilitySound;
+
     protected override void Awake()
     {
         base.Awake();
@@ -62,6 +64,7 @@ public class Player : Entity, IPointerClickHandler
 
     public void PieceAbility()
     {
+        Manager.Instance.soundFXManager.PlaySoundFXClip(abilitySound, transform);
         playerMovement.PieceAbility();
     }
 

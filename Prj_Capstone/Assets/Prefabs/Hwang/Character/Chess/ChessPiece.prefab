@@ -240,6 +240,7 @@ MonoBehaviour:
   <combatAbilityRangeHighlightedTileBase>k__BackingField: {fileID: 11400000, guid: 87a3887f8c2233c4286c07c5a89833ec, type: 2}
   <combatAbilityAOEHighlightedTileBase>k__BackingField: {fileID: 11400000, guid: 0decdefb311307748bb9cf105f5e22e9, type: 2}
   <attackTypeCount>k__BackingField: 0
+  <attackSound>k__BackingField: []
   <combatAbilities>k__BackingField: []
 --- !u!1 &7567322727258068424
 GameObject:

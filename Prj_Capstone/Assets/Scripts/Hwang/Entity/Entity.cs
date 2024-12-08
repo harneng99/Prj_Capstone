@@ -147,6 +147,8 @@ public class Entity : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
         }
         else
         {
+            Manager.Instance.soundFXManager.PlaySoundFXClip(entityCombat.attackSound, transform, 0.2f);
+
             entityCombat.targetEntity.animator.SetTrigger("Hurt");
 
             if (killTargetEntity == 0)

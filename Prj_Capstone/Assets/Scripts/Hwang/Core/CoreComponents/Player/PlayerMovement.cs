@@ -166,7 +166,7 @@ public class PlayerMovement : Movement
                             dontInteractWithTile = true;
                             DrawMoveableTilemap(false);
                             queenAbilityCellgridPosition = Manager.Instance.playerInputManager.GetMousePosition(GridType.Cellgrid);
-                            Entity targetEntity = Manager.Instance.gameManager.EntityExistsAt(queenAbilityCellgridPosition);
+                            Entity targetEntity = Manager.Instance.gameManager.EntityExistsAt(queenAbilityCellgridPosition, true, typeof(Enemy), true);
                             if (targetEntity != null)
                             {
                                 targetEntity.isDead = true;
@@ -659,7 +659,7 @@ public class PlayerMovement : Movement
         }
         else if (pieceType == PieceType.Queen)
         {
-            Entity entity = Manager.Instance.gameManager.EntityExistsAt(queenAbilityCellgridPosition, false, typeof(Enemy));
+            Entity entity = Manager.Instance.gameManager.EntityExistsAt(queenAbilityCellgridPosition, false, typeof(Enemy), true);
             CustomTileData customTileData = pathfinder.objectTilemap.GetInstantiatedObject(queenAbilityCellgridPosition)?.GetComponent<CustomTileData>();
 
             if (entity != null || customTileData != null)

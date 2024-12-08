@@ -14,7 +14,9 @@ public abstract class Combat : CoreComponent
     [field: SerializeField] public int attackTypeCount { get; private set; }
     public CombatAbility currentSelectedCombatAbility { get; set; }
     public Entity targetEntity { get; set; }
-    
+
+    [field: SerializeField] public AudioClip[] attackSound { get; private set; }
+
     [field: SerializeField] public List<CombatAbility> combatAbilities { get; protected set; }
     public List<GameObject> combatAbilityButtons { get; protected set; } = new List<GameObject>();
     protected Tilemap aoeTilemap;

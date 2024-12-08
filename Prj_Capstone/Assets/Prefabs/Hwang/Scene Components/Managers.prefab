@@ -521,3 +521,6 @@ MonoBehaviour:
   <warningUI>k__BackingField: {fileID: 0}
   <phaseInformationUI>k__BackingField: {fileID: 0}
   <endTurnButton>k__BackingField: {fileID: 0}
+  pauseSound: {fileID: 8300000, guid: c9eccb2cc00156c44bc72d66a82797cd, type: 3}
+  stageClearSound: {fileID: 8300000, guid: b9930f91961f2724ebb5a1899f3f85bc, type: 3}
+  stageFailSound: {fileID: 8300000, guid: f548f69e35989d844870558bd95ad076, type: 3}

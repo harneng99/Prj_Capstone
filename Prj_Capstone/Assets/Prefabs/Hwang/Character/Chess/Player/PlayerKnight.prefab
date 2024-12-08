@@ -60,6 +60,18 @@ PrefabInstance:
       propertyPath: <attackTypeCount>k__BackingField
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 2213366446394666299, guid: d1b71e54bab625f41b4d8ab5d36b2980, type: 3}
+      propertyPath: <attackSound>k__BackingField.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2213366446394666299, guid: d1b71e54bab625f41b4d8ab5d36b2980, type: 3}
+      propertyPath: <attackSound>k__BackingField.Array.data[0]
+      value: 
+      objectReference: {fileID: 8300000, guid: 054264f567086dd488084fb65e2efaf7, type: 3}
+    - target: {fileID: 2982321197458983534, guid: d1b71e54bab625f41b4d8ab5d36b2980, type: 3}
+      propertyPath: walkSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 21b567ec3173c9c439275aefc679d0b8, type: 3}
     - target: {fileID: 2982321197458983534, guid: d1b71e54bab625f41b4d8ab5d36b2980, type: 3}
       propertyPath: <pieceType>k__BackingField
       value: 1

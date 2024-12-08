@@ -17,13 +17,7 @@ public abstract class Movement : CoreComponent
     [field: SerializeField] public PieceType pieceType { get; protected set; }
     [SerializeField] protected TileBase moveRangeHighlightedTileBase;
     [SerializeField] protected TileBase attackRangeHighlightedTileBase;
-    // [SerializeField] protected TileBase wallTileBase;
-    // [SerializeField] protected TileBase swampTileBase;
     [SerializeField] protected int maxMovementStamina;
-
-    [Header("Knight Animation")]
-    [SerializeField] protected float destinationAlpha;
-    [SerializeField] protected Vector3 destinationOffset;
 
     public Pathfinder pathfinder { get; private set; }
     public Vector3 currentWorldgridPosition { get; set; }
@@ -33,8 +27,10 @@ public abstract class Movement : CoreComponent
     public event Action smoothMoveFinished;
 
     public bool isMoving { get; protected set; }
+    protected bool playWalkSound;
     protected bool didCurrentEntityMovedThisTurn;
     protected Coroutine smoothMovementCoroutine;
+    protected AudioSource audioSource;
 
     protected Vector3Int[] knightMovements = { new Vector3Int(-1, 2, 0), new Vector3Int(1, 2, 0), new Vector3Int(2, 1, 0), new Vector3Int(2, -1, 0), new Vector3Int(1, -2, 0), new Vector3Int(-1, -2, 0), new Vector3Int(-2, 1, 0), new Vector3Int(-2, -1, 0) };
     protected Vector3Int[] bishopDirections = { new Vector3Int(1, 1, 0), new Vector3Int(1, -1, 0), new Vector3Int(-1, 1, 0), new Vector3Int(-1, -1, 0) };
@@ -44,6 +40,7 @@ public abstract class Movement : CoreComponent
         base.Awake();
 
         pathfinder = GetComponent<Pathfinder>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     protected virtual void Start()
@@ -57,9 +54,21 @@ public abstract class Movement : CoreComponent
         smoothMoveFinished += () =>
         {
             isMoving = false;
+            playWalkSound = false;
             entity.entityCombat.targetEntity = null;
             entity.animator.SetBool("Move", false);
         };
+    }
+
+    private void Update()
+    {
+        if (playWalkSound)
+        {
+            if (!audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
+        }
     }
 
     protected override void OnPointerClick(PointerEventData eventData)
@@ -191,6 +200,7 @@ public abstract class Movement : CoreComponent
 
         if (pieceType != PieceType.Knight)
         {
+            playWalkSound = true;
             while (path.Count > nthFromTheBack)
             {
                 Vector3 currentDestinationWorldgridPosition = path.First().worldgridPosition;
@@ -218,6 +228,7 @@ public abstract class Movement : CoreComponent
         }
         else
         {
+            Manager.Instance.soundFXManager.PlaySoundFXClip(audioSource.clip, transform);
             entity.animator.SetBool("Jump", true);
             float duration = 0.5f; // entity.animator.GetCurrentAnimatorStateInfo(0).normalizedTime / 2.0f;
             Vector3 destinationWorldgridPosition = path.Last().worldgridPosition;
@@ -231,10 +242,12 @@ public abstract class Movement : CoreComponent
             entity.transform.position = destinationWorldgridPosition;
             entity.animator.SetBool("Jump", false);
 
+            Manager.Instance.soundFXManager.PlaySoundFXClip(audioSource.clip, transform);
             if (nthFromTheBack == 0)
             {
                 yield return new WaitForAnimationToFinish(entity.animator, "Jump");
             }
+            playWalkSound = true;
         }
         
         yield break;
@@ -274,17 +287,21 @@ public abstract class Movement : CoreComponent
             {
                 entity.animator.SetInteger("AttackType", UnityEngine.Random.Range(0, entity.entityCombat.attackTypeCount));
                 entity.animator.SetTrigger("Attack");
-                // string animationName = "Attack" + entity.animator.GetInteger("AttackType").ToString();
+                
                 yield return new WaitForAnimationToStart(entity.entityCombat.targetEntity.animator, "Death");
                 yield return new WaitForAnimationToFinish(entity.entityCombat.targetEntity.animator, "Death");
 
+                playWalkSound = true;
                 yield return MovementCoroutine(path);
             }
             else if (AttackAfterMove(pieceType))
             {
+                playWalkSound = pieceType != PieceType.Knight;
+
                 yield return MovementCoroutine(path, 1);
                 yield return MoveToAttackPosition(destinationWorldgridPosition);
 
+                playWalkSound = false;
                 entity.animator.SetInteger("AttackType", UnityEngine.Random.Range(0, entity.entityCombat.attackTypeCount));
                 entity.animator.SetTrigger("Attack");
                 string animationName = "Attack" + entity.animator.GetInteger("AttackType").ToString();
@@ -299,6 +316,7 @@ public abstract class Movement : CoreComponent
             }
         }
 
+        playWalkSound = true;
         entity.animator.SetBool("Move", true);
         while (Vector3.Distance(entity.transform.position, destinationWorldgridPosition) > epsilon)
         {

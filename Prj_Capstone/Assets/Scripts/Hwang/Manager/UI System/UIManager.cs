@@ -26,6 +26,10 @@ public class UIManager : MonoBehaviour
     [field: SerializeField] public GameObject phaseInformationUI { get; private set; }
     [field: SerializeField] public Button endTurnButton { get; private set; }
 
+    [SerializeField] private AudioClip pauseSound;
+    [SerializeField] private AudioClip stageClearSound;
+    [SerializeField] private AudioClip stageFailSound;
+
     private Resolution[] resolutions;
     private List<Resolution> filteredResolutions;
     private RefreshRate currentRefreshRate;
@@ -185,6 +189,14 @@ public class UIManager : MonoBehaviour
 
     public void ShowGameResultWindow(string resultText)
     {
+        if (resultText.Contains("Clear"))
+        {
+            Manager.Instance.soundFXManager.PlaySoundFXClip(stageClearSound, transform);
+        }
+        else if (resultText.Contains("Fail"))
+        {
+            Manager.Instance.soundFXManager.PlaySoundFXClip(stageFailSound, transform);
+        }
         Manager.Instance.gameManager.PauseGame();
         phaseInformationUI.SetActive(false);
         warningUI.SetActive(false);
@@ -207,6 +219,7 @@ public class UIManager : MonoBehaviour
     {
         if (!gameResultWindow.activeSelf)
         {
+            Manager.Instance.soundFXManager.PlaySoundFXClip(pauseSound, transform);
             gamePauseWindow.SetActive(!gamePauseWindow.activeSelf);
             gamePauseButton.interactable = !gamePauseWindow.activeSelf;
         }

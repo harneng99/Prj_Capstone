@@ -12,6 +12,12 @@ public class SoundFXManager : MonoBehaviour
 
     public void PlaySoundFXClip(AudioClip audioClip, Transform spawnTransform, float pitchDeviation = 0.0f, float volume = 1.0f)
     {
+        if (audioClip == null)
+        {
+            Debug.LogWarning($"{audioClip.name} is null. Cannot play sound.");
+            return;
+        }
+
         Random rand = new Random();
 
         AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity);

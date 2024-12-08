@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 3722395276640024411}
   - component: {fileID: 2887661748777458668}
   - component: {fileID: 5591371340742971128}
+  - component: {fileID: 3775274862556532416}
   m_Layer: 3
   m_Name: Movement
   m_TagString: Untagged
@@ -188,13 +189,104 @@ MonoBehaviour:
   <pieceType>k__BackingField: 0
   moveRangeHighlightedTileBase: {fileID: 11400000, guid: 28645d8737dbcec489a33b9e12d754f8, type: 2}
   attackRangeHighlightedTileBase: {fileID: 11400000, guid: 3c6884ad66936454598ab4f1ea47a748, type: 2}
-  wallTileBase: {fileID: 11400000, guid: 2512229f08cc5544f842ded3aa0b2629, type: 2}
-  swampTileBase: {fileID: 11400000, guid: 5a20b6c1dc70f1b4fb31379ba25235d9, type: 2}
   maxMovementStamina: 0
-  duration: 0.5
-  destinationAlpha: 0
-  destinationOffset: {x: -0.3, y: 0.7, z: 0}
-  destinationRotation: {x: 0, y: 0, z: 16}
+  walkSound: {fileID: 8300000, guid: 21b567ec3173c9c439275aefc679d0b8, type: 3}
+--- !u!82 &3775274862556532416
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2713280967091000847}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 5018678649133447786, guid: 0382db7a1d754034a9cce1ee07ff3bf9, type: 2}
+  m_audioClip: {fileID: 8300000, guid: 21b567ec3173c9c439275aefc679d0b8, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &3084743374381173007
 GameObject:
   m_ObjectHideFlags: 0
@@ -1041,4 +1133,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <combatAbilityRangeHighlightedTileBase>k__BackingField: {fileID: 11400000, guid: 87a3887f8c2233c4286c07c5a89833ec, type: 2}
   <combatAbilityAOEHighlightedTileBase>k__BackingField: {fileID: 11400000, guid: 0decdefb311307748bb9cf105f5e22e9, type: 2}
+  <attackTypeCount>k__BackingField: 0
+  <attackSound>k__BackingField: []
   <combatAbilities>k__BackingField: []
